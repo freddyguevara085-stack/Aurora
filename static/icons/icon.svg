@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Aurora icon">
+  <rect width="192" height="192" rx="36" fill="#d81b60"/>
+  <circle cx="96" cy="96" r="54" fill="#fff3f8"/>
+  <path d="M96 48c-11 0-20 9-20 20v16c0 4 3 7 7 7h26c4 0 7-3 7-7V68c0-11-9-20-20-20Z" fill="#d81b60"/>
+  <path d="M74 96c0-12 10-22 22-22s22 10 22 22v18c0 8-6 14-14 14h-16c-8 0-14-6-14-14v-18Z" fill="#ff8fa3"/>
+</svg>
