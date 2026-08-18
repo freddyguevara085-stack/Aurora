@@ -1,0 +1,9 @@
+{
+  "name": "Aurora",
+  "short_name": "Aurora",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf9fc",
+  "theme_color": "#331956",
+  "icons": [{ "src": "/static/assets/inicio/aurora-logo.png", "sizes": "32x32", "type": "image/png" }]
+}
