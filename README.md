@@ -1,310 +1,224 @@
-Aurora
+# Aurora
 
-Información prenatal clara, cercana y disponible cuando se necesita.
+> Contigo desde el primer latido.
 
-Aurora es una aplicación web progresiva (PWA) de acompañamiento prenatal. Reúne en una sola experiencia información práctica sobre las etapas del embarazo, controles prenatales, señales de alerta y centros de atención.
+Aurora es una aplicación web progresiva de acompañamiento prenatal orientada principalmente a mujeres embarazadas de Nicaragua, en especial primerizas y personas con conectividad limitada. Su interfaz actual presenta una pantalla de inicio responsive con información demostrativa del embarazo y recursos PWA para conservar la interfaz esencial tras una primera visita.
 
-Nuestro propósito es brindar una herramienta sencilla, confiable y fácil de consultar desde el teléfono. Al funcionar como PWA, Aurora podrá instalarse desde un navegador compatible y conservar su contenido esencial para consultas posteriores, incluso cuando la conexión sea limitada.
+## Problema que aborda
 
-El proyecto se desarrolla como una propuesta de hackatón en categoría aficionado, combinando utilidad social, diseño accesible y una implementación técnica realista.
+Durante el embarazo, la información sobre controles, señales de alerta y centros de atención puede estar dispersa o no estar disponible en el momento de necesitarla. Aurora plantea una experiencia móvil clara para acompañar a la usuaria entre consultas médicas, sin sustituir la atención profesional.
 
-Aviso: Aurora ofrece información general de orientación y promueve la búsqueda oportuna de atención profesional.
+## Propuesta de valor
 
-Funciones principales
+Aurora concentra el acompañamiento prenatal en cuatro acciones: organizar el seguimiento del embarazo, recordar controles y citas, consultar información clara sobre cada etapa y señales de alerta, y ubicar centros de atención. La propuesta prioriza lectura sencilla, dispositivos móviles y la disponibilidad de recursos esenciales que ya hayan sido almacenados por el navegador.
 
-Calendario de controles prenatales: registro de la fecha de última menstruación o fecha probable de parto, cálculo de la semana de embarazo y visualización de los controles sugeridos como una línea de tiempo.
+## Público objetivo
 
-Seguimiento de citas: identificación del próximo control y opción de marcar cada cita como pendiente, realizada o reprogramada. Las fechas sugeridas siempre pueden editarse para seguir las indicaciones del profesional de salud.
+- Mujeres embarazadas de Nicaragua, especialmente primerizas.
+- Personas que requieren una consulta prenatal fácil de comprender desde el teléfono.
+- Usuarios con conectividad intermitente que necesitan volver a consultar recursos esenciales cargados previamente.
 
-Recordatorios: avisos dentro de la aplicación y notificaciones locales cuando el dispositivo y el navegador sean compatibles y la persona usuaria conceda permiso.
+## Funcionalidades principales
 
-Directorio de salud y emergencia: listado local de centros de salud, hospitales y contactos de emergencia con teléfono, dirección, horario y servicios disponibles.
+### Implementadas
 
-Búsqueda rápida del directorio: filtrado por nombre, tipo de centro o zona para encontrar un contacto relevante con menos pasos.
+- Pantalla de inicio responsive renderizada con Flask y plantillas Jinja.
+- Tarjeta visual de embarazo con datos demostrativos de semana, trimestre, progreso, tamaño de referencia y próximo control.
+- Accesos visuales a calendario, registro de control, señales de alerta, guía y centros; en la versión actual estos enlaces son anclas de la interfaz y no abren módulos independientes.
+- Navegación inferior con las secciones Inicio, Embarazo, Guía, Centros y Perfil como estructura visual.
+- Web App Manifest, registro de Service Worker y caché del shell de la aplicación, incluidos estilos, JavaScript y recursos gráficos utilizados por la vista de inicio.
 
-Información breve de señales de alerta: pantalla de consulta con recomendaciones para buscar atención profesional inmediata ante síntomas que requieran evaluación. Debe validarse con fuentes sanitarias locales antes de su publicación.
+### Alcance funcional de Aurora
 
-Enfoque del calendario
+La propuesta del producto contempla registro e inicio de sesión, cálculo y seguimiento personalizado del embarazo, controles y citas, calendario, recordatorios, información prenatal por etapas, señales de alerta, directorio de centros, búsqueda y filtros. Estas capacidades no están implementadas en el código actual y no se presentan como disponibles en esta versión.
 
-El calendario no pretende establecer un cronograma médico universal. A partir de la fecha de última menstruación o la fecha probable de parto, Aurora propone fechas orientativas y destaca la información más útil para la planificación diaria:
+## Alcance responsable y aviso de orientación
 
-Semana actual del embarazo.
+Aurora complementa la atención profesional: no diagnostica, no prescribe tratamientos y no sustituye al personal sanitario. La información prenatal y las señales de alerta deben sustentarse en fuentes sanitarias confiables y promover la búsqueda de atención profesional cuando corresponda. La aplicación no declara validación oficial por parte del MINSA.
 
-Próximo control y tiempo restante.
+## Roles y permisos
 
-Controles pendientes, realizados y reprogramados.
+Los siguientes roles están definidos para el producto. La aplicación actual no incluye autenticación, autorización ni interfaces de administración; por ello estos permisos aún no se aplican mediante código.
 
-Recordatorios configurables.
+| Rol | Permisos definidos |
+| --- | --- |
+| Usuario | Consultar información y administrar su seguimiento prenatal. |
+| Administrador | Mantener centros, contenidos y señales de alerta. |
+| Auditor | Consultar el historial de acciones administrativas. |
 
-Acceso rápido al directorio de salud y a las señales de alerta.
+## Tecnologías utilizadas
 
-La frecuencia y el contenido de los controles deben validarse con protocolos sanitarios del país donde se publique la aplicación. Las indicaciones del profesional de salud siempre tienen prioridad sobre las fechas sugeridas por Aurora.
+| Tecnología | Función en el proyecto |
+| --- | --- |
+| Python | Lenguaje del servidor. |
+| Flask 3.0.2 | Aplicación web, servidor de desarrollo y definición de rutas. |
+| Jinja2 | Renderizado de las plantillas HTML. |
+| HTML5 y CSS3 | Estructura y diseño responsive de la interfaz. |
+| JavaScript | Registro del Service Worker en el navegador. |
+| Web App Manifest y Service Worker | Configuración instalable y caché de recursos del shell de la aplicación. |
+| MySQL 8.0 o superior | Motor previsto por el esquema relacional de `Aurora_BD.sql`; no está conectado a Flask en la versión actual. |
+| python-dotenv 1.0.1 | Dependencia declarada en `requirements.txt`; el código actual no carga variables de entorno. |
+| Git y GitHub | Control de versiones y colaboración mediante el repositorio remoto. |
 
-Nuestra motivación
+## Arquitectura del proyecto
 
-El embarazo es una etapa en la que surgen preguntas frecuentes y se necesita consultar información con rapidez. Sin embargo, los datos importantes pueden estar repartidos entre distintas fuentes, redactados de forma complicada o depender permanentemente de una conexión a internet.
+```text
+Aurora/
+├── app.py                         # Crea la aplicación Flask y registra el blueprint
+├── Aurora_BD.sql                   # Esquema relacional para MySQL 8.0 o superior
+├── controllers/
+│   └── routes.py                  # Rutas /, /service-worker.js y /manifest.json
+├── models/                        # Paquete reservado; no contiene modelos implementados
+├── services/                      # Paquete reservado; no contiene servicios implementados
+├── static/
+│   ├── assets/inicio/             # Imágenes e iconos de la pantalla de inicio
+│   ├── css/style.css              # Estilos de la interfaz
+│   ├── js/app.js                  # Registro del Service Worker
+│   ├── manifest.json              # Configuración de la PWA
+│   └── service-worker.js          # Caché del shell de la aplicación
+├── templates/
+│   ├── layouts/base.html          # Layout base Jinja
+│   ├── partials/bottom_nav.html   # Navegación inferior
+│   └── index.html                 # Vista de inicio
+├── requirements.txt               # Dependencias Python
+└── run.bat                        # Inicio local en Windows con .venv
+```
 
-Aurora nace para organizar esa información en una interfaz amigable. La aplicación busca acompañar la consulta diaria, ayudar a reconocer información importante y facilitar el acceso a centros de atención disponibles en la comunidad.
+## Base de datos
 
-Objetivo general
+El repositorio incluye `Aurora_BD.sql`, un esquema para MySQL 8.0 o superior. El script crea la base de datos `aurora` con codificación `utf8mb4`, tablas InnoDB, claves foráneas, índices, restricciones y una vista de resumen del embarazo.
 
-Desarrollar una aplicación web progresiva que facilite el acceso a información prenatal organizada, señales de alerta y datos de centros de salud mediante una experiencia responsive, instalable y con soporte offline básico.
+Las entidades confirmadas son `roles`, `usuarios`, `perfiles_gestantes`, `embarazos`, `controles_prenatales`, `recordatorios`, `centros_atencion`, `contenidos_prenatales`, `senales_alerta` e `historial_auditoria`. El script también define `vista_resumen_embarazo` para calcular semana, trimestre y progreso del embarazo activo.
 
-¿Cómo acompaña Aurora?
+La aplicación Flask actual no carga este script, no contiene configuración de conexión a MySQL y no define modelos en `models/`. En consecuencia, la interfaz sigue usando datos demostrativos y no hay formularios funcionales conectados a persistencia.
 
-Aurora concentra su experiencia en cuatro áreas principales:
+## Requisitos previos
 
-Guía prenatal
+- Python 3 con `venv` disponible.
+- `pip`.
+- Un navegador moderno con soporte para Service Workers para comprobar las capacidades PWA.
+- Git, si se clonará el repositorio.
 
-Presenta información breve y ordenada por trimestre para ayudar a comprender los controles y cuidados generales correspondientes a cada etapa del embarazo. Cada contenido deberá mostrar una fuente sanitaria confiable y su fecha de revisión.
+## Instalación local
 
-Señales de alerta
+1. Clone el repositorio y entre en su carpeta:
 
-Ofrece una sección visible y fácil de entender con situaciones que requieren buscar atención profesional. Su diseño priorizará mensajes directos, lectura rápida y acceso inmediato al directorio de centros.
-
-Directorio de centros
-
-Permite consultar centros de salud de una ciudad o zona seleccionada. La información podrá incluir nombre, tipo de establecimiento, municipio, dirección, teléfono, horario y fecha de verificación.
-
-Experiencia PWA
-
-Permite utilizar Aurora como una aplicación instalable desde el navegador. El contenido esencial previamente cargado podrá mantenerse disponible mediante un service worker y una estrategia básica de caché.
-
-Propuesta de valor
-
-Aurora reúne en una sola herramienta tres cualidades principales:
-
-Claridad: información organizada y presentada con lenguaje comprensible.
-
-Accesibilidad: interfaz adaptable a teléfonos y computadoras.
-
-Disponibilidad: contenido esencial preparado para consultas con conectividad limitada.
-
-La combinación de estas cualidades convierte a Aurora en una guía de consulta práctica que acerca información prenatal y recursos locales a quienes los necesitan.
-
-Funcionalidades del MVP
-
-La primera versión funcional contempla:
-
-Pantalla de inicio con acceso directo a las secciones principales.
-
-Guía prenatal organizada por trimestre.
-
-Sección de señales de alerta.
-
-Directorio local de centros de salud.
-
-Buscador y filtros por nombre, municipio o tipo de centro.
-
-Formularios básicos para gestionar la información del directorio.
-
-Permisos definidos para administrador, usuario y auditor.
-
-Registro básico de acciones administrativas.
-
-Diseño responsive para móvil y escritorio.
-
-Instalación como PWA y funcionamiento offline básico.
-
-La base de datos y los roles apoyarán la organización y actualización de la información, mientras que la experiencia pública seguirá concentrada en la consulta prenatal.
-
-Usuarios y responsabilidades
-
-Rol
-
-Participación en Aurora
-
-Usuario
-
-Consulta la guía prenatal, las señales de alerta y el directorio.
-
-Administrador
-
-Mantiene actualizados los centros y contenidos disponibles.
-
-Auditor
-
-Revisa el historial de acciones para apoyar la integridad de la información.
-
-Estado actual del proyecto
-
-Aurora cuenta con su base técnica inicial:
-
-Aplicación Flask en funcionamiento.
-
-Controlador con la ruta principal.
-
-Plantillas Jinja y layout HTML compartido.
-
-Página inicial de demostración.
-
-Web App Manifest e icono de instalación.
-
-Service worker con caché inicial.
-
-Registro del service worker mediante JavaScript.
-
-Script de arranque para Windows.
-
-Estructura preparada para incorporar modelos y servicios.
-
-El desarrollo continuará con la construcción de la interfaz, los módulos de contenido, el directorio y la persistencia de datos.
-
-Tecnologías utilizadas
-
-Tecnología
-
-Función dentro del proyecto
-
-Python 3
-
-Lenguaje principal del backend.
-
-Flask
-
-Servidor, rutas y renderizado de vistas.
-
-Jinja2
-
-Plantillas y reutilización de layouts.
-
-HTML5
-
-Estructura semántica de la interfaz.
-
-CSS3
-
-Diseño visual y adaptación a diferentes pantallas.
-
-JavaScript
-
-Interactividad y comportamiento de la PWA.
-
-Web App Manifest
-
-Configuración de la aplicación instalable.
-
-Service Worker
-
-Caché y acceso offline básico.
-
-Git y GitHub
-
-Control de versiones y evidencia del avance.
-
-SQLite y las dependencias de autenticación se incorporarán durante la etapa correspondiente del desarrollo.
-
-Instalación local
-
-Requisitos
-
-Python 3.10 o superior.
-
-pip.
-
-Git.
-
-Un navegador moderno.
-
-Pasos
-
-Clonar el repositorio:
-
+```bash
 git clone https://github.com/freddyguevara085-stack/Aurora.git
 cd Aurora
+```
 
-Crear un entorno virtual:
+2. Cree el entorno virtual.
 
-python -m venv .venv
+Windows PowerShell:
 
-Activar el entorno virtual.
+```powershell
+py -m venv .venv
+```
 
-En Windows PowerShell:
+Windows CMD:
 
+```cmd
+py -m venv .venv
+```
+
+Linux/macOS:
+
+```bash
+python3 -m venv .venv
+```
+
+3. Active el entorno e instale las dependencias.
+
+Windows PowerShell:
+
+```powershell
 .\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
 
-En Windows CMD:
+Windows CMD:
 
+```cmd
 .venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
+```
 
-En Linux o macOS:
+Linux/macOS:
 
+```bash
 source .venv/bin/activate
+python3 -m pip install -r requirements.txt
+```
 
-Instalar las dependencias:
+## Configuración de variables de entorno
 
-pip install -r requirements.txt
+La aplicación actual no lee variables de entorno. Aunque el repositorio incluye `.env.example`, este archivo está vacío y no se requiere configurarlo para ejecutar el sistema localmente.
 
-Ejecución
+El archivo `.gitignore` excluye `.env`, los entornos virtuales, cachés de Python y archivos de bases de datos locales (`*.db` y `*.sqlite3`) del control de versiones.
 
-Con el entorno virtual activado, ejecutar:
+## Ejecución del sistema
 
-python app.py
+Con las dependencias instaladas, ejecute `app.py` desde la raíz del proyecto.
 
-En Windows también se puede iniciar con:
+Windows PowerShell:
 
+```powershell
+.\.venv\Scripts\python.exe app.py
+```
+
+Windows CMD:
+
+```cmd
+.venv\Scripts\python.exe app.py
+```
+
+Linux/macOS:
+
+```bash
+python3 app.py
+```
+
+En Windows también está disponible el script `run.bat`, que usa `.venv\Scripts\python.exe` cuando el entorno virtual existe:
+
+```cmd
 run.bat
+```
 
-Después, abrir en el navegador:
+Abra la aplicación en [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
 
-http://localhost:5000
+## Recorrido básico
 
-Experiencia de demostración
+1. Inicie el servidor y abra la URL local.
+2. Compruebe la tarjeta de embarazo, el próximo control y las secciones visuales de la pantalla de inicio.
+3. Verifique la navegación inferior y los accesos visuales; en esta versión no llevan a módulos funcionales separados.
+4. En un navegador compatible, recargue la página una vez para registrar `/service-worker.js`. El Service Worker almacena el shell definido en `static/service-worker.js`, por lo que esos recursos pueden estar disponibles posteriormente con conectividad limitada.
 
-El recorrido principal de Aurora permitirá:
+## Seguridad y buenas prácticas
 
-Abrir o instalar la aplicación desde el navegador.
+- La aplicación separa rutas, plantillas, recursos estáticos, modelos y servicios en directorios definidos.
+- Los recursos de la interfaz se sirven mediante `url_for` en las plantillas, lo que evita rutas estáticas duplicadas en el HTML.
+- El repositorio ignora archivos locales sensibles y generados, incluidos `.env`, `.venv/`, `__pycache__/`, `*.db` y `*.sqlite3`.
+- La clave secreta configurada en `app.py` es adecuada solo para desarrollo local. Antes de cualquier despliegue debe reemplazarse por una configuración segura fuera del código fuente.
+- El servidor se inicia con `debug=True`; no debe utilizarse esa configuración en un entorno de producción.
 
-Explorar información correspondiente a una etapa del embarazo.
+## Control de versiones
 
-Consultar las señales de alerta.
+El repositorio usa Git y mantiene un remoto en GitHub. La rama principal actual es `main`; también existen referencias históricas de trabajo en `develop` y `temporal`, integradas en el historial de `main`. Los archivos fuente, recursos PWA y documentación se versionan en el repositorio, mientras que los entornos locales y datos locales se excluyen con `.gitignore`.
 
-Buscar un centro de atención mediante filtros sencillos.
+## Estado real del proyecto
 
-Acceder nuevamente al contenido esencial después de una primera visita con conexión.
+Aurora cuenta con una base Flask navegable en la ruta principal, una interfaz de inicio responsive, una configuración PWA con caché de recursos esenciales y un esquema relacional MySQL documentado en `Aurora_BD.sql`. Los datos mostrados en la vista son demostrativos y están definidos en `controllers/routes.py`.
 
-Ruta de desarrollo
+No hay registro o inicio de sesión, gestión de perfiles, conexión de Flask a MySQL, persistencia de datos, formularios operativos, calendario funcional, recordatorios, búsqueda de centros, directorio, contenido prenatal gestionable, señales de alerta administrables, historial de auditoría ni aplicación efectiva de roles. Estas diferencias son relevantes frente al alcance de producto y a los entregables completos de la categoría.
 
-El proyecto avanzará en el siguiente orden:
+## Limitaciones responsables
 
-Completar la identidad visual, la navegación y el diseño responsive.
+- El contenido mostrado no constituye una recomendación clínica personalizada.
+- La caché se limita a los recursos del shell definidos en el Service Worker; no equivale a funcionamiento completamente sin conexión.
+- La pantalla actual utiliza datos de demostración, no información personal ni registros médicos.
+- Los enlaces a secciones futuras son elementos de interfaz y no rutas implementadas.
 
-Desarrollar la guía prenatal y la sección de señales de alerta.
+## Hackathon Nicaragua 2026
 
-Diseñar el modelo entidad-relación.
-
-Implementar el directorio de centros y sus filtros.
-
-Integrar la base de datos y los formularios de gestión.
-
-Aplicar los roles y permisos definidos.
-
-Registrar las acciones administrativas relevantes.
-
-Completar la estrategia de caché y probar el funcionamiento offline.
-
-Realizar pruebas funcionales y preparar la demostración final.
-
-Criterios de éxito
-
-Aurora tendrá un MVP completo cuando:
-
-La navegación sea clara en móvil y escritorio.
-
-La guía y las señales de alerta presenten información organizada y con fuentes.
-
-El directorio permita encontrar centros mediante búsqueda y filtros.
-
-Los formularios mantengan actualizada la información presentada.
-
-Cada rol pueda realizar únicamente las acciones que le corresponden.
-
-El contenido esencial pueda consultarse después de una primera visita con conexión.
-
-El recorrido principal pueda demostrarse de forma fluida y sin errores.
-
-Enfoque responsable
-
-Aurora está orientada a la educación y a la consulta de información general. El contenido se seleccionará a partir de fuentes sanitarias confiables, se identificará su fecha de revisión y se mantendrá visible el llamado a buscar atención profesional cuando corresponda.
-
-Aurora busca acompañar cada etapa con información cercana, organizada y accesible.
+Este repositorio se prepara para la preclasificación del Hackathon Nicaragua 2026, categoría Aficionado. El documento presenta de forma verificable la descripción general, las tecnologías utilizadas, la instalación básica y la ejecución local del sistema, y distingue el prototipo implementado del alcance completo propuesto para Aurora.
