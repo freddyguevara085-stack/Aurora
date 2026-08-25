@@ -4,14 +4,14 @@
   "description": "Aplicación de acompañamiento prenatal offline-first",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#d81b60",
+  "background_color": "#faf9fc",
+  "theme_color": "#331956",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/static/icons/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/static/assets/inicio/aurora-logo.png",
+      "sizes": "32x32",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

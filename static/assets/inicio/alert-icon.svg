@@ -1,0 +1,6 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="38" height="41" viewBox="0 0 38 41" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Background">
+<rect width="38" height="41" rx="19" fill="white"/>
+<path id="Icon" d="M8 27L19 8L30 27H8V27M19 24C19.2833 24 19.5208 23.9042 19.7125 23.7125C19.9042 23.5208 20 23.2833 20 23C20 22.7167 19.9042 22.4792 19.7125 22.2875C19.5208 22.0958 19.2833 22 19 22C18.7167 22 18.4792 22.0958 18.2875 22.2875C18.0958 22.4792 18 22.7167 18 23C18 23.2833 18.0958 23.5208 18.2875 23.7125C18.4792 23.9042 18.7167 24 19 24V24M18 21H20V16H18V21V21" fill="#8B496C"/>
+</g>
+</svg>
