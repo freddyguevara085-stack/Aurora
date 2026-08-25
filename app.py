@@ -1,13 +1,16 @@
 from flask import Flask
+
+from config import Config
 from controllers.routes import main_bp
+from extensions import db, migrate
 
 app = Flask(__name__)
-# Una clave secreta básica para desarrollo
-app.config['SECRET_KEY'] = 'clave-secreta-hackathon'
+app.config.from_object(Config)
 
-# Registramos el controlador de rutas
+db.init_app(app)
+migrate.init_app(app, db)
+
 app.register_blueprint(main_bp)
 
 if __name__ == '__main__':
-    # debug=True permite que los cambios se vean sin reiniciar el servidor
     app.run(debug=True, host='0.0.0.0', port=5000)
