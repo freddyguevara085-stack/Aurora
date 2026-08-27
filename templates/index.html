@@ -4,7 +4,7 @@
 <main class="app-shell">
     <header class="topbar">
         <a href="{{ url_for('main.index') }}" aria-label="Aurora, inicio">
-            <img src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="32" height="32" alt="Aurora">
+            <img class="brand-logo" src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="40" height="40" alt="Aurora">
         </a>
     </header>
     <section class="welcome">
@@ -12,9 +12,7 @@
         <p>Rol: {{ home.role_name }}</p>
     </section>
     {% if home.empty_message %}
-    <section class="appointment">
-        <div><em>SEGUIMIENTO</em><h2>Sin embarazo activo</h2><p>{{ home.empty_message }}</p></div>
-    </section>
+    {% set empty_title = 'Sin embarazo activo' %}{% set empty_text = home.empty_message %}{% set empty_url = url_for('main.embarazo') %}{% set empty_action = 'Ver mi embarazo' %}{% include 'partials/empty_state.html' %}
     {% else %}
     <section class="pregnancy-card">
         <div class="progress">
@@ -28,6 +26,7 @@
         <div><em>PRÓXIMO CONTROL</em>{% if home.control %}<h2>{{ home.control.fecha_control.strftime('%d/%m/%Y') }}{% if home.control.hora_control %}, {{ home.control.hora_control.strftime('%H:%M') }}{% endif %}</h2>{% else %}<h2>No hay controles próximos</h2>{% endif %}</div>
     </section>
     {% endif %}
+    <section class="quick-links" aria-label="Accesos rápidos"><a href="{{ url_for('main.controles') }}">Controles</a><a href="{{ url_for('main.calendario') }}">Calendario</a><a href="{{ url_for('main.alertas') }}">Señales de alerta</a></section>
     <section class="guide"><div><em>RECORDATORIOS</em>{% if home.recordatorios %}<ul>{% for recordatorio in home.recordatorios %}<li>{{ recordatorio.titulo }}</li>{% endfor %}</ul>{% else %}<p>No hay recordatorios pendientes.</p>{% endif %}</div></section>
     <section class="guide"><div><em>GUÍA</em>{% if home.contenidos %}<ul>{% for contenido in home.contenidos %}<li>{{ contenido.titulo }}</li>{% endfor %}</ul>{% else %}<p>No hay contenidos disponibles para esta etapa.</p>{% endif %}</div></section>
     <section class="guide"><div><em>SEÑALES DE ALERTA</em>{% if home.senales %}<ul>{% for senal in home.senales %}<li>{{ senal.titulo }}</li>{% endfor %}</ul>{% else %}<p>No hay señales de alerta disponibles.</p>{% endif %}</div></section>
