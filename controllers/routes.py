@@ -1,9 +1,11 @@
 from flask import Blueprint, render_template, send_from_directory
+from flask_login import login_required
 
 main_bp = Blueprint('main', __name__)
 
 # Ruta principal (la vista HTML)
 @main_bp.route('/')
+@login_required
 def index():
     # Estos valores de demostracion conservan la forma que tendran los datos
     # del perfil y de los controles cuando se conecten los servicios.

@@ -1,12 +1,14 @@
 """Modelo de usuarios de Aurora."""
 
+from flask_login import UserMixin
 from sqlalchemy.dialects.mysql import INTEGER as UINT
 from sqlalchemy.dialects.mysql import TINYINT
+from werkzeug.security import check_password_hash
 
 from extensions import db
 
 
-class Usuario(db.Model):
+class Usuario(UserMixin, db.Model):
     """Tabla `usuarios`: cuentas de acceso al sistema."""
 
     __tablename__ = "usuarios"
@@ -80,6 +82,13 @@ class Usuario(db.Model):
         back_populates="usuario",
         foreign_keys="HistorialAuditoria.usuario_id",
     )
+
+    @property
+    def is_active(self) -> bool:
+        return bool(self.activo)
+
+    def verificar_password(self, password: str) -> bool:
+        return check_password_hash(self.password_hash, password)
 
     __table_args__ = (
         db.UniqueConstraint("email", name="uk_usuarios_email"),

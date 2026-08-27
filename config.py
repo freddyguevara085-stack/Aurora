@@ -12,6 +12,9 @@ class Config:
     if not SECRET_KEY:
         raise RuntimeError('SECRET_KEY debe estar definida para iniciar Aurora.')
 
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+
     MYSQL_HOST = os.getenv('MYSQL_HOST', '127.0.0.1')
     MYSQL_PORT = int(os.getenv('MYSQL_PORT', '3306'))
     MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'aurora')
