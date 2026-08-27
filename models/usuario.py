@@ -55,6 +55,26 @@ class Usuario(db.Model):
         back_populates="usuario",
         foreign_keys="Recordatorio.usuario_id",
     )
+    contenidos_creados = db.relationship(
+        "ContenidoPrenatal",
+        back_populates="creado_por",
+        foreign_keys="ContenidoPrenatal.creado_por_usuario_id",
+    )
+    contenidos_actualizados = db.relationship(
+        "ContenidoPrenatal",
+        back_populates="actualizado_por",
+        foreign_keys="ContenidoPrenatal.actualizado_por_usuario_id",
+    )
+    senales_creadas = db.relationship(
+        "SenalAlerta",
+        back_populates="creada_por",
+        foreign_keys="SenalAlerta.creado_por_usuario_id",
+    )
+    senales_actualizadas = db.relationship(
+        "SenalAlerta",
+        back_populates="actualizada_por",
+        foreign_keys="SenalAlerta.actualizado_por_usuario_id",
+    )
 
     __table_args__ = (
         db.UniqueConstraint("email", name="uk_usuarios_email"),
