@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, send_from_directory, url_for
 from flask_login import current_user, login_required
@@ -26,33 +26,56 @@ def _usuario_gestante():
     return current_user.rol and current_user.rol.nombre == "usuario"
 
 
+def validar_fechas_embarazo(fum_raw, fpp_raw, metodo):
+    """Normaliza fechas del embarazo sin aceptar estimaciones contradictorias."""
+    try:
+        fum = date.fromisoformat(fum_raw) if fum_raw else None
+        fpp = date.fromisoformat(fpp_raw) if fpp_raw else None
+    except ValueError:
+        return None, None, "Revisa el formato de las fechas."
+    if not fum and not fpp:
+        return None, None, "Indica la fecha de última menstruación o la fecha probable de parto."
+    if fum and fum > date.today():
+        return None, None, "La fecha de última menstruación no puede estar en el futuro."
+    if metodo == "fum" and fum:
+        return fum, fum + timedelta(days=280), None
+    if fum and fpp:
+        dias = (fpp - fum).days
+        if dias < 1 or dias > 322:
+            return None, None, "La relación entre las fechas no parece coherente."
+    return fum, fpp, None
+
+
 @main_bp.route('/embarazo', methods=['GET', 'POST'])
 @login_required
 def embarazo():
     perfil, activo = perfil_y_embarazo(current_user.id)
     if request.method == 'POST':
-        if not _usuario_gestante() or not perfil or activo:
+        if not _usuario_gestante() or not perfil:
             abort(403)
         fum = request.form.get('fum') or None
         fpp = request.form.get('fpp') or None
         metodo = request.form.get('metodo_fpp') or None
-        if not fum and not fpp:
-            flash('Indica FUM o FPP.', 'error')
-        elif metodo and metodo not in {'fum', 'ecografia', 'profesional', 'otro'}:
+        if metodo and metodo not in {'fum', 'ecografia', 'profesional', 'otro'}:
             flash('Método no válido.', 'error')
         else:
-            try:
-                nuevo = Embarazo(perfil_gestante_id=perfil.id, fum=date.fromisoformat(fum) if fum else None, fpp=date.fromisoformat(fpp) if fpp else None, metodo_fpp=metodo, estado='activo')
-                db.session.add(nuevo); db.session.commit()
-                return redirect(url_for('main.embarazo'))
-            except ValueError:
-                flash('Las fechas no son válidas.', 'error')
-            except SQLAlchemyError:
-                db.session.rollback()
-                flash('No fue posible registrar el embarazo.', 'error')
+            fum_fecha, fpp_fecha, error = validar_fechas_embarazo(fum, fpp, metodo)
+            if error:
+                flash(error, 'error')
+            else:
+                try:
+                    destino = activo or Embarazo(perfil_gestante_id=perfil.id, estado='activo')
+                    destino.fum, destino.fpp, destino.metodo_fpp = fum_fecha, fpp_fecha, metodo
+                    if not activo:
+                        db.session.add(destino)
+                    db.session.commit()
+                    return redirect(url_for('main.embarazo'))
+                except SQLAlchemyError:
+                    db.session.rollback()
+                    flash('No fue posible guardar la información del embarazo.', 'error')
     controles = controles_activos(activo)
     semana = calcular_semana_gestacional(activo.fum, activo.fpp) if activo else None
-    return render_template('embarazo.html', perfil=perfil, embarazo=activo, controles=controles, semana=semana)
+    return render_template('embarazo.html', perfil=perfil, embarazo=activo, controles=controles, semana=semana, date=date.today())
 
 
 @main_bp.route('/controles')
@@ -144,11 +167,29 @@ def perfil():
         consentimiento = request.form.get('consentimiento_datos', '0')
         if consentimiento not in {'0', '1'}:
             abort(400)
+        nacimiento_raw = request.form.get('fecha_nacimiento') or None
+        fecha_invalida = False
+        try:
+            nacimiento = date.fromisoformat(nacimiento_raw) if nacimiento_raw else None
+        except ValueError:
+            nacimiento = None
+            fecha_invalida = True
+            flash('La fecha de nacimiento no es válida.', 'error')
+        if nacimiento and nacimiento > date.today():
+            flash('La fecha de nacimiento no puede estar en el futuro.', 'error')
+            nacimiento = None
+            fecha_invalida = True
+        if fecha_invalida:
+            return render_template('perfil.html', perfil=perfil_actual, cedula=None, es_gestante=True, form_data=request.form, date=date.today())
         perfil_actual = perfil_actual or PerfilGestante(usuario_id=current_user.id)
+        perfil_actual.cedula = (request.form.get('cedula') or '').strip()[:20] or None
+        perfil_actual.fecha_nacimiento = nacimiento
         perfil_actual.telefono = (request.form.get('telefono') or '').strip()[:30] or None
         perfil_actual.direccion_residencia = (request.form.get('direccion_residencia') or '').strip() or None
         perfil_actual.municipio = (request.form.get('municipio') or '').strip()[:100] or None
         perfil_actual.departamento = (request.form.get('departamento') or '').strip()[:100] or None
+        perfil_actual.contacto_emergencia_nombre = (request.form.get('contacto_emergencia_nombre') or '').strip()[:150] or None
+        perfil_actual.contacto_emergencia_telefono = (request.form.get('contacto_emergencia_telefono') or '').strip()[:30] or None
         perfil_actual.consentimiento_datos = int(consentimiento)
         perfil_actual.fecha_consentimiento = datetime.now() if consentimiento == '1' else None
         if not perfil_actual.id: db.session.add(perfil_actual)
@@ -163,7 +204,7 @@ def perfil():
     cedula = None
     if perfil_actual and perfil_actual.cedula:
         cedula = '*' * max(0, len(perfil_actual.cedula) - 4) + perfil_actual.cedula[-4:]
-    return render_template('perfil.html', perfil=perfil_actual, cedula=cedula, es_gestante=_usuario_gestante())
+    return render_template('perfil.html', perfil=perfil_actual, cedula=cedula, es_gestante=_usuario_gestante(), form_data=None, date=date.today())
 
 # Ruta para que la PWA encuentre el Service Worker
 @main_bp.route('/service-worker.js')
