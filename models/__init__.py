@@ -1,4 +1,5 @@
 from models.acceso import Permiso, Rol, RolPermiso
+from models.auditoria import HistorialAuditoria
 from models.contenido import ContenidoPrenatal, SenalAlerta
 from models.directorio import CentroAtencion, CentroServicio, Servicio
 from models.gestacion import Embarazo, PerfilGestante
@@ -12,6 +13,7 @@ __all__ = [
     'ContenidoPrenatal',
     'ControlPrenatal',
     'Embarazo',
+    'HistorialAuditoria',
     'PerfilGestante',
     'Permiso',
     'Rol',

@@ -75,6 +75,11 @@ class Usuario(db.Model):
         back_populates="actualizada_por",
         foreign_keys="SenalAlerta.actualizado_por_usuario_id",
     )
+    registros_auditoria = db.relationship(
+        "HistorialAuditoria",
+        back_populates="usuario",
+        foreign_keys="HistorialAuditoria.usuario_id",
+    )
 
     __table_args__ = (
         db.UniqueConstraint("email", name="uk_usuarios_email"),
