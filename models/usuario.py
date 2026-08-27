@@ -40,6 +40,11 @@ class Usuario(db.Model):
     )
 
     rol = db.relationship("Rol", back_populates="usuarios")
+    perfil_gestante = db.relationship(
+        "PerfilGestante",
+        back_populates="usuario",
+        uselist=False,
+    )
 
     __table_args__ = (
         db.UniqueConstraint("email", name="uk_usuarios_email"),
