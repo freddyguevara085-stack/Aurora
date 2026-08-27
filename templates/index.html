@@ -1,3 +1,36 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Inicio | Aurora{% endblock %}
-{% block content %}<main class="app-shell"><header class="topbar"><a href="{{ url_for('main.index') }}" aria-label="Aurora, inicio"><img src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="32" height="32" alt="Aurora"></a><button class="notification-button" type="button" aria-label="Notificaciones"><img src="{{ url_for('static', filename='assets/inicio/notification.svg') }}" width="16" height="20" alt=""></button></header><section class="welcome"><h1>Hola, {{ home.user_name }}</h1><p>Acompañando el comienzo de una nueva vida.</p></section><section class="pregnancy-card"><i></i><div class="progress"><div class="circle"><span>Semana</span><strong>{{ home.week }}</strong><img src="{{ url_for('static', filename='assets/inicio/pregnancy-progress-ring.svg') }}" width="120" height="120" alt=""></div><b>{{ home.trimester }}</b><p>Tu bebé tiene el tamaño de un <strong>{{ home.baby_size }}</strong>. 🥥</p><div class="bar" role="progressbar" aria-label="Progreso" aria-valuenow="{{ home.progress }}" aria-valuemin="0" aria-valuemax="100"><span style="width:{{ home.progress }}%"></span></div><small>Semana 1 <span>Semana 40</span></small></div></section><section class="appointment"><div><em>PRÓXIMO CONTROL</em><h2>{{ home.next_appointment.date }}, {{ home.next_appointment.time }}</h2><p><img src="{{ url_for('static', filename='assets/inicio/location.svg') }}" alt="">{{ home.next_appointment.clinic }}</p><a href="#calendario">Ver calendario <img src="{{ url_for('static', filename='assets/inicio/chevron.svg') }}" alt=""></a></div><img src="{{ url_for('static', filename='assets/inicio/appointment-action.svg') }}" width="34" height="42" alt=""></section><section class="quick"><a href="#registrar-control"><img src="{{ url_for('static', filename='assets/inicio/register-control.svg') }}" alt="">Registrar Control</a><a href="#calendario"><img src="{{ url_for('static', filename='assets/inicio/calendar.svg') }}" alt="">Ver Calendario</a></section><a class="alert" href="#senales-alerta"><img src="{{ url_for('static', filename='assets/inicio/alert-icon.svg') }}" alt=""><span><strong>Señales de alerta</strong><small>Conoce cuándo es importante buscar atención profesional.</small></span><b>Ver señales <img src="{{ url_for('static', filename='assets/inicio/asset-05.svg') }}" alt=""></b></a><section class="guide"><header><h2>Guía del trimestre</h2><a href="#guia">Ver más</a></header><article><img src="{{ url_for('static', filename='assets/inicio/guide-image.png') }}" alt=""><div><em>EMBARAZO</em><h3>Tu bebé y tu cuerpo esta semana</h3><p>Conoce los cambios que estás viviendo.</p><a href="#guia">Leer artículo</a></div></article></section><p class="offline">Información disponible sin conexión</p></main>{% include 'partials/bottom_nav.html' %}{% endblock %}
+{% block content %}
+<main class="app-shell">
+    <header class="topbar">
+        <a href="{{ url_for('main.index') }}" aria-label="Aurora, inicio">
+            <img src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="32" height="32" alt="Aurora">
+        </a>
+    </header>
+    <section class="welcome">
+        <h1>Hola, {{ home.user_name }}</h1>
+        <p>Rol: {{ home.role_name }}</p>
+    </section>
+    {% if home.empty_message %}
+    <section class="appointment">
+        <div><em>SEGUIMIENTO</em><h2>Sin embarazo activo</h2><p>{{ home.empty_message }}</p></div>
+    </section>
+    {% else %}
+    <section class="pregnancy-card">
+        <div class="progress">
+            <div class="circle"><span>Semana</span><strong>{{ home.week }}</strong></div>
+            <b>{% if home.trimester %}Trimestre {{ home.trimester }}{% else %}Sin trimestre disponible{% endif %}</b>
+            <div class="bar" role="progressbar" aria-label="Progreso" aria-valuenow="{{ home.progress }}" aria-valuemin="0" aria-valuemax="100"><span style="width:{{ home.progress }}%"></span></div>
+            <small>Semana 1 <span>Semana 42</span></small>
+        </div>
+    </section>
+    <section class="appointment">
+        <div><em>PRÓXIMO CONTROL</em>{% if home.control %}<h2>{{ home.control.fecha_control.strftime('%d/%m/%Y') }}{% if home.control.hora_control %}, {{ home.control.hora_control.strftime('%H:%M') }}{% endif %}</h2>{% else %}<h2>No hay controles próximos</h2>{% endif %}</div>
+    </section>
+    {% endif %}
+    <section class="guide"><div><em>RECORDATORIOS</em>{% if home.recordatorios %}<ul>{% for recordatorio in home.recordatorios %}<li>{{ recordatorio.titulo }}</li>{% endfor %}</ul>{% else %}<p>No hay recordatorios pendientes.</p>{% endif %}</div></section>
+    <section class="guide"><div><em>GUÍA</em>{% if home.contenidos %}<ul>{% for contenido in home.contenidos %}<li>{{ contenido.titulo }}</li>{% endfor %}</ul>{% else %}<p>No hay contenidos disponibles para esta etapa.</p>{% endif %}</div></section>
+    <section class="guide"><div><em>SEÑALES DE ALERTA</em>{% if home.senales %}<ul>{% for senal in home.senales %}<li>{{ senal.titulo }}</li>{% endfor %}</ul>{% else %}<p>No hay señales de alerta disponibles.</p>{% endif %}</div></section>
+    {% include 'partials/bottom_nav.html' %}
+</main>
+{% endblock %}

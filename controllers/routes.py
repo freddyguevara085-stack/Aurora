@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, send_from_directory
-from flask_login import login_required
+from flask_login import current_user, login_required
+
+from services.home import construir_inicio
 
 main_bp = Blueprint('main', __name__)
 
@@ -7,20 +9,7 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 @login_required
 def index():
-    # Estos valores de demostracion conservan la forma que tendran los datos
-    # del perfil y de los controles cuando se conecten los servicios.
-    home_data = {
-        'user_name': 'Ana',
-        'week': 24,
-        'trimester': 'Trimestre 2',
-        'progress': 60,
-        'baby_size': 'coco',
-        'next_appointment': {
-            'date': '15 de Octubre',
-            'time': '10:00 AM',
-            'clinic': 'Centro Médico Salud & Vida',
-        },
-    }
+    home_data = construir_inicio(current_user.id)
     return render_template('index.html', home=home_data)
 
 # Ruta para que la PWA encuentre el Service Worker
