@@ -45,6 +45,16 @@ class Usuario(db.Model):
         back_populates="usuario",
         uselist=False,
     )
+    controles_registrados = db.relationship(
+        "ControlPrenatal",
+        back_populates="registrado_por_usuario",
+        foreign_keys="ControlPrenatal.registrado_por_usuario_id",
+    )
+    recordatorios = db.relationship(
+        "Recordatorio",
+        back_populates="usuario",
+        foreign_keys="Recordatorio.usuario_id",
+    )
 
     __table_args__ = (
         db.UniqueConstraint("email", name="uk_usuarios_email"),

@@ -109,6 +109,11 @@ class Embarazo(db.Model):
     )
 
     perfil_gestante = db.relationship("PerfilGestante", back_populates="embarazos")
+    controles_prenatales = db.relationship(
+        "ControlPrenatal",
+        back_populates="embarazo",
+        foreign_keys="ControlPrenatal.embarazo_id",
+    )
 
     __table_args__ = (
         db.Index("idx_embarazos_perfil_estado", "perfil_gestante_id", "estado"),

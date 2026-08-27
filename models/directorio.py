@@ -53,6 +53,11 @@ class CentroAtencion(db.Model):
         back_populates="centro_atencion",
         cascade="all, delete-orphan",
     )
+    controles_prenatales = db.relationship(
+        "ControlPrenatal",
+        back_populates="centro_atencion",
+        foreign_keys="ControlPrenatal.centro_atencion_id",
+    )
 
     __table_args__ = (
         db.UniqueConstraint("codigo_minsa", name="uk_centros_codigo_minsa"),
