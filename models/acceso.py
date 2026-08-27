@@ -38,6 +38,7 @@ class Rol(db.Model):
         back_populates="roles",
         viewonly=True,
     )
+    usuarios = db.relationship("Usuario", back_populates="rol")
 
     __table_args__ = (
         db.UniqueConstraint("nombre", name="uk_roles_nombre"),
