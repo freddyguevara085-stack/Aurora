@@ -1,1 +1,28 @@
-<form method="post" class="stack-form"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><fieldset><legend>Fechas del embarazo</legend><label>FUM — Fecha de última menstruación<input name="fum" type="date" max="{{ date.today().isoformat() }}" value="{{ embarazo.fum.isoformat() if embarazo and embarazo.fum else '' }}"></label><small>Primer día de la última menstruación.</small><label>FPP — Fecha probable de parto<input name="fpp" type="date" value="{{ embarazo.fpp.isoformat() if embarazo and embarazo.fpp else '' }}"></label><small>Fecha estimada; puede ajustarse con orientación profesional.</small></fieldset><fieldset><legend>Método de estimación</legend><select name="metodo_fpp"><option value="">No especificado</option>{% for valor, texto in [('fum','Fecha de última menstruación'),('ecografia','Ecografía'),('profesional','Profesional'),('otro','Otro')] %}<option value="{{ valor }}" {% if embarazo and embarazo.metodo_fpp == valor %}selected{% endif %}>{{ texto }}</option>{% endfor %}</select></fieldset><button type="submit">{{ 'Guardar cambios' if editar else 'Guardar embarazo' }}</button></form>
+{% set fum_value = form_data.get('fum') if form_data is not none else (embarazo.fum.isoformat() if embarazo and embarazo.fum else '') %}
+{% set fpp_value = form_data.get('fpp') if form_data is not none else (embarazo.fpp.isoformat() if embarazo and embarazo.fpp else '') %}
+{% set metodo_value = form_data.get('metodo_fpp') if form_data is not none else (embarazo.metodo_fpp if embarazo else '') %}
+<form method="post" class="stack-form" action="{{ url_for('main.embarazo', editar=1) if editar else url_for('main.embarazo') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <fieldset>
+    <legend>Fechas del embarazo</legend>
+    <label>FUM — Fecha de última menstruación<input name="fum" type="date" max="{{ date.today().isoformat() }}" value="{{ fum_value or '' }}"></label>
+    <small>Primer día de la última menstruación.</small>
+    <label>FPP — Fecha probable de parto<input name="fpp" type="date" value="{{ fpp_value or '' }}"></label>
+    <small>Fecha estimada; puede ajustarse con orientación profesional.</small>
+  </fieldset>
+  <fieldset>
+    <legend>Método de estimación</legend>
+    <select name="metodo_fpp">
+      <option value="">No especificado</option>
+      {% for valor, texto in [('fum','Fecha de última menstruación'),('ecografia','Ecografía'),('profesional','Profesional'),('otro','Otro')] %}
+      <option value="{{ valor }}" {% if metodo_value == valor %}selected{% endif %}>{{ texto }}</option>
+      {% endfor %}
+    </select>
+  </fieldset>
+  <div class="pregnancy-form-actions">
+    <button class="button button--primary button--wide" type="submit">{{ 'Guardar cambios' if editar else 'Registrar embarazo' }}</button>
+    {% if editar %}
+    <a class="button button--secondary button--wide" href="{{ url_for('main.embarazo') }}">Cancelar</a>
+    {% endif %}
+  </div>
+</form>

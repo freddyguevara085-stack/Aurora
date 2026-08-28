@@ -1,35 +1,34 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Inicio | Aurora{% endblock %}
 {% block content %}
-<main class="app-shell">
-    <header class="topbar">
-        <a href="{{ url_for('main.index') }}" aria-label="Aurora, inicio">
-            <img class="brand-logo" src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="40" height="40" alt="Aurora">
-        </a>
-    </header>
-    <section class="welcome">
-        <h1>Hola, {{ home.user_name }}</h1>
-        <p>Rol: {{ home.role_name }}</p>
-    </section>
-    {% if home.empty_message %}
-    {% set empty_title = 'Sin embarazo activo' %}{% set empty_text = home.empty_message %}{% set empty_url = url_for('main.embarazo') %}{% set empty_action = 'Ver mi embarazo' %}{% include 'partials/empty_state.html' %}
-    {% else %}
-    <section class="pregnancy-card">
-        <div class="progress">
-            <div class="circle"><span>Semana</span><strong>{{ home.week }}</strong></div>
-            <b>{% if home.trimester %}Trimestre {{ home.trimester }}{% else %}Sin trimestre disponible{% endif %}</b>
-            <div class="bar" role="progressbar" aria-label="Progreso" aria-valuenow="{{ home.progress }}" aria-valuemin="0" aria-valuemax="100"><span style="width:{{ home.progress }}%"></span></div>
-            <small>Semana 1 <span>Semana 42</span></small>
-        </div>
-    </section>
-    <section class="appointment">
-        <div><em>PRÓXIMO CONTROL</em>{% if home.control %}<h2>{{ home.control.fecha_control.strftime('%d/%m/%Y') }}{% if home.control.hora_control %}, {{ home.control.hora_control.strftime('%H:%M') }}{% endif %}</h2>{% else %}<h2>No hay controles próximos</h2>{% endif %}</div>
-    </section>
-    {% endif %}
-    <section class="quick-links" aria-label="Accesos rápidos"><a href="{{ url_for('main.controles') }}">Controles</a><a href="{{ url_for('main.calendario') }}">Calendario</a><a href="{{ url_for('main.alertas') }}">Señales de alerta</a></section>
-    <section class="home-section"><header><em>RECORDATORIOS</em></header>{% for recordatorio in home.recordatorios %}<article class="compact-card">{{ recordatorio.titulo }}</article>{% else %}<p>No hay recordatorios pendientes.</p>{% endfor %}</section>
-    <section class="home-section"><header><em>GUÍA</em></header>{% for contenido in home.contenidos %}<article class="compact-card">{{ contenido.titulo }}</article>{% else %}<p>No hay contenidos disponibles para esta etapa.</p>{% endfor %}</section>
-    <section class="home-section alerts-preview"><header><em>SEÑALES DE ALERTA</em><a href="{{ url_for('main.alertas') }}">Ver todas</a></header><p class="professional-note">Ante una emergencia, busca atención profesional.</p>{% for senal in home.senales %}<article class="compact-card"><b>{{ senal.titulo }}</b></article>{% else %}<p>No hay señales de alerta disponibles.</p>{% endfor %}</section>
-    {% include 'partials/bottom_nav.html' %}
+<main class="app-shell home-shell">
+  <header class="home-header"><a href="{{ url_for('main.index') }}" aria-label="Aurora, inicio"><img src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="32" height="32" alt="Aurora"></a><button class="icon-button" type="button" aria-label="Notificaciones"><span class="material-symbols-outlined">notifications</span></button></header>
+  <section class="home-intro"><h1>Hola, {{ home.user_name }}</h1><p>Acompañando el comienzo de una nueva vida.</p></section>
+  {% if home.empty_message %}
+    {% set empty_title = 'Sin embarazo activo' %}{% set empty_text = home.empty_message %}{% set empty_url = url_for('main.embarazo') %}{% set empty_action = 'Registrar mi embarazo' %}{% include 'partials/empty_state.html' %}
+  {% else %}
+  <section class="pregnancy-overview" aria-label="Progreso del embarazo">
+    <span class="corner-glow" aria-hidden="true"></span>
+    <div class="week-ring">
+      <span>Semana</span>
+      <strong>{{ home.week }}</strong>
+    </div>
+    <span class="stage-pill">Trimestre {{ home.trimester }}</span>
+    <p>Estás avanzando en la semana {{ home.week }} de tu embarazo.</p>
+    <div class="progress-track">
+      <span style="width:{{ home.progress }}%"></span>
+    </div>
+    <div class="progress-labels">
+      <span>Semana 1</span>
+      <span>Semana 42</span>
+    </div>
+  </section>
+  {% endif %}
+  <section class="next-control home-card"><div><p class="eyebrow">PRÓXIMO CONTROL</p>{% if home.control %}<h2>{{ home.control.fecha_control.strftime('%d/%m/%Y') }}{% if home.control.hora_control %}, {{ home.control.hora_control.strftime('%H:%M') }}{% endif %}</h2><p class="muted-row"><span class="material-symbols-outlined">location_on</span>{{ home.control.centro_atencion.nombre if home.control.centro_atencion else 'Centro por confirmar' }}</p>{% else %}<h2>No hay controles próximos</h2><p class="muted-row">Registra una cita para verla aquí.</p>{% endif %}<a class="text-link" href="{{ url_for('main.calendario') }}">Ver calendario <span class="material-symbols-outlined">chevron_right</span></a></div><span class="round-icon"><span class="material-symbols-outlined">calendar_month</span></span></section>
+  <section class="home-actions" aria-label="Acciones rápidas"><a class="home-action home-action--primary" href="{{ url_for('main.nuevo_control') }}"><span class="material-symbols-outlined">medical_services</span><span>Registrar Control</span></a><a class="home-action home-action--pink" href="{{ url_for('main.calendario') }}"><span class="material-symbols-outlined">calendar_month</span><span>Ver Calendario</span></a></section>
+  <a class="alert-banner" href="{{ url_for('main.alertas') }}"><span class="alert-banner__icon"><span class="material-symbols-outlined">warning</span></span><span><strong>Señales de alerta</strong><small>Conoce cuándo es importante buscar atención profesional.</small></span><b>Ver<br>señales <span class="material-symbols-outlined">chevron_right</span></b></a>
+  <section class="home-guide"><header><h2>Guía del Trimestre</h2><a href="{{ url_for('main.guia', trimestre=home.trimester) }}">Ver más</a></header>{% if home.contenidos %}{% set contenido = home.contenidos[0] %}<article class="feature-article"><div class="feature-article__image"><img src="{{ url_for('static', filename='assets/inicio/guide-image.png') }}" alt="Mujer realizando ejercicios prenatales"><span>{{ contenido.categoria }}</span></div><div><h3>{{ contenido.titulo }}</h3><p>{{ contenido.resumen or 'Información útil y clara para acompañarte durante esta etapa.' }}</p><a href="{{ url_for('main.detalle_guia', contenido_id=contenido.id) }}">Leer artículo <span class="material-symbols-outlined">arrow_forward</span></a></div></article>{% else %}<article class="feature-article"><div class="feature-article__image"><img src="{{ url_for('static', filename='assets/inicio/guide-image.png') }}" alt="Mujer realizando ejercicios prenatales"><span>Bienestar</span></div><div><h3>Ejercicios suaves para aliviar el dolor de espalda</h3><p>Mantenerse activa es fundamental. Descubre esta rutina de 10 minutos...</p><a href="{{ url_for('main.guia') }}">Leer artículo <span class="material-symbols-outlined">arrow_forward</span></a></div></article>{% endif %}</section>
+  <p class="offline-note"><span class="material-symbols-outlined">check_circle</span> Información esencial disponible sin conexión</p>
+
 </main>
 {% endblock %}

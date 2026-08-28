@@ -1,1 +1,58 @@
-{% extends 'layouts/base.html' %}{% block title %}Centros de salud | Aurora{% endblock %}{% block content %}<main class="app-shell">{% set back_url = url_for('main.index') %}{% set back_label = 'Inicio' %}{% set page_title = 'Centros de salud' %}{% include 'partials/page_header.html' %}<form class="filters" method="get"><label>Buscar <input name="q" value="{{ q }}" maxlength="80"></label><label>Tipo <select name="tipo"><option value="">Todos</option>{% for valor, etiqueta in [('hospital','Hospital'),('centro_salud','Centro de salud'),('puesto_salud','Puesto de salud'),('casa_materna','Casa materna'),('clinica','Clínica'),('otro','Otro')] %}<option value="{{ valor }}" {% if tipo == valor %}selected{% endif %}>{{ etiqueta }}</option>{% endfor %}</select></label><button>Buscar</button></form>{% for centro in centros %}<article class="card"><span class="chip">{{ centro.tipo_establecimiento|replace('_', ' ') }}</span><h2>{{ centro.nombre }}</h2><p>{{ centro.municipio }}, {{ centro.departamento }}</p><a href="{{ url_for('main.detalle_centro', centro_id=centro.id) }}">Ver información</a></article>{% else %}{% set empty_title = 'Sin centros encontrados' %}{% set empty_text = 'Prueba cambiando el nombre, municipio o tipo de establecimiento.' %}{% set empty_url = none %}{% set empty_action = none %}{% include 'partials/empty_state.html' %}{% endfor %}{% include 'partials/bottom_nav.html' %}</main>{% endblock %}
+{% extends 'layouts/base.html' %}
+{% block title %}Centros de salud | Aurora{% endblock %}
+
+{% block content %}
+<main class="app-shell">
+    {% set back_url = url_for('main.index') %}
+    {% set back_label = 'Inicio' %}
+    {% set page_title = 'Centros de salud' %}
+    {% include 'partials/page_header.html' %}
+
+    <section class="verification-notice" role="note">
+        <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+        <div>
+            <strong>Directorio con información por confirmar</strong>
+            <p>Los centros sin fecha de verificación institucional pueden tener datos desactualizados. Confirma teléfono, horario y servicios directamente con el establecimiento antes de acudir.</p>
+        </div>
+    </section>
+
+    <form class="filters" method="get">
+        <label>
+            Buscar
+            <input name="q" value="{{ q }}" maxlength="80">
+        </label>
+        <label>
+            Tipo
+            <select name="tipo">
+                <option value="">Todos</option>
+                {% for valor, etiqueta in [('hospital','Hospital'),('centro_salud','Centro de salud'),('puesto_salud','Puesto de salud'),('casa_materna','Casa materna'),('clinica','Clínica'),('otro','Otro')] %}
+                <option value="{{ valor }}" {% if tipo == valor %}selected{% endif %}>{{ etiqueta }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <button class="button button--primary button--wide">Buscar</button>
+    </form>
+
+    {% for centro in centros %}
+    <article class="card">
+        <span class="chip">{{ centro.tipo_establecimiento|replace('_', ' ') }}</span>
+        {% if centro.fecha_verificacion %}
+        <span class="status-badge status-badge--success">Verificado {{ centro.fecha_verificacion.strftime('%d/%m/%Y') }}</span>
+        {% else %}
+        <span class="status-badge status-badge--warning">Datos sin verificar</span>
+        {% endif %}
+        <h2>{{ centro.nombre }}</h2>
+        <p>{{ centro.municipio }}, {{ centro.departamento }}</p>
+        <a class="text-link" href="{{ url_for('main.detalle_centro', centro_id=centro.id) }}">
+            Ver información <span class="material-symbols-outlined">chevron_right</span>
+        </a>
+    </article>
+    {% else %}
+        {% set empty_title = 'Sin centros encontrados' %}
+        {% set empty_text = 'Prueba cambiando el nombre, municipio o tipo de establecimiento.' %}
+        {% set empty_url = none %}
+        {% set empty_action = none %}
+        {% include 'partials/empty_state.html' %}
+    {% endfor %}
+</main>
+{% endblock %}

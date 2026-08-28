@@ -1,0 +1,127 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Guía Prenatal | Administración Aurora{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1>Gestión de Guía Prenatal</h1>
+    <p>Artículos educativos orientativos para las diferentes etapas del embarazo.</p>
+  </div>
+  <a href="{{ url_for('admin.nuevo_contenido') }}" class="button button--primary">
+    <span class="material-symbols-outlined">add</span> Nuevo Contenido
+  </a>
+</div>
+
+<section class="card-surface admin-filter-card">
+  <form method="get" class="admin-filter-form">
+    <div class="filter-group">
+      <label for="categoria">Categoría</label>
+      <input type="text" id="categoria" name="categoria" value="{{ categoria_actual }}" placeholder="Ej. bienestar, cuidados...">
+    </div>
+
+    <div class="filter-group">
+      <label for="trimestre">Trimestre</label>
+      <select id="trimestre" name="trimestre">
+        <option value="">Todos</option>
+        <option value="1" {% if trimestre_actual == 1 %}selected{% endif %}>1.er Trimestre</option>
+        <option value="2" {% if trimestre_actual == 2 %}selected{% endif %}>2.º Trimestre</option>
+        <option value="3" {% if trimestre_actual == 3 %}selected{% endif %}>3.er Trimestre</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado">
+        <option value="">Todos</option>
+        <option value="publicado" {% if estado_actual == 'publicado' %}selected{% endif %}>Publicado</option>
+        <option value="borrador" {% if estado_actual == 'borrador' %}selected{% endif %}>Borrador</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button type="submit" class="button button--primary">Filtrar</button>
+      {% if categoria_actual or trimestre_actual or estado_actual %}
+        <a href="{{ url_for('admin.contenidos') }}" class="button button--secondary">Limpiar</a>
+      {% endif %}
+    </div>
+  </form>
+</section>
+
+<section class="card-surface admin-section">
+  {% if contenidos %}
+    <div class="admin-table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Categoría</th>
+            <th>Etapa</th>
+            <th>Estado</th>
+            <th>Revisión</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in contenidos %}
+            <tr>
+              <td>
+                <strong>{{ item.titulo }}</strong>
+                {% if item.resumen %}
+                  <p class="admin-cell-desc">{{ item.resumen[:80] }}...</p>
+                {% endif %}
+              </td>
+              <td><span class="chip">{{ item.categoria }}</span></td>
+              <td>
+                {% if item.trimestre %}
+                  <small>Trim. {{ item.trimestre }}</small><br>
+                {% endif %}
+                {% if item.semana_desde and item.semana_hasta %}
+                  <small>Sem. {{ item.semana_desde }}-{{ item.semana_hasta }}</small>
+                {% else %}
+                  <small class="muted-text">General</small>
+                {% endif %}
+              </td>
+              <td>
+                {% if item.publicado %}
+                  <span class="status-badge status-badge--success">Publicado</span>
+                {% else %}
+                  <span class="status-badge status-badge--warning">Borrador</span>
+                {% endif %}
+              </td>
+              <td><small>{{ item.fecha_revision.strftime('%d/%m/%Y') }}</small></td>
+              <td>
+                <div class="admin-row-actions">
+                  <a href="{{ url_for('admin.editar_contenido', contenido_id=item.id) }}" class="admin-action-btn" title="Editar">
+                    <span class="material-symbols-outlined">edit</span>
+                  </a>
+
+                  <form action="{{ url_for('admin.toggle_publicacion_contenido', contenido_id=item.id) }}" method="post" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="admin-action-btn" title="{{ 'Despublicar' if item.publicado else 'Publicar' }}">
+                      <span class="material-symbols-outlined">{{ 'visibility_off' if item.publicado else 'visibility' }}</span>
+                    </button>
+                  </form>
+
+                  <form action="{{ url_for('admin.eliminar_contenido', contenido_id=item.id) }}" method="post" class="inline-form" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este contenido?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty">
+      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);">menu_book</span>
+      <h3>No se encontraron contenidos</h3>
+      <p>No hay artículos que coincidan con los filtros o aún no se han registrado.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

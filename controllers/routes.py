@@ -50,9 +50,12 @@ def validar_fechas_embarazo(fum_raw, fpp_raw, metodo):
 @login_required
 def embarazo():
     perfil, activo = perfil_y_embarazo(current_user.id)
+    editar = (request.args.get('editar') == '1' or request.method == 'POST') and activo is not None
+    form_data = None
     if request.method == 'POST':
         if not _usuario_gestante() or not perfil:
             abort(403)
+        form_data = request.form
         fum = request.form.get('fum') or None
         fpp = request.form.get('fpp') or None
         metodo = request.form.get('metodo_fpp') or None
@@ -75,14 +78,30 @@ def embarazo():
                     flash('No fue posible guardar la información del embarazo.', 'error')
     controles = controles_activos(activo)
     semana = calcular_semana_gestacional(activo.fum, activo.fpp) if activo else None
-    return render_template('embarazo.html', perfil=perfil, embarazo=activo, controles=controles, semana=semana, date=date.today())
+    proximo = next((control for control in controles if control.fecha_control >= date.today() and control.estado in {'programado', 'reprogramado'}), None)
+    return render_template(
+        'embarazo.html',
+        perfil=perfil,
+        embarazo=activo,
+        controles=controles,
+        proximo=proximo,
+        semana=semana,
+        editar=editar,
+        form_data=form_data,
+        date=date.today(),
+    )
 
 
 @main_bp.route('/controles')
 @login_required
 def controles():
     _, activo = perfil_y_embarazo(current_user.id)
-    return render_template('controles.html', embarazo=activo, controles=controles_activos(activo))
+    controles = controles_activos(activo)
+    hoy = date.today()
+    proximos = [control for control in controles if control.fecha_control >= hoy and control.estado in {'programado', 'reprogramado'}]
+    proximo = min(proximos, key=lambda control: (control.fecha_control, control.hora_control or datetime.min.time()), default=None)
+    anteriores = [control for control in reversed(controles) if control is not proximo]
+    return render_template('controles.html', embarazo=activo, controles=controles, proximo=proximo, anteriores=anteriores)
 
 
 @main_bp.route('/controles/nuevo', methods=['GET', 'POST'])
@@ -125,7 +144,9 @@ def calendario():
 def guia():
     trimestre = request.args.get('trimestre', type=int)
     categoria = (request.args.get('categoria') or '').strip()[:80]
-    return render_template('guia.html', contenidos=contenidos_publicados(trimestre, categoria), trimestre=trimestre, categoria=categoria)
+    _, activo = perfil_y_embarazo(current_user.id)
+    semana = calcular_semana_gestacional(activo.fum, activo.fpp) if activo else None
+    return render_template('guia.html', contenidos=contenidos_publicados(trimestre, categoria), trimestre=trimestre, categoria=categoria, semana=semana)
 
 
 @main_bp.route('/guia/<int:contenido_id>')
@@ -160,7 +181,7 @@ def detalle_centro(centro_id):
 @main_bp.route('/perfil', methods=['GET', 'POST'])
 @login_required
 def perfil():
-    perfil_actual, _ = perfil_y_embarazo(current_user.id)
+    perfil_actual, embarazo_actual = perfil_y_embarazo(current_user.id)
     if request.method == 'POST':
         if not _usuario_gestante():
             abort(403)
@@ -180,7 +201,8 @@ def perfil():
             nacimiento = None
             fecha_invalida = True
         if fecha_invalida:
-            return render_template('perfil.html', perfil=perfil_actual, cedula=None, es_gestante=True, form_data=request.form, date=date.today())
+            semana = calcular_semana_gestacional(embarazo_actual.fum, embarazo_actual.fpp) if embarazo_actual else None
+            return render_template('perfil.html', perfil=perfil_actual, embarazo=embarazo_actual, semana=semana, cedula=None, es_gestante=True, form_data=request.form, date=date.today())
         perfil_actual = perfil_actual or PerfilGestante(usuario_id=current_user.id)
         perfil_actual.cedula = (request.form.get('cedula') or '').strip()[:20] or None
         perfil_actual.fecha_nacimiento = nacimiento
@@ -204,7 +226,8 @@ def perfil():
     cedula = None
     if perfil_actual and perfil_actual.cedula:
         cedula = '*' * max(0, len(perfil_actual.cedula) - 4) + perfil_actual.cedula[-4:]
-    return render_template('perfil.html', perfil=perfil_actual, cedula=cedula, es_gestante=_usuario_gestante(), form_data=None, date=date.today())
+    semana = calcular_semana_gestacional(embarazo_actual.fum, embarazo_actual.fpp) if embarazo_actual else None
+    return render_template('perfil.html', perfil=perfil_actual, embarazo=embarazo_actual, semana=semana, cedula=cedula, es_gestante=_usuario_gestante(), form_data=None, date=date.today())
 
 # Ruta para que la PWA encuentre el Service Worker
 @main_bp.route('/service-worker.js')

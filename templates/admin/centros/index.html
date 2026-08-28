@@ -1,0 +1,141 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Centros de Salud | Administración Aurora{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1>Directorio de Centros de Salud</h1>
+    <p>Administra los establecimientos de atención médica, puestos de salud y casas maternas.</p>
+  </div>
+  <a href="{{ url_for('admin.nuevo_centro') }}" class="button button--primary">
+    <span class="material-symbols-outlined">add</span> Nuevo Centro
+  </a>
+</div>
+
+<section class="card-surface admin-filter-card">
+  <form method="get" class="admin-filter-form">
+    <div class="filter-group">
+      <label for="q">Buscar por Nombre o Ubicación</label>
+      <input type="text" id="q" name="q" value="{{ busqueda_actual }}" placeholder="Ej. Managua, Hospital Bertha...">
+    </div>
+
+    <div class="filter-group">
+      <label for="tipo">Tipo de Establecimiento</label>
+      <select id="tipo" name="tipo">
+        <option value="">Todos los tipos</option>
+        <option value="hospital" {% if tipo_actual == 'hospital' %}selected{% endif %}>Hospital</option>
+        <option value="centro_salud" {% if tipo_actual == 'centro_salud' %}selected{% endif %}>Centro de salud</option>
+        <option value="puesto_salud" {% if tipo_actual == 'puesto_salud' %}selected{% endif %}>Puesto de salud</option>
+        <option value="casa_materna" {% if tipo_actual == 'casa_materna' %}selected{% endif %}>Casa materna</option>
+        <option value="clinica" {% if tipo_actual == 'clinica' %}selected{% endif %}>Clínica</option>
+        <option value="otro" {% if tipo_actual == 'otro' %}selected{% endif %}>Otro</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado">
+        <option value="">Todos</option>
+        <option value="activo" {% if estado_actual == 'activo' %}selected{% endif %}>Activo</option>
+        <option value="inactivo" {% if estado_actual == 'inactivo' %}selected{% endif %}>Inactivo</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button type="submit" class="button button--primary">Filtrar</button>
+      {% if busqueda_actual or tipo_actual or estado_actual %}
+        <a href="{{ url_for('admin.centros') }}" class="button button--secondary">Limpiar</a>
+      {% endif %}
+    </div>
+  </form>
+</section>
+
+<section class="card-surface admin-section">
+  {% if centros %}
+    <div class="admin-table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Centro / Establecimiento</th>
+            <th>Tipo</th>
+            <th>Ubicación</th>
+            <th>Servicios</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in centros %}
+            <tr>
+              <td>
+                <strong>{{ item.nombre }}</strong>
+                {% if item.codigo_minsa %}
+                  <small class="muted-text"><br>MINSA: {{ item.codigo_minsa }}</small>
+                {% endif %}
+                {% if item.telefono %}
+                  <small class="muted-text"> · Tel: {{ item.telefono }}</small>
+                {% endif %}
+              </td>
+              <td><span class="chip">{{ item.tipo_establecimiento|replace('_', ' ')|capitalize }}</span></td>
+              <td>
+                <small>{{ item.municipio }}, {{ item.departamento }}</small>
+                {% if item.silais %}
+                  <br><small class="muted-text">SILAIS: {{ item.silais }}</small>
+                {% endif %}
+              </td>
+              <td>
+                {% set num_serv = item.asignaciones_servicios|length %}
+                {% if num_serv > 0 %}
+                  <span class="chip" style="background: var(--soft); color: var(--primary);">{{ num_serv }} servicio(s)</span>
+                {% else %}
+                  <small class="muted-text">Ninguno</small>
+                {% endif %}
+              </td>
+              <td>
+                {% if item.activo %}
+                  <span class="status-badge status-badge--success">Activo</span>
+                {% else %}
+                  <span class="status-badge status-badge--warning">Inactivo</span>
+                {% endif %}
+                {% if item.fecha_verificacion %}
+                  <small class="verification-state verification-state--verified">Verificado: {{ item.fecha_verificacion.strftime('%d/%m/%Y') }}</small>
+                {% else %}
+                  <small class="verification-state">Sin verificación institucional</small>
+                {% endif %}
+              </td>
+              <td>
+                <div class="admin-row-actions">
+                  <a href="{{ url_for('admin.editar_centro', centro_id=item.id) }}" class="admin-action-btn" title="Editar">
+                    <span class="material-symbols-outlined">edit</span>
+                  </a>
+
+                  <form action="{{ url_for('admin.toggle_centro', centro_id=item.id) }}" method="post" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="admin-action-btn" title="{{ 'Desactivar' if item.activo else 'Activar' }}">
+                      <span class="material-symbols-outlined">{{ 'toggle_on' if item.activo else 'toggle_off' }}</span>
+                    </button>
+                  </form>
+
+                  <form action="{{ url_for('admin.eliminar_centro', centro_id=item.id) }}" method="post" class="inline-form" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este centro de salud?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty">
+      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);">local_hospital</span>
+      <h3>No se encontraron centros de salud</h3>
+      <p>No hay establecimientos que coincidan con la búsqueda o aún no se han registrado.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

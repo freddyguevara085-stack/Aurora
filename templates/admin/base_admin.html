@@ -1,0 +1,52 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Panel de Administración | Aurora{% endblock %}
+
+{% block content %}
+<div class="admin-shell">
+  <header class="admin-topbar">
+    <div class="admin-topbar__brand">
+      <span class="material-symbols-outlined">admin_panel_settings</span>
+      <strong>Aurora</strong>
+      <span class="admin-badge">Admin</span>
+    </div>
+    <div class="admin-topbar__user">
+      <span>{{ current_user.nombres }}</span>
+      <form action="{{ url_for('auth.logout') }}" method="post" class="inline-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="admin-logout-btn" title="Cerrar sesión">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
+      </form>
+    </div>
+  </header>
+
+  <nav class="admin-nav" aria-label="Navegación administrativa">
+    <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link {% if request.endpoint == 'admin.dashboard' %}is-active{% endif %}">
+      <span class="material-symbols-outlined">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+    <a href="{{ url_for('admin.contenidos') }}" class="admin-nav-link {% if request.endpoint in ['admin.contenidos', 'admin.nuevo_contenido', 'admin.editar_contenido'] %}is-active{% endif %}">
+      <span class="material-symbols-outlined">menu_book</span>
+      <span>Guía Prenatal</span>
+    </a>
+    <a href="{{ url_for('admin.senales') }}" class="admin-nav-link {% if request.endpoint in ['admin.senales', 'admin.nueva_senal', 'admin.editar_senal'] %}is-active{% endif %}">
+      <span class="material-symbols-outlined">warning</span>
+      <span>Señales de Alerta</span>
+    </a>
+    <a href="{{ url_for('admin.centros') }}" class="admin-nav-link {% if request.endpoint in ['admin.centros', 'admin.nuevo_centro', 'admin.editar_centro'] %}is-active{% endif %}">
+      <span class="material-symbols-outlined">local_hospital</span>
+      <span>Centros de Salud</span>
+    </a>
+    <a href="{{ url_for('admin.servicios') }}" class="admin-nav-link {% if request.endpoint in ['admin.servicios', 'admin.nuevo_servicio', 'admin.editar_servicio'] %}is-active{% endif %}">
+      <span class="material-symbols-outlined">medical_services</span>
+      <span>Servicios</span>
+    </a>
+  </nav>
+
+  <main class="admin-content">
+    {% include 'partials/flash.html' %}
+    {% block admin_content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}

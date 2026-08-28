@@ -1,24 +1,20 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Iniciar sesión | Aurora{% endblock %}
 {% block content %}
-<main class="app-shell">
-    <section class="welcome" aria-labelledby="login-title">
-        <img src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="48" height="48" alt="Aurora">
-        <h1 id="login-title">Inicia sesión</h1>
-        <p>Accede a tu acompañamiento prenatal.</p>
-    </section>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% for category, message in messages %}
-        <p role="alert" class="flash flash--{{ category }}">{{ message }}</p>
-        {% endfor %}
-    {% endwith %}
-    <form method="post" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <label for="email">Correo electrónico</label>
-        <input id="email" name="email" type="email" autocomplete="email" required>
-        <label for="password">Contraseña</label>
-        <input id="password" name="password" type="password" autocomplete="current-password" required>
-        <button type="submit">Iniciar sesión</button>
-    </form>
+<main class="app-shell login-shell">
+  <section class="login-hero" aria-labelledby="login-title">
+    <img src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="96" height="96" alt="Aurora">
+    <p class="login-brand">Aurora</p>
+    <h1 id="login-title">Bienvenida de nuevo</h1>
+    <p>Accede a tu acompañamiento prenatal.</p>
+  </section>
+  {% include 'partials/flash.html' %}
+  <form class="login-card" method="post" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="email">Correo electrónico<input id="email" name="email" type="email" autocomplete="email" placeholder="tu@correo.com" required></label>
+    <label for="password">Contraseña<input id="password" name="password" type="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required></label>
+    <button class="button button--primary button--wide" type="submit">Iniciar sesión</button>
+    <p class="form-note"><span class="material-symbols-outlined" aria-hidden="true">lock</span> Tus datos se mantienen protegidos.</p>
+  </form>
 </main>
 {% endblock %}

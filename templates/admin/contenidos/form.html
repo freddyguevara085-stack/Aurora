@@ -1,0 +1,176 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}{{ 'Nuevo Contenido' if accion == 'crear' else 'Editar Contenido' }} | Administración Aurora{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1>{{ 'Nuevo Contenido Prenatal' if accion == 'crear' else 'Editar Contenido' }}</h1>
+    <p>La información debe ser clara, verificada y de fuentes oficiales de salud.</p>
+  </div>
+  <a href="{{ url_for('admin.contenidos') }}" class="button button--secondary">
+    <span class="material-symbols-outlined">arrow_back</span> Volver a la lista
+  </a>
+</div>
+
+<section class="card-surface admin-section">
+  <form method="post" class="stack-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <fieldset>
+      <legend>Información Principal</legend>
+
+      <label for="titulo">
+        Título *
+        <input
+          type="text"
+          id="titulo"
+          name="titulo"
+          maxlength="180"
+          required
+          value="{{ form_data.get('titulo', '') if form_data else (contenido.titulo if contenido else '') }}"
+          placeholder="Ej. Primer trimestre: organiza tu atención prenatal"
+        >
+      </label>
+
+      <label for="categoria">
+        Categoría *
+        <input
+          type="text"
+          id="categoria"
+          name="categoria"
+          maxlength="80"
+          required
+          value="{{ form_data.get('categoria', '') if form_data else (contenido.categoria if contenido else '') }}"
+          placeholder="Ej. Controles prenatales, Cuidados, Bienestar..."
+        >
+      </label>
+
+      <label for="resumen">
+        Resumen
+        <textarea
+          id="resumen"
+          name="resumen"
+          maxlength="500"
+          placeholder="Breve descripción orientativa que se mostrará en las tarjetas (máx. 500 caracteres)..."
+          rows="2"
+        >{{ form_data.get('resumen', '') if form_data else (contenido.resumen or '' if contenido else '') }}</textarea>
+      </label>
+
+      <label for="contenido">
+        Contenido Completo *
+        <textarea
+          id="contenido"
+          name="contenido"
+          required
+          placeholder="Escribe el texto informativo completo del artículo..."
+          rows="8"
+        >{{ form_data.get('contenido', '') if form_data else (contenido.contenido if contenido else '') }}</textarea>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Etapa Gestacional (Opcional)</legend>
+      <p class="form-help">Si el contenido aplica a una etapa específica, indícala aquí. Si es información general, déjalos vacíos.</p>
+
+      <label for="trimestre">
+        Trimestre
+        {% set sel_trim = form_data.get('trimestre', '')|string if form_data else (contenido.trimestre|string if contenido and contenido.trimestre else '') %}
+        <select id="trimestre" name="trimestre">
+          <option value="">Aplica a cualquier trimestre</option>
+          <option value="1" {% if sel_trim == '1' %}selected{% endif %}>1.er Trimestre (Semanas 1 a 13)</option>
+          <option value="2" {% if sel_trim == '2' %}selected{% endif %}>2.º Trimestre (Semanas 14 a 27)</option>
+          <option value="3" {% if sel_trim == '3' %}selected{% endif %}>3.er Trimestre (Semanas 28 a 42)</option>
+        </select>
+      </label>
+
+      <div class="form-grid-2">
+        <label for="semana_desde">
+          Semana Desde
+          <input
+            type="number"
+            id="semana_desde"
+            name="semana_desde"
+            min="1"
+            max="42"
+            value="{{ form_data.get('semana_desde', '') if form_data else (contenido.semana_desde if contenido and contenido.semana_desde else '') }}"
+            placeholder="1"
+          >
+        </label>
+
+        <label for="semana_hasta">
+          Semana Hasta
+          <input
+            type="number"
+            id="semana_hasta"
+            name="semana_hasta"
+            min="1"
+            max="42"
+            value="{{ form_data.get('semana_hasta', '') if form_data else (contenido.semana_hasta if contenido and contenido.semana_hasta else '') }}"
+            placeholder="42"
+          >
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fuente y Validación de Salud</legend>
+
+      <label for="fuente_nombre">
+        Nombre de la Fuente *
+        <input
+          type="text"
+          id="fuente_nombre"
+          name="fuente_nombre"
+          maxlength="180"
+          required
+          value="{{ form_data.get('fuente_nombre', '') if form_data else (contenido.fuente_nombre if contenido else 'OPS/OMS - Salud materna') }}"
+          placeholder="Ej. OPS/OMS, Ministerio de Salud..."
+        >
+      </label>
+
+      <label for="fuente_url">
+        URL de la Fuente (Opcional)
+        <input
+          type="url"
+          id="fuente_url"
+          name="fuente_url"
+          maxlength="500"
+          value="{{ form_data.get('fuente_url', '') if form_data else (contenido.fuente_url or '' if contenido else '') }}"
+          placeholder="https://..."
+        >
+      </label>
+
+      <label for="fecha_revision">
+        Fecha de Revisión Médica/Institucional *
+        {% set f_rev = form_data.get('fecha_revision', '') if form_data else (contenido.fecha_revision.strftime('%Y-%m-%d') if contenido and contenido.fecha_revision else '') %}
+        <input
+          type="date"
+          id="fecha_revision"
+          name="fecha_revision"
+          required
+          value="{{ f_rev }}"
+        >
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Publicación</legend>
+      {% set is_pub = (form_data.get('publicado') in ['1', 'true', 'on']) if form_data else (contenido.publicado == 1 if contenido else true) %}
+      <label class="checkbox-row">
+        <input type="checkbox" name="publicado" value="1" {% if is_pub %}checked{% endif %}>
+        <strong>Publicar inmediatamente en la Guía Prenatal</strong>
+      </label>
+      <small class="form-help">Si desmarcas esta opción, el contenido se guardará como borrador y no será visible para las gestantes.</small>
+    </fieldset>
+
+    <div class="form-actions-bar">
+      <button type="submit" class="button button--primary">
+        <span class="material-symbols-outlined">save</span>
+        {{ 'Crear Contenido' if accion == 'crear' else 'Guardar Cambios' }}
+      </button>
+      <a href="{{ url_for('admin.contenidos') }}" class="button button--secondary">Cancelar</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

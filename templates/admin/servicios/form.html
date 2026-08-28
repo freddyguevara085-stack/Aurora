@@ -1,0 +1,66 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}{{ 'Nuevo Servicio' if accion == 'crear' else 'Editar Servicio' }} | Administración Aurora{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1>{{ 'Nuevo Servicio de Atención' if accion == 'crear' else 'Editar Servicio' }}</h1>
+    <p>Define los tipos de atención médica materno-infantil disponibles.</p>
+  </div>
+  <a href="{{ url_for('admin.servicios') }}" class="button button--secondary">
+    <span class="material-symbols-outlined">arrow_back</span> Volver al catálogo
+  </a>
+</div>
+
+<section class="card-surface admin-section">
+  <form method="post" class="stack-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <fieldset>
+      <legend>Información del Servicio</legend>
+
+      <label for="nombre">
+        Nombre del Servicio *
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          maxlength="120"
+          required
+          value="{{ form_data.get('nombre', '') if form_data else (servicio.nombre if servicio else '') }}"
+          placeholder="Ej. Atención prenatal, Vacunación, Planificación familiar..."
+        >
+      </label>
+
+      <label for="descripcion">
+        Descripción del Servicio
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          maxlength="500"
+          placeholder="Describe brevemente en qué consiste la atención brindada (máx. 500 caracteres)..."
+          rows="3"
+        >{{ form_data.get('descripcion', '') if form_data else (servicio.descripcion or '' if servicio else '') }}</textarea>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Disponibilidad</legend>
+      {% set is_act = (form_data.get('activo') in ['1', 'true', 'on']) if form_data else (servicio.activo == 1 if servicio else true) %}
+      <label class="checkbox-row">
+        <input type="checkbox" name="activo" value="1" {% if is_act %}checked{% endif %}>
+        <strong>Servicio activo en el catálogo global</strong>
+      </label>
+    </fieldset>
+
+    <div class="form-actions-bar">
+      <button type="submit" class="button button--primary">
+        <span class="material-symbols-outlined">save</span>
+        {{ 'Registrar Servicio' if accion == 'crear' else 'Guardar Cambios' }}
+      </button>
+      <a href="{{ url_for('admin.servicios') }}" class="button button--secondary">Cancelar</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

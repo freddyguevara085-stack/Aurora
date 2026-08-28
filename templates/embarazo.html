@@ -1,1 +1,45 @@
-{% extends 'layouts/base.html' %}{% block title %}Mi embarazo | Aurora{% endblock %}{% block content %}<main class="app-shell">{% set back_url = url_for('main.index') %}{% set back_label = 'Volver a Inicio' %}{% set page_title = 'Mi embarazo' %}{% include 'partials/page_header.html' %}{% include 'partials/flash.html' %}{% if embarazo %}<section class="card hero"><p>Semana visual</p><strong>{{ semana if semana is not none else '—' }}</strong><p>Estado: {{ embarazo.estado }}</p></section><section class="card data-card"><h2>Información del embarazo</h2><p><b>FUM — Fecha de última menstruación</b><br>{{ embarazo.fum or 'No registrada' }}<small>Primer día de la última menstruación.</small></p><p><b>FPP — Fecha probable de parto</b><br>{{ embarazo.fpp or 'No registrada' }}<small>Fecha estimada; puede ajustarse con orientación profesional.</small></p><p><b>Método de estimación</b><br>{{ embarazo.metodo_fpp or 'No registrado' }}</p><a class="button" href="{{ url_for('main.controles') }}">Ver controles</a></section><details class="card edit-panel"><summary>Editar información</summary>{% set editar = true %}{% include 'partials/embarazo_form.html' %}</details>{% elif perfil and current_user.rol.nombre == 'usuario' %}<section class="card"><h2>Registra tu embarazo</h2><p>Indica al menos una fecha. La información es orientativa y no sustituye la atención profesional.</p>{% set editar = false %}{% include 'partials/embarazo_form.html' %}</section>{% else %}{% set empty_title = 'Sin embarazo activo' %}{% set empty_text = 'No hay un perfil gestante asociado a esta cuenta.' %}{% set empty_url = none %}{% set empty_action = none %}{% include 'partials/empty_state.html' %}{% endif %}{% include 'partials/bottom_nav.html' %}</main>{% endblock %}
+{% extends 'layouts/base.html' %}
+{% block title %}{{ 'Editar embarazo' if editar else 'Mi embarazo' }} | Aurora{% endblock %}
+
+{% block content %}
+<main class="app-shell section-shell pregnancy-page">
+  {% if editar %}
+    {% set back_url = url_for('main.embarazo') %}
+    {% set back_label = 'Cancelar edición y volver a Mi embarazo' %}
+    {% set page_title = 'Editar embarazo' %}
+  {% else %}
+    {% set back_url = url_for('main.index') %}
+    {% set back_label = 'Volver a Inicio' %}
+    {% set page_title = 'Aurora' %}
+  {% endif %}
+  {% include 'partials/page_header.html' %}
+
+  {% if editar %}
+    <section class="section-intro">
+      <h2>Editar embarazo</h2>
+      <p>Actualiza tus fechas y el método de estimación.</p>
+    </section>
+  {% else %}
+    <section class="section-intro"><h2>Mi embarazo</h2><p>Acompaña tu progreso paso a paso</p></section>
+  {% endif %}
+
+  {% include 'partials/flash.html' %}
+
+  {% if embarazo and editar %}
+    <section class="card-surface setup-card pregnancy-edit-card">
+      <p class="form-help">La fecha probable de parto es una estimación y puede ajustarse con orientación profesional.</p>
+      {% include 'partials/embarazo_form.html' %}
+    </section>
+  {% elif embarazo %}
+    {% set trimester = 1 if semana and semana <= 13 else (2 if semana and semana <= 27 else 3) %}
+    <section class="pregnancy-visual card-surface"><div class="pregnancy-photo"><img src="{{ url_for('static', filename='assets/stitch/pregnancy-week-24.jpg') }}" alt="Representación visual del embarazo"><div><strong>Semana {{ semana if semana is not none else '—' }}</strong><span>{% if semana is not none %}{{ 'Primer' if trimester == 1 else ('Segundo' if trimester == 2 else 'Tercer') }} trimestre{% else %}Etapa por calcular{% endif %}</span></div></div><div class="range-labels"><span>Semana 1</span><span>Semana 42</span></div><div class="progress-track"><span style="width:{{ ((semana or 0) / 42 * 100)|round|int }}%"></span></div><p class="range-current">Semana {{ semana if semana is not none else '—' }} de 42</p></section>
+    <section class="pregnancy-status card-surface"><h3><span class="material-symbols-outlined">info</span> Tu embarazo esta semana</h3><div class="status-row"><span class="material-symbols-outlined">calendar_month</span><p><small>Tu etapa</small><strong>{{ 'Primer' if trimester == 1 else ('Segundo' if trimester == 2 else 'Tercer') }} trimestre</strong></p></div><div class="status-row"><span class="material-symbols-outlined">event</span><p><small>Próximo control</small><strong>{% if proximo %}{{ proximo.fecha_control.strftime('%d/%m/%Y') }}{% if proximo.hora_control %} · {{ proximo.hora_control.strftime('%H:%M') }}{% endif %}{% else %}Sin control programado{% endif %}</strong></p></div><div class="status-row"><span class="material-symbols-outlined">child_care</span><p><small>Fecha probable de parto</small><strong>{{ embarazo.fpp.strftime('%d/%m/%Y') if embarazo.fpp else 'No registrada' }}</strong></p></div></section>
+    <a class="button button--secondary button--wide pregnancy-edit-link" href="{{ url_for('main.embarazo', editar=1) }}"><span class="material-symbols-outlined">edit</span> Editar información</a>
+    <section class="prenatal-controls card-surface"><h3><span class="material-symbols-outlined">medical_services</span> Mis controles prenatales</h3><div class="control-count"><strong>{{ controles|length }}</strong><span>controles registrados hasta ahora</span></div><a class="button button--primary button--wide" href="{{ url_for('main.controles') }}">Ver mis controles <span class="material-symbols-outlined">arrow_forward</span></a><div class="split-actions"><a href="{{ url_for('main.nuevo_control') }}"><span class="material-symbols-outlined">add</span> Registrar control</a><a href="{{ url_for('main.calendario') }}"><span class="material-symbols-outlined">calendar_today</span> Ver calendario</a></div></section>
+  {% elif perfil and current_user.rol.nombre == 'usuario' %}
+    <section class="card-surface setup-card"><h3>Registrar embarazo</h3><p>Indica al menos una fecha. Esta información es orientativa y no sustituye la atención profesional.</p>{% include 'partials/embarazo_form.html' %}</section>
+  {% else %}
+    {% set empty_title = 'Sin embarazo activo' %}{% set empty_text = 'No hay un perfil gestante asociado a esta cuenta.' %}{% set empty_url = none %}{% set empty_action = none %}{% include 'partials/empty_state.html' %}
+  {% endif %}
+</main>
+{% endblock %}

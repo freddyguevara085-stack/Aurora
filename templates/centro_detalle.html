@@ -1,1 +1,96 @@
-{% extends 'layouts/base.html' %}{% block title %}{{ centro.nombre }} | Aurora{% endblock %}{% block content %}<main class="app-shell"><a class="back" href="{{ url_for('main.centros') }}">Centros</a><article class="card"><span class="chip">{{ centro.tipo_establecimiento|replace('_', ' ') }}</span><h1>{{ centro.nombre }}</h1><p>{{ centro.municipio }}, {{ centro.departamento }}</p>{% if centro.direccion %}<p>Dirección: {{ centro.direccion }}</p>{% endif %}{% if centro.telefono %}<p><a href="tel:{{ centro.telefono|replace(' ', '')|replace('-', '')|replace('(', '')|replace(')', '') }}">Llamar al centro</a></p>{% endif %}{% if centro.horario %}<p>Horario: {{ centro.horario }}</p>{% endif %}<h2>Servicios disponibles</h2>{% for servicio in servicios %}<span class="chip">{{ servicio.nombre }}</span>{% else %}<p>No hay servicios disponibles registrados.</p>{% endfor %}</article></main>{% endblock %}
+{% extends 'layouts/base.html' %}
+{% block title %}{{ centro.nombre }} | Aurora{% endblock %}
+
+{% block content %}
+<main class="app-shell">
+    {% set back_url = url_for('main.centros') %}
+    {% set back_label = 'Centros de salud' %}
+    {% set page_title = 'Detalles del Centro' %}
+    {% include 'partials/page_header.html' %}
+
+    {% if centro.fecha_verificacion %}
+    <section class="verification-notice verification-notice--verified" role="status">
+        <span class="material-symbols-outlined" aria-hidden="true">verified</span>
+        <div>
+            <strong>Verificación institucional registrada</strong>
+            <p>Última verificación: {{ centro.fecha_verificacion.strftime('%d/%m/%Y') }}.</p>
+        </div>
+    </section>
+    {% else %}
+    <section class="verification-notice" role="note">
+        <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+        <div>
+            <strong>Información por confirmar</strong>
+            <p>Este centro aún no cuenta con verificación institucional registrada. Confirma teléfono, horario y servicios directamente con el establecimiento antes de acudir.</p>
+        </div>
+    </section>
+    {% endif %}
+
+    <article class="card" style="margin-bottom: 24px;">
+        <div style="margin-bottom: 16px;">
+            <span class="status-badge status-badge--success" style="text-transform: capitalize;">
+                {{ centro.tipo_establecimiento|replace('_', ' ') }}
+            </span>
+        </div>
+
+        <h1 style="margin-top: 0; font-size: 22px; line-height: 1.3;">{{ centro.nombre }}</h1>
+        <div class="muted-row" style="margin-bottom: 20px;">
+            <span class="material-symbols-outlined">map</span>
+            <span>{{ centro.municipio }}, {{ centro.departamento }}</span>
+        </div>
+
+        {% if centro.direccion %}
+        <div class="muted-row" style="align-items: flex-start; margin-bottom: 12px;">
+            <span class="material-symbols-outlined" style="margin-top: 2px;">location_on</span>
+            <span style="color: var(--ink);">{{ centro.direccion }}</span>
+        </div>
+        {% endif %}
+
+        {% if centro.horario %}
+        <div class="muted-row" style="align-items: flex-start; margin-bottom: 20px;">
+            <span class="material-symbols-outlined" style="margin-top: 2px;">schedule</span>
+            <span style="color: var(--ink);">{{ centro.horario }}</span>
+        </div>
+        {% endif %}
+
+        {% if centro.telefono %}
+        <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
+            {# Split phones if there are multiple (e.g. '8213-1122 / 2713-6305') #}
+            {% for tel in centro.telefono.split('/') %}
+                <a href="tel:{{ tel|trim|replace(' ', '')|replace('-', '') }}" class="button button--primary button--wide" style="text-decoration: none;">
+                    <span class="material-symbols-outlined">call</span>
+                    Llamar al {{ tel|trim }}
+                </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if centro.latitud and centro.longitud %}
+        <div style="margin-top: {% if centro.telefono %}12px{% else %}24px{% endif %};">
+            <a href="https://www.google.com/maps/search/?api=1&query={{ centro.latitud }},{{ centro.longitud }}" target="_blank" class="button button--secondary button--wide" style="text-decoration: none;">
+                <span class="material-symbols-outlined">directions</span>
+                Ver en el mapa
+            </a>
+        </div>
+        {% endif %}
+    </article>
+
+    <h2 class="eyebrow" style="margin-bottom: 12px;">SERVICIOS DISPONIBLES</h2>
+    <div class="card" style="padding: 20px;">
+        {% if servicios %}
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                {% for servicio in servicios %}
+                    <span class="admin-badge" style="background: var(--soft); color: var(--ink); border: 1px solid var(--line); font-weight: 500; font-size: 13px; padding: 6px 12px;">
+                        {{ servicio.nombre }}
+                    </span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="muted-row">
+                <span class="material-symbols-outlined">info</span>
+                <span>No hay servicios registrados para este centro.</span>
+            </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

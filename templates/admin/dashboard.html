@@ -1,0 +1,78 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Dashboard | Administración Aurora{% endblock %}
+
+{% block admin_content %}
+<section class="admin-welcome">
+  <h1>Panel de Administración</h1>
+  <p>Gestión centralizada de contenidos, señales de alerta y directorio de salud.</p>
+</section>
+
+<section class="admin-metrics-grid">
+  <div class="metric-card card-surface">
+    <div class="metric-card__header">
+      <span class="material-symbols-outlined metric-icon">menu_book</span>
+      <span class="metric-count">{{ metricas.contenidos }}</span>
+    </div>
+    <h3>Contenidos Prenatales</h3>
+    <p>{{ metricas.contenidos_publicados }} publicados en la guía</p>
+  </div>
+
+  <div class="metric-card card-surface">
+    <div class="metric-card__header">
+      <span class="material-symbols-outlined metric-icon metric-icon--pink">warning</span>
+      <span class="metric-count">{{ metricas.senales }}</span>
+    </div>
+    <h3>Señales de Alerta</h3>
+    <p>{{ metricas.senales_activas }} activas para consulta</p>
+  </div>
+
+  <div class="metric-card card-surface">
+    <div class="metric-card__header">
+      <span class="material-symbols-outlined metric-icon">local_hospital</span>
+      <span class="metric-count">{{ metricas.centros }}</span>
+    </div>
+    <h3>Centros de Salud</h3>
+    <p>{{ metricas.centros_activos }} establecimientos habilitados</p>
+  </div>
+
+  <div class="metric-card card-surface">
+    <div class="metric-card__header">
+      <span class="material-symbols-outlined metric-icon metric-icon--pink">medical_services</span>
+      <span class="metric-count">{{ metricas.servicios }}</span>
+    </div>
+    <h3>Servicios Disponibles</h3>
+    <p>Catálogo global de atención</p>
+  </div>
+</section>
+
+<section class="admin-section card-surface">
+  <h2>Actividad Reciente</h2>
+  {% if eventos %}
+    <div class="admin-table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Acción</th>
+            <th>Módulo</th>
+            <th>Usuario</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for ev in eventos %}
+            <tr>
+              <td><small>{{ ev.created_at.strftime('%d/%m/%Y %H:%M') }}</small></td>
+              <td><span class="chip">{{ ev.accion }}</span></td>
+              <td><strong>{{ ev.entidad }}</strong></td>
+              <td>{{ ev.usuario.nombres if ev.usuario else 'Sistema' }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="muted-text">No se han registrado eventos en el historial de auditoría todavía.</p>
+  {% endif %}
+</section>
+{% endblock %}

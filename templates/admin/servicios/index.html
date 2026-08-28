@@ -1,0 +1,86 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Catálogo de Servicios | Administración Aurora{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1>Catálogo de Servicios de Salud</h1>
+    <p>Servicios que pueden ser asignados a los centros de atención médica.</p>
+  </div>
+  <a href="{{ url_for('admin.nuevo_servicio') }}" class="button button--primary">
+    <span class="material-symbols-outlined">add</span> Nuevo Servicio
+  </a>
+</div>
+
+<section class="card-surface admin-section">
+  {% if servicios %}
+    <div class="admin-table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Nombre del Servicio</th>
+            <th>Descripción</th>
+            <th>Centros Asociados</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in servicios %}
+            <tr>
+              <td><strong>{{ item.nombre }}</strong></td>
+              <td>
+                {% if item.descripcion %}
+                  <p class="admin-cell-desc">{{ item.descripcion }}</p>
+                {% else %}
+                  <span class="muted-text">Sin descripción</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="chip" style="background: var(--soft); color: var(--primary);">
+                  {{ item.asignaciones_centros|length }} centro(s)
+                </span>
+              </td>
+              <td>
+                {% if item.activo %}
+                  <span class="status-badge status-badge--success">Activo</span>
+                {% else %}
+                  <span class="status-badge status-badge--warning">Inactivo</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="admin-row-actions">
+                  <a href="{{ url_for('admin.editar_servicio', servicio_id=item.id) }}" class="admin-action-btn" title="Editar">
+                    <span class="material-symbols-outlined">edit</span>
+                  </a>
+
+                  <form action="{{ url_for('admin.toggle_servicio', servicio_id=item.id) }}" method="post" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="admin-action-btn" title="{{ 'Desactivar' if item.activo else 'Activar' }}">
+                      <span class="material-symbols-outlined">{{ 'toggle_on' if item.activo else 'toggle_off' }}</span>
+                    </button>
+                  </form>
+
+                  <form action="{{ url_for('admin.eliminar_servicio', servicio_id=item.id) }}" method="post" class="inline-form" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este servicio?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty">
+      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);">medical_services</span>
+      <h3>No hay servicios registrados</h3>
+      <p>Comienza agregando los servicios disponibles para asociarlos a los centros de salud.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

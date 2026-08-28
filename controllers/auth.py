@@ -53,6 +53,8 @@ def cargar_usuario(user_id: str) -> Usuario | None:
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
+        if current_user.rol and current_user.rol.nombre == "administrador":
+            return redirect(url_for("admin.dashboard"))
         return redirect(url_for("main.index"))
 
     if request.method == "POST":
@@ -74,6 +76,8 @@ def login():
 
         login_user(usuario, remember=False)
         next_url = normalizar_next_local(request.args.get("next"))
+        if not next_url and usuario.rol and usuario.rol.nombre == "administrador":
+            return redirect(url_for("admin.dashboard"))
         return redirect(next_url or url_for("main.index"))
 
     return render_template("login.html")

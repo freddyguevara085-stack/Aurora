@@ -2,6 +2,7 @@ from flask import Flask
 
 from config import Config
 from commands import register_commands
+from controllers.admin import admin_bp
 from controllers.auth import auth_bp
 from controllers.routes import main_bp
 from extensions import csrf, db, login_manager, migrate
@@ -20,6 +21,7 @@ migrate.init_app(app, db)
 
 app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
+app.register_blueprint(admin_bp)
 register_commands(app)
 
 if __name__ == '__main__':

@@ -1,0 +1,105 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}Señales de Alerta | Administración Aurora{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1>Gestión de Señales de Alerta</h1>
+    <p>Signos de advertencia orientativos que indican cuándo acudir a urgencias o al centro de salud.</p>
+  </div>
+  <a href="{{ url_for('admin.nueva_senal') }}" class="button button--primary">
+    <span class="material-symbols-outlined">add</span> Nueva Señal
+  </a>
+</div>
+
+<section class="card-surface admin-filter-card">
+  <form method="get" class="admin-filter-form">
+    <div class="filter-group">
+      <label for="estado">Filtrar por Estado</label>
+      <select id="estado" name="estado">
+        <option value="">Todas</option>
+        <option value="activa" {% if estado_actual == 'activa' %}selected{% endif %}>Activas</option>
+        <option value="inactiva" {% if estado_actual == 'inactiva' %}selected{% endif %}>Inactivas</option>
+      </select>
+    </div>
+
+    <div class="filter-actions">
+      <button type="submit" class="button button--primary">Filtrar</button>
+      {% if estado_actual %}
+        <a href="{{ url_for('admin.senales') }}" class="button button--secondary">Limpiar</a>
+      {% endif %}
+    </div>
+  </form>
+</section>
+
+<section class="card-surface admin-section">
+  {% if senales %}
+    <div class="admin-table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Orden</th>
+            <th>Título y Descripción</th>
+            <th>Acción Recomendada</th>
+            <th>Estado</th>
+            <th>Revisión</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in senales %}
+            <tr>
+              <td>
+                <span class="chip" style="font-weight: 700;">#{{ item.orden_visual }}</span>
+              </td>
+              <td>
+                <strong>{{ item.titulo }}</strong>
+                <p class="admin-cell-desc">{{ item.descripcion[:90] }}...</p>
+              </td>
+              <td>
+                <p class="admin-cell-desc" style="color: #6f3253; font-weight: 500;">{{ item.accion_recomendada[:80] }}...</p>
+              </td>
+              <td>
+                {% if item.activo %}
+                  <span class="status-badge status-badge--success">Activa</span>
+                {% else %}
+                  <span class="status-badge status-badge--warning">Inactiva</span>
+                {% endif %}
+              </td>
+              <td><small>{{ item.fecha_revision.strftime('%d/%m/%Y') }}</small></td>
+              <td>
+                <div class="admin-row-actions">
+                  <a href="{{ url_for('admin.editar_senal', senal_id=item.id) }}" class="admin-action-btn" title="Editar">
+                    <span class="material-symbols-outlined">edit</span>
+                  </a>
+
+                  <form action="{{ url_for('admin.toggle_senal', senal_id=item.id) }}" method="post" class="inline-form">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="admin-action-btn" title="{{ 'Desactivar' if item.activo else 'Activar' }}">
+                      <span class="material-symbols-outlined">{{ 'toggle_on' if item.activo else 'toggle_off' }}</span>
+                    </button>
+                  </form>
+
+                  <form action="{{ url_for('admin.eliminar_senal', senal_id=item.id) }}" method="post" class="inline-form" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta señal de alerta?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar">
+                      <span class="material-symbols-outlined">delete</span>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty">
+      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);">warning</span>
+      <h3>No se encontraron señales de alerta</h3>
+      <p>No hay registros coincidentes con los filtros aplicados.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

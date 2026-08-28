@@ -1,0 +1,133 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}{{ 'Nueva Señal de Alerta' if accion == 'crear' else 'Editar Señal de Alerta' }} | Administración Aurora{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1>{{ 'Nueva Señal de Alerta' if accion == 'crear' else 'Editar Señal de Alerta' }}</h1>
+    <p>Define signos de advertencia que orientan a la gestante a buscar atención médica inmediata.</p>
+  </div>
+  <a href="{{ url_for('admin.senales') }}" class="button button--secondary">
+    <span class="material-symbols-outlined">arrow_back</span> Volver a la lista
+  </a>
+</div>
+
+<section class="card-surface admin-section">
+  <form method="post" class="stack-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <fieldset>
+      <legend>Información de la Señal</legend>
+
+      <label for="titulo">
+        Título de la Señal *
+        <input
+          type="text"
+          id="titulo"
+          name="titulo"
+          maxlength="180"
+          required
+          value="{{ form_data.get('titulo', '') if form_data else (senal.titulo if senal else '') }}"
+          placeholder="Ej. Sangrado vaginal, Fiebre o escalofríos, Dolor intenso..."
+        >
+      </label>
+
+      <label for="descripcion">
+        Descripción del Síntoma / Signo *
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          required
+          placeholder="Describe brevemente qué es lo que la usuaria podría experimentar..."
+          rows="3"
+        >{{ form_data.get('descripcion', '') if form_data else (senal.descripcion if senal else '') }}</textarea>
+      </label>
+
+      <label for="accion_recomendada">
+        Acción Recomendada *
+        <textarea
+          id="accion_recomendada"
+          name="accion_recomendada"
+          required
+          placeholder="Indica con claridad qué debe hacer (ej. 'Busca atención profesional de inmediato')..."
+          rows="2"
+        >{{ form_data.get('accion_recomendada', '') if form_data else (senal.accion_recomendada if senal else '') }}</textarea>
+      </label>
+
+      <label for="orden_visual">
+        Orden Visual de Prioridad
+        {% set ord_val = form_data.get('orden_visual', '') if form_data else (senal.orden_visual if senal else '0') %}
+        <input
+          type="number"
+          id="orden_visual"
+          name="orden_visual"
+          min="0"
+          max="65535"
+          value="{{ ord_val }}"
+          placeholder="0"
+        >
+        <small class="form-help">Los números menores aparecen primero en la lista de señales (0, 1, 2...).</small>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Fuente Médica y Validación</legend>
+
+      <label for="fuente_nombre">
+        Nombre de la Fuente *
+        <input
+          type="text"
+          id="fuente_nombre"
+          name="fuente_nombre"
+          maxlength="180"
+          required
+          value="{{ form_data.get('fuente_nombre', '') if form_data else (senal.fuente_nombre if senal else 'OPS/OMS - Salud materna') }}"
+          placeholder="Ej. OPS/OMS, Protocolo MINSA..."
+        >
+      </label>
+
+      <label for="fuente_url">
+        URL de la Fuente (Opcional)
+        <input
+          type="url"
+          id="fuente_url"
+          name="fuente_url"
+          maxlength="500"
+          value="{{ form_data.get('fuente_url', '') if form_data else (senal.fuente_url or '' if senal else '') }}"
+          placeholder="https://..."
+        >
+      </label>
+
+      <label for="fecha_revision">
+        Fecha de Revisión Oficial *
+        {% set f_rev = form_data.get('fecha_revision', '') if form_data else (senal.fecha_revision.strftime('%Y-%m-%d') if senal and senal.fecha_revision else '') %}
+        <input
+          type="date"
+          id="fecha_revision"
+          name="fecha_revision"
+          required
+          value="{{ f_rev }}"
+        >
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Disponibilidad</legend>
+      {% set is_act = (form_data.get('activo') in ['1', 'true', 'on']) if form_data else (senal.activo == 1 if senal else true) %}
+      <label class="checkbox-row">
+        <input type="checkbox" name="activo" value="1" {% if is_act %}checked{% endif %}>
+        <strong>Señal activa y visible en la aplicación</strong>
+      </label>
+    </fieldset>
+
+    <div class="form-actions-bar">
+      <button type="submit" class="button button--primary">
+        <span class="material-symbols-outlined">save</span>
+        {{ 'Registrar Señal' if accion == 'crear' else 'Guardar Cambios' }}
+      </button>
+      <a href="{{ url_for('admin.senales') }}" class="button button--secondary">Cancelar</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

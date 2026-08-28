@@ -1,0 +1,228 @@
+{% extends 'admin/base_admin.html' %}
+
+{% block title %}{{ 'Nuevo Centro de Salud' if accion == 'crear' else 'Editar Centro de Salud' }} | Administración Aurora{% endblock %}
+
+{% block admin_content %}
+<div class="admin-page-header">
+  <div>
+    <h1>{{ 'Nuevo Centro de Salud' if accion == 'crear' else 'Editar Centro de Salud' }}</h1>
+    <p>Registra la información de contacto, ubicación y servicios que ofrece el establecimiento.</p>
+  </div>
+  <a href="{{ url_for('admin.centros') }}" class="button button--secondary">
+    <span class="material-symbols-outlined">arrow_back</span> Volver al directorio
+  </a>
+</div>
+
+<section class="card-surface admin-section">
+  <form method="post" class="stack-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <fieldset>
+      <legend>Identificación del Establecimiento</legend>
+
+      <label for="nombre">
+        Nombre del Centro *
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          maxlength="150"
+          required
+          value="{{ form_data.get('nombre', '') if form_data else (centro.nombre if centro else '') }}"
+          placeholder="Ej. Centro de Salud Sócrates Flores, Hospital Bertha Calderón..."
+        >
+      </label>
+
+      <div class="form-grid-2">
+        <label for="tipo_establecimiento">
+          Tipo de Establecimiento *
+          {% set sel_tipo = form_data.get('tipo_establecimiento', '') if form_data else (centro.tipo_establecimiento if centro else 'centro_salud') %}
+          <select id="tipo_establecimiento" name="tipo_establecimiento" required>
+            <option value="hospital" {% if sel_tipo == 'hospital' %}selected{% endif %}>Hospital</option>
+            <option value="centro_salud" {% if sel_tipo == 'centro_salud' %}selected{% endif %}>Centro de salud</option>
+            <option value="puesto_salud" {% if sel_tipo == 'puesto_salud' %}selected{% endif %}>Puesto de salud</option>
+            <option value="casa_materna" {% if sel_tipo == 'casa_materna' %}selected{% endif %}>Casa materna</option>
+            <option value="clinica" {% if sel_tipo == 'clinica' %}selected{% endif %}>Clínica</option>
+            <option value="otro" {% if sel_tipo == 'otro' %}selected{% endif %}>Otro</option>
+          </select>
+        </label>
+
+        <label for="codigo_minsa">
+          Código Oficial MINSA (Opcional)
+          <input
+            type="text"
+            id="codigo_minsa"
+            name="codigo_minsa"
+            maxlength="20"
+            value="{{ form_data.get('codigo_minsa', '') if form_data else (centro.codigo_minsa or '' if centro else '') }}"
+            placeholder="Ej. MINSA-1024"
+          >
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Ubicación Geográfica</legend>
+
+      <div class="form-grid-2">
+        <label for="departamento">
+          Departamento *
+          <input
+            type="text"
+            id="departamento"
+            name="departamento"
+            maxlength="100"
+            required
+            value="{{ form_data.get('departamento', '') if form_data else (centro.departamento if centro else '') }}"
+            placeholder="Ej. Managua, Matagalpa, León..."
+          >
+        </label>
+
+        <label for="municipio">
+          Municipio *
+          <input
+            type="text"
+            id="municipio"
+            name="municipio"
+            maxlength="100"
+            required
+            value="{{ form_data.get('municipio', '') if form_data else (centro.municipio if centro else '') }}"
+            placeholder="Ej. Managua, Tipitapa, Ciudad Sandino..."
+          >
+        </label>
+      </div>
+
+      <label for="silais">
+        SILAIS de Referencia (Opcional)
+        <input
+          type="text"
+          id="silais"
+          name="silais"
+          maxlength="100"
+          value="{{ form_data.get('silais', '') if form_data else (centro.silais or '' if centro else '') }}"
+          placeholder="Ej. SILAIS Managua"
+        >
+      </label>
+
+      <label for="direccion">
+        Dirección Física
+        <textarea
+          id="direccion"
+          name="direccion"
+          placeholder="Puntos de referencia o dirección exacta..."
+          rows="2"
+        >{{ form_data.get('direccion', '') if form_data else (centro.direccion or '' if centro else '') }}</textarea>
+      </label>
+
+      <div class="form-grid-2">
+        <label for="latitud">
+          Latitud (GPS)
+          <input
+            type="number"
+            id="latitud"
+            name="latitud"
+            step="0.0000001"
+            min="-90"
+            max="90"
+            value="{{ form_data.get('latitud', '') if form_data else (centro.latitud or '' if centro else '') }}"
+            placeholder="12.136389"
+          >
+        </label>
+
+        <label for="longitud">
+          Longitud (GPS)
+          <input
+            type="number"
+            id="longitud"
+            name="longitud"
+            step="0.0000001"
+            min="-180"
+            max="180"
+            value="{{ form_data.get('longitud', '') if form_data else (centro.longitud or '' if centro else '') }}"
+            placeholder="-86.251389"
+          >
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Contacto y Horario de Atención</legend>
+
+      <div class="form-grid-2">
+        <label for="telefono">
+          Teléfono de Contacto
+          <input
+            type="text"
+            id="telefono"
+            name="telefono"
+            maxlength="30"
+            value="{{ form_data.get('telefono', '') if form_data else (centro.telefono or '' if centro else '') }}"
+            placeholder="Ej. 2222-3344"
+          >
+        </label>
+
+        <label for="horario">
+          Horario de Atención
+          <input
+            type="text"
+            id="horario"
+            name="horario"
+            maxlength="255"
+            value="{{ form_data.get('horario', '') if form_data else (centro.horario or '' if centro else 'Lunes a Viernes 7:00 AM - 4:00 PM') }}"
+            placeholder="Ej. 24 horas / Lunes a Viernes 8am - 4pm"
+          >
+        </label>
+      </div>
+
+      <label for="fecha_verificacion">
+        Fecha de Verificación de Datos
+        {% set f_ver = form_data.get('fecha_verificacion', '') if form_data else (centro.fecha_verificacion.strftime('%Y-%m-%d') if centro and centro.fecha_verificacion else '') %}
+        <input
+          type="date"
+          id="fecha_verificacion"
+          name="fecha_verificacion"
+          value="{{ f_ver }}"
+        >
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Servicios Disponibles en este Centro</legend>
+      <p class="form-help">Selecciona todos los servicios que actualmente ofrece este establecimiento de salud:</p>
+
+      <div class="services-checkbox-grid">
+        {% for serv in servicios %}
+          <label class="checkbox-row" style="background: var(--soft); padding: 8px 12px; border-radius: 10px;">
+            <input
+              type="checkbox"
+              name="servicios_ids"
+              value="{{ serv.id }}"
+              {% if serv.id in servicios_asignados_ids %}checked{% endif %}
+            >
+            <span><strong>{{ serv.nombre }}</strong></span>
+          </label>
+        {% else %}
+          <p class="muted-text">No hay servicios registrados en el catálogo. <a href="{{ url_for('admin.nuevo_servicio') }}">Crear un servicio</a> primero.</p>
+        {% endfor %}
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Disponibilidad</legend>
+      {% set is_act = (form_data.get('activo') in ['1', 'true', 'on']) if form_data else (centro.activo == 1 if centro else true) %}
+      <label class="checkbox-row">
+        <input type="checkbox" name="activo" value="1" {% if is_act %}checked{% endif %}>
+        <strong>Centro de salud activo y visible para las usuarias</strong>
+      </label>
+    </fieldset>
+
+    <div class="form-actions-bar">
+      <button type="submit" class="button button--primary">
+        <span class="material-symbols-outlined">save</span>
+        {{ 'Registrar Centro' if accion == 'crear' else 'Guardar Cambios' }}
+      </button>
+      <a href="{{ url_for('admin.centros') }}" class="button button--secondary">Cancelar</a>
+    </div>
+  </form>
+</section>
+{% endblock %}
