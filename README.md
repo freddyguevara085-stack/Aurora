@@ -1,21 +1,38 @@
 # Aurora
 
-Aurora es una aplicación web progresiva para el acompañamiento prenatal. Ayuda a la gestante a organizar su información de embarazo, controles y recursos educativos desde una experiencia móvil, sin sustituir la atención de profesionales de salud.
+Aurora es una aplicación web de acompañamiento prenatal. Su MVP busca que una gestante pueda entender en qué etapa está, organizar su próximo control y encontrar orientación para buscar ayuda. No diagnostica, no prescribe ni sustituye la atención de profesionales de salud.
 
-Estado técnico de referencia: commit `13f7d36` (`feat: completar MVP de Aurora`).
+## Alcance del MVP
 
-## Funciones principales
+El recorrido principal que valida Aurora es: iniciar sesión, completar el perfil y embarazo, consultar la semana gestacional, registrar un control y acceder a señales de alerta y centros de atención.
 
-- Autenticación por correo y contraseña, con redirección según rol.
-- Perfil de gestante con datos personales, ubicación, contacto de emergencia y consentimiento.
-- Registro y edición del embarazo activo, cálculo visual de semana y trimestre, y cálculo de FPP desde FUM cuando corresponde.
-- Registro, consulta y seguimiento de controles prenatales propios.
-- Calendario de controles y recordatorios pendientes.
-- Guía prenatal con filtros por trimestre y categoría, más detalle de artículos publicados.
-- Señales de alerta activas con orientación para buscar atención profesional cuando corresponda.
-- Directorio de centros activos, búsqueda por nombre o municipio, filtro por tipo y detalle de servicios.
-- Panel administrativo para contenidos prenatales, señales de alerta, centros de atención y servicios; incluye métricas y eventos recientes de auditoría.
-- PWA instalable con caché del shell estático y recursos esenciales tras una visita inicial en línea.
+### Funciones principales para la gestante
+
+- Inicio de sesión por correo y contraseña.
+- Perfil con datos personales, ubicación, contacto de emergencia y consentimiento.
+- Registro y edición del embarazo activo, con cálculo visual orientativo de semana, trimestre y FPP desde la FUM cuando corresponde.
+- Registro y consulta de controles prenatales propios.
+- Calendario de controles y consulta de recordatorios pendientes previamente registrados.
+- Señales de alerta con orientación para buscar atención profesional.
+- Directorio de centros activos, con búsqueda, filtros y detalle de servicios.
+
+### Funciones complementarias
+
+- Guía prenatal con filtros por trimestre y categoría.
+- Instalación como PWA y caché de recursos estáticos esenciales. Los datos dinámicos y las páginas privadas requieren conexión al servidor.
+
+### Soporte interno
+
+El repositorio también contiene un panel administrativo para mantener contenidos, señales, centros y servicios, además de mostrar métricas y eventos recientes de auditoría. Este panel facilita la demostración y operación del MVP, pero no forma parte de la propuesta de valor principal para la gestante.
+
+### Fuera del alcance actual
+
+- Registro público y recuperación de contraseña.
+- Creación, edición o envío automático de recordatorios y notificaciones.
+- Edición o reprogramación de controles ya registrados.
+- Funcionamiento completo sin conexión.
+- Interfaz dedicada para el rol `auditor`.
+- Integraciones con expedientes clínicos o sistemas institucionales.
 
 ## Tecnologías
 
@@ -28,7 +45,7 @@ Estado técnico de referencia: commit `13f7d36` (`feat: completar MVP de Aurora`
 | Flask-Migrate | Integración de migraciones para el proyecto. |
 | Jinja2, HTML y CSS | Plantillas y diseño responsive. |
 | Poppins e iconos Material Symbols locales | Tipografía e iconografía sin CDN. |
-| Service Worker y Web App Manifest | Capacidades PWA y disponibilidad básica sin conexión. |
+| Service Worker y Web App Manifest | Instalación PWA y caché del shell estático. |
 | MySQL | Persistencia relacional. |
 
 ## Estructura del proyecto
@@ -164,9 +181,9 @@ flask --app app create-user
 
 | Rol | Estado real en el MVP |
 | --- | --- |
-| `usuario` | Puede acceder a su perfil, embarazo, controles, calendario, guía, alertas y directorio. Las consultas de seguimiento se limitan al perfil asociado a `current_user.id`. |
+| `usuario` | Puede acceder a su perfil, embarazo, controles, calendario, guía, alertas y directorio. Las consultas se limitan al perfil asociado a `current_user.id`. |
 | `administrador` | Es el único rol autorizado por `admin_required` para acceder al panel y gestionar contenidos, señales, centros y servicios. El panel muestra actividad reciente de auditoría. |
-| `auditor` | Está definido en el esquema con el permiso `consultar_auditoria`, pero el MVP actual no expone una ruta o interfaz específica para este rol. |
+| `auditor` | Está previsto en el esquema con el permiso `consultar_auditoria`, pero queda fuera del alcance funcional actual porque no existe una ruta o interfaz específica para este rol. |
 
 Los permisos se modelan en las tablas `roles`, `permisos` y `roles_permisos`. La autorización actualmente aplicada en las rutas administrativas exige explícitamente el rol `administrador`.
 
@@ -181,19 +198,23 @@ Los permisos se modelan en las tablas `roles`, `permisos` y `roles_permisos`. La
 - Redirección `next` de login normalizada para aceptar solo rutas locales seguras.
 - Rollback ante errores SQL en operaciones de escritura.
 
-## PWA y disponibilidad sin conexión
+## PWA y caché estática
 
 El navegador registra el service worker desde `static/js/app.js`. Tras una visita inicial con conexión, `static/service-worker.js` almacena el manifest, CSS, JavaScript, tipografías e imágenes esenciales del shell de Aurora.
 
-La caché es básica y no convierte Aurora en una aplicación clínica sin conexión: las páginas privadas no se agregan al shell y los datos dinámicos requieren acceso al servidor.
+Esta capacidad permite instalar la aplicación y reutilizar recursos visuales ya descargados; no ofrece un modo funcional sin conexión. Las páginas privadas no se agregan al shell y los datos dinámicos requieren acceso al servidor.
 
 ## Limitaciones del MVP
 
 - Aurora brinda acompañamiento informativo; no diagnostica, no prescribe y no sustituye la atención profesional.
 - La fecha probable de parto y la semana mostrada son orientativas.
 - El directorio comunica cuando un centro no tiene verificación institucional registrada. Confirma teléfono, horario y servicios directamente con el establecimiento antes de acudir.
-- El rol `auditor` está modelado en la base de datos, pero su interfaz dedicada no forma parte del MVP actual.
+- Las cuentas se crean localmente mediante un comando administrativo; no existe registro público ni recuperación de contraseña.
+- Los recordatorios existentes solo se consultan. El MVP no los crea, envía ni convierte en notificaciones del dispositivo.
+- Los controles pueden registrarse y consultarse, pero todavía no editarse o reprogramarse desde la interfaz de la gestante.
+- El proyecto aún no incluye una suite de pruebas automatizadas.
+- Un despliegue con datos reales requeriría validación clínica y legal, controles adicionales de privacidad y seguridad, copias de respaldo y una configuración de producción.
 
 ## Estado actual
 
-El MVP del commit `13f7d36` incluye flujos funcionales de gestante, autenticación y roles, panel administrativo, persistencia MySQL, recursos visuales locales y PWA básica. Para cambios posteriores, verifica el estado de la rama con `git status` antes de editar o desplegar.
+El MVP incluye el recorrido principal de la gestante, autenticación, persistencia MySQL, contenidos de apoyo, directorio de centros y un panel administrativo de soporte. La prioridad antes de ampliar el alcance es validar el recorrido principal con usuarias, incorporar pruebas automatizadas y cerrar los requisitos necesarios para un despliegue seguro.
