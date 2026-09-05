@@ -92,55 +92,104 @@ La separación anterior corresponde al patrón MVC: los controladores reciben la
 
 Clona el proyecto y entra a su carpeta:
 
-```powershell
+```bash
 git clone https://github.com/freddyguevara085-stack/Aurora.git
 cd Aurora
 ```
 
-Crea y activa el entorno virtual:
+### Entorno virtual y dependencias
+
+Crea el entorno virtual e instala las dependencias según la terminal que utilices:
+
+**Opción A — PowerShell:**
 
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
-```
-
-Instala las dependencias:
-
-```powershell
 python -m pip install -r requirements.txt
 ```
 
-En CMD, la activación equivalente es:
+**Opción B — CMD (Símbolo del sistema):**
 
 ```cmd
+py -m venv .venv
 .venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
 ```
 
 ## Configuración local
 
 Copia la plantilla pública de configuración y completa los valores locales necesarios. No subas `.env` al repositorio ni compartas sus valores.
 
-```powershell
-Copy-Item .env.example .env
-```
+- En PowerShell:
+  ```powershell
+  Copy-Item .env.example .env
+  ```
+- En CMD:
+  ```cmd
+  copy .env.example .env
+  ```
 
 La aplicación requiere `SECRET_KEY` y utiliza las variables `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USER` y `MYSQL_PASSWORD` para construir la conexión. Los nombres de la base y las credenciales de `.env` deben coincidir con tu instalación local de MySQL.
 
-### Base de datos MySQL
+## Base de datos MySQL
 
-El script [Aurora_BD.sql](Aurora_BD.sql) crea la base `aurora`, sus tablas, claves, índices, roles y permisos. Ejecútalo desde la raíz del repositorio:
+### Importación por consola (CMD)
 
-```powershell
+El script [Aurora_BD.sql](Aurora_BD.sql) crea la base `aurora`, sus tablas, claves, índices, roles y permisos. Para cargar contenidos, señales y servicios iniciales del MVP, se ejecuta el seed idempotente [database/Aurora_MVP_seed.sql](database/Aurora_MVP_seed.sql).
+
+Dado que el operador de redirección `<` está reservado en PowerShell y produce un error de sintaxis, los siguientes comandos deben ejecutarse en **CMD (Símbolo del sistema)** desde la raíz del repositorio:
+
+```cmd
 mysql -u root -p < Aurora_BD.sql
-```
-
-Para cargar contenidos, señales y servicios iniciales del MVP, ejecuta el seed idempotente:
-
-```powershell
 mysql -u root -p aurora < database\Aurora_MVP_seed.sql
 ```
 
-El modelo relacional y sus relaciones están definidos en [Aurora_BD.sql](Aurora_BD.sql). No hay un diagrama gráfico separado en el repositorio.
+> **Nota para PowerShell:** Si prefieres importar utilizando PowerShell en lugar de CMD, utiliza el paso de contenido por tubería (*pipe*):
+> ```powershell
+> Get-Content Aurora_BD.sql | mysql -u root -p
+> Get-Content database\Aurora_MVP_seed.sql | mysql -u root -p aurora
+> ```
+
+### Alternativa gráfica desde MySQL Workbench
+
+Si prefieres importar la base de datos visualmente sin usar la consola:
+
+1. Abre **MySQL Workbench** y conéctate a tu servidor local de MySQL.
+2. **Esquema y catálogos base**: Ve al menú **File > Open SQL Script...** (o pulsa `Ctrl + Shift + O`), selecciona el archivo [Aurora_BD.sql](Aurora_BD.sql) de la raíz del proyecto y presiona el icono de rayo (**Execute / `Ctrl + Shift + Enter`**). Esto creará la base de datos `aurora`, las tablas, índices, roles y permisos.
+3. **Datos iniciales (Seed)**: De la misma forma, abre el archivo [database/Aurora_MVP_seed.sql](database/Aurora_MVP_seed.sql) y ejecútalo (asegurándote de que el esquema `aurora` esté seleccionado o activo) para cargar los contenidos prenatales, señales de alerta y servicios iniciales del MVP.
+
+### Diagrama Entidad-Relación
+
+El diagrama Entidad-Relación (ER) ya existe y se entrega por separado como parte de los entregables oficiales de la competencia (Hackathon Nicaragua 2026, categoría Aficionado). No se incluye un archivo gráfico del diagrama dentro de este repositorio; todas las entidades, claves primarias, foráneas, restricciones de integridad e índices se encuentran íntegramente implementadas y documentadas en [Aurora_BD.sql](Aurora_BD.sql).
+
+## Normalización de la base de datos (1FN y 2FN)
+
+El diseño del esquema relacional en [Aurora_BD.sql](Aurora_BD.sql) fue analizado y estructurado bajo las reglas de normalización:
+
+### Primera Forma Normal (1FN)
+
+- **Criterio**: Requiere que cada campo contenga exclusivamente valores atómicos (indivisibles), que no existan grupos repetitivos ni atributos multivaluados en una misma columna, y que cada tabla cuente con una clave primaria que identifique de forma única cada tupla.
+- **Justificación en el esquema real**:
+  - Las entidades principales (`roles`, `permisos`, `usuarios`, `perfiles_gestantes`, `embarazos`, `controles_prenatales`, `centros_atencion`, `servicios`, `recordatorios`, `contenidos_prenatales` y `senales_alerta`) descomponen la información en columnas con tipos de datos atómicos escalares (`int`, `varchar`, `date`, `decimal`, etc.) y cuentan con claves primarias definidas (`id`).
+  - Las relaciones de muchos a muchos no emplean listas o cadenas delimitadas dentro de un solo campo, sino tablas intermedias asociativas (`roles_permisos` y `centros_servicios`), preservando la atomicidad.
+- **Inconsistencia técnica identificada (reporte sin modificación del SQL)**:
+  - En la tabla `historial_auditoria`, la columna `detalles` se define como tipo `json` (`detalles json null`). En la teoría relacional clásica (1FN estricta), un objeto JSON contiene una estructura semiestructurada no atómica (pares clave-valor). Si bien es una práctica estándar y eficiente en motores modernos como MySQL para almacenar registros de auditoría sin proliferación excesiva de tablas, desde una perspectiva formal estricta representa una excepción a la regla de atomicidad de la 1FN.
+
+### Segunda Forma Normal (2FN)
+
+- **Criterio**: Requiere satisfacer 1FN y garantizar que todos los atributos no clave dependan funcionalmente de la totalidad de la clave primaria (dependencia funcional completa), sin dependencias parciales respecto a subconjuntos de claves compuestas.
+- **Tablas con clave primaria simple**:
+  - En todas las tablas cuya clave primaria consta de una única columna subrogada (`id`) —tales como `usuarios`, `perfiles_gestantes`, `embarazos`, `centros_atencion`, `servicios`, `recordatorios`, `contenidos_prenatales` y `senales_alerta`— no existe la posibilidad matemática de una dependencia parcial de la clave primaria (al no existir un subconjunto propio de una clave de un solo atributo). Por lo tanto, cumplen 2FN intrínsecamente.
+- **Claves compuestas y ausencia de dependencias parciales**:
+  - **`roles_permisos`** (clave primaria compuesta: `(rol_id, permiso_id)`):
+    - Atributo no clave: `asignado_at` (marca temporal de asignación).
+    - *Justificación*: El campo `asignado_at` indica el momento exacto en que un permiso específico fue concedido a un rol específico. No depende de `rol_id` en solitario (el rol existe independientemente de cuándo se asignó un permiso particular) ni de `permiso_id` en solitario (el permiso existe con anterioridad a su vinculación). Depende funcionalmente de la combinación completa `(rol_id, permiso_id)`. Al no existir dependencias parciales, cumple 2FN.
+  - **`centros_servicios`** (clave primaria compuesta: `(centro_atencion_id, servicio_id)`):
+    - Atributos no clave: `disponible`, `observaciones`, `fecha_verificacion`, `created_at`, `updated_at`.
+    - *Justificación*: Los atributos `disponible` (si la sede ofrece o no el servicio), `observaciones` (condiciones locales de atención) y `fecha_verificacion` (fecha en la que se constató el servicio en esa sede) describen exclusivamente la prestación de un servicio concreto en una sede puntual. Los datos generales del centro (nombre, municipio, teléfono, ubicación) residen en `centros_atencion`, y los del servicio (nombre, descripción general) en `servicios`. Ningún atributo no clave depende únicamente de `centro_atencion_id` ni únicamente de `servicio_id`, sino de la clave compuesta completa `(centro_atencion_id, servicio_id)`. Se garantiza la ausencia de dependencias parciales, cumpliendo 2FN.
+  - **`controles_prenatales`**:
+    - Posee una clave primaria subrogada `id` y una clave candidata única compuesta `(embarazo_id, numero_control)`. Todos los atributos descriptivos del control (`fecha_control`, `hora_control`, `edad_gestacional_semanas`, `estado`, `indicaciones`, `notas`, etc.) dependen funcionalmente de esa consulta médica específica en ese embarazo; no dependen únicamente del número ordinal de control ni únicamente del embarazo.
 
 ## Ejecutar Flask localmente
 

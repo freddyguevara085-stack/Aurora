@@ -1,4 +1,4 @@
-"""Controlador principal y rutas del panel de administraci├│n de Aurora."""
+"""Controlador principal y rutas del panel de administración de Aurora."""
 
 
 
@@ -72,7 +72,7 @@ def admin_required(f):
 
 def dashboard():
 
-    """Vista principal del panel administrativo con m├®tricas y accesos r├ípidos."""
+    """Vista principal del panel administrativo con métricas y accesos rápidos."""
 
     total_contenidos = db.session.scalar(select(func.count(ContenidoPrenatal.id))) or 0
 
@@ -130,7 +130,7 @@ def dashboard():
 
 # ============================================================================
 
-# CRUD: CONTENIDOS PRENATALES (GU├ìA)
+# CRUD: CONTENIDOS PRENATALES (GUÍA)
 
 # ============================================================================
 
@@ -148,11 +148,11 @@ def validar_datos_contenido(form_data):
 
     if not titulo:
 
-        errores.append("El t├¡tulo es obligatorio.")
+        errores.append("El título es obligatorio.")
 
     elif len(titulo) > 180:
 
-        errores.append("El t├¡tulo no puede exceder 180 caracteres.")
+        errores.append("El título no puede exceder 180 caracteres.")
 
 
 
@@ -168,7 +168,7 @@ def validar_datos_contenido(form_data):
 
     if not contenido:
 
-        errores.append("El cuerpo del contenido no puede estar vac├¡o.")
+        errores.append("El cuerpo del contenido no puede estar vacío.")
 
 
 
@@ -176,11 +176,11 @@ def validar_datos_contenido(form_data):
 
     if not categoria:
 
-        errores.append("La categor├¡a es obligatoria.")
+        errores.append("La categoría es obligatoria.")
 
     elif len(categoria) > 80:
 
-        errores.append("La categor├¡a no puede exceder 80 caracteres.")
+        errores.append("La categoría no puede exceder 80 caracteres.")
 
 
 
@@ -210,7 +210,7 @@ def validar_datos_contenido(form_data):
 
     if not fecha_rev_raw:
 
-        errores.append("La fecha de revisi├│n es obligatoria.")
+        errores.append("La fecha de revisión es obligatoria.")
 
     else:
 
@@ -220,7 +220,7 @@ def validar_datos_contenido(form_data):
 
         except ValueError:
 
-            errores.append("La fecha de revisi├│n debe tener formato AAAA-MM-DD v├ílido.")
+            errores.append("La fecha de revisión debe tener formato AAAA-MM-DD válido.")
 
 
 
@@ -240,7 +240,7 @@ def validar_datos_contenido(form_data):
 
         except ValueError:
 
-            errores.append("El trimestre debe ser num├®rico.")
+            errores.append("El trimestre debe ser numérico.")
 
 
 
@@ -258,7 +258,7 @@ def validar_datos_contenido(form_data):
 
         if not (sem_desde_raw and sem_hasta_raw):
 
-            errores.append("Debes especificar tanto la semana inicial como la final, o dejar ambas vac├¡as.")
+            errores.append("Debes especificar tanto la semana inicial como la final, o dejar ambas vacías.")
 
         else:
 
@@ -282,7 +282,7 @@ def validar_datos_contenido(form_data):
 
             except ValueError:
 
-                errores.append("Las semanas de gestaci├│n deben ser n├║meros enteros.")
+                errores.append("Las semanas de gestación deben ser números enteros.")
 
 
 
@@ -330,7 +330,7 @@ def validar_datos_contenido(form_data):
 
 def contenidos():
 
-    """Listado general de contenidos prenatales para administraci├│n."""
+    """Listado general de contenidos prenatales para administración."""
 
     query = select(ContenidoPrenatal)
 
@@ -404,7 +404,7 @@ def contenidos():
 
 def nuevo_contenido():
 
-    """Creaci├│n de un nuevo art├¡culo en la gu├¡a prenatal."""
+    """Creación de un nuevo artículo en la guía prenatal."""
 
     if request.method == "POST":
 
@@ -461,7 +461,7 @@ def nuevo_contenido():
 
 
 
-            flash(f"Contenido ┬½{nuevo.titulo}┬╗ creado exitosamente.", "success")
+            flash(f"Contenido «{nuevo.titulo}» creado exitosamente.", "success")
 
             return redirect(url_for("admin.contenidos"))
 
@@ -497,7 +497,7 @@ def nuevo_contenido():
 
 def editar_contenido(contenido_id):
 
-    """Edici├│n de un contenido prenatal existente."""
+    """Edición de un contenido prenatal existente."""
 
     item = db.session.get(ContenidoPrenatal, contenido_id)
 
@@ -560,7 +560,7 @@ def editar_contenido(contenido_id):
 
 
 
-            flash(f"Contenido ┬½{item.titulo}┬╗ actualizado correctamente.", "success")
+            flash(f"Contenido «{item.titulo}» actualizado correctamente.", "success")
 
             return redirect(url_for("admin.contenidos"))
 
@@ -596,7 +596,7 @@ def editar_contenido(contenido_id):
 
 def eliminar_contenido(contenido_id):
 
-    """Elimina un art├¡culo de la gu├¡a prenatal."""
+    """Elimina un artículo de la guía prenatal."""
 
     item = db.session.get(ContenidoPrenatal, contenido_id)
 
@@ -631,7 +631,7 @@ def eliminar_contenido(contenido_id):
 
 
 
-        flash(f"Contenido ┬½{titulo}┬╗ eliminado del sistema.", "success")
+        flash(f"Contenido «{titulo}» eliminado del sistema.", "success")
 
     except SQLAlchemyError:
 
@@ -694,13 +694,13 @@ def toggle_publicacion_contenido(contenido_id):
 
         estado_txt = "publicado" if nuevo_estado == 1 else "guardado como borrador"
 
-        flash(f"El contenido ahora est├í {estado_txt}.", "success")
+        flash(f"El contenido ahora está {estado_txt}.", "success")
 
     except SQLAlchemyError:
 
         db.session.rollback()
 
-        flash("No se pudo cambiar el estado de publicaci├│n.", "error")
+        flash("No se pudo cambiar el estado de publicación.", "error")
 
 
 
@@ -712,7 +712,7 @@ def toggle_publicacion_contenido(contenido_id):
 
 # ============================================================================
 
-# CRUD: SE├æALES DE ALERTA
+# CRUD: SEÑALES DE ALERTA
 
 # ============================================================================
 
@@ -720,7 +720,7 @@ def toggle_publicacion_contenido(contenido_id):
 
 def validar_datos_senal(form_data):
 
-    """Valida y limpia los datos del formulario de se├▒al de alerta."""
+    """Valida y limpia los datos del formulario de señal de alerta."""
 
     errores = []
 
@@ -730,11 +730,11 @@ def validar_datos_senal(form_data):
 
     if not titulo:
 
-        errores.append("El t├¡tulo es obligatorio.")
+        errores.append("El título es obligatorio.")
 
     elif len(titulo) > 180:
 
-        errores.append("El t├¡tulo no puede exceder 180 caracteres.")
+        errores.append("El título no puede exceder 180 caracteres.")
 
 
 
@@ -742,7 +742,7 @@ def validar_datos_senal(form_data):
 
     if not descripcion:
 
-        errores.append("La descripci├│n de la se├▒al es obligatoria.")
+        errores.append("La descripción de la señal es obligatoria.")
 
 
 
@@ -750,7 +750,7 @@ def validar_datos_senal(form_data):
 
     if not accion_recomendada:
 
-        errores.append("La acci├│n recomendada es obligatoria.")
+        errores.append("La acción recomendada es obligatoria.")
 
 
 
@@ -764,11 +764,11 @@ def validar_datos_senal(form_data):
 
         if not (0 <= orden_visual <= 65535):
 
-            errores.append("El orden visual debe ser un n├║mero entero entre 0 y 65535.")
+            errores.append("El orden visual debe ser un número entero entre 0 y 65535.")
 
     except ValueError:
 
-        errores.append("El orden visual debe ser un n├║mero entero.")
+        errores.append("El orden visual debe ser un número entero.")
 
 
 
@@ -798,7 +798,7 @@ def validar_datos_senal(form_data):
 
     if not fecha_rev_raw:
 
-        errores.append("La fecha de revisi├│n m├®dica es obligatoria.")
+        errores.append("La fecha de revisión médica es obligatoria.")
 
     else:
 
@@ -808,7 +808,7 @@ def validar_datos_senal(form_data):
 
         except ValueError:
 
-            errores.append("La fecha de revisi├│n debe tener formato AAAA-MM-DD v├ílido.")
+            errores.append("La fecha de revisión debe tener formato AAAA-MM-DD válido.")
 
 
 
@@ -850,7 +850,7 @@ def validar_datos_senal(form_data):
 
 def senales():
 
-    """Listado general de se├▒ales de alerta para administraci├│n."""
+    """Listado general de señales de alerta para administración."""
 
     estado = request.args.get("estado", "").strip()
 
@@ -888,7 +888,7 @@ def senales():
 
 def nueva_senal():
 
-    """Creaci├│n de una nueva se├▒al de alerta."""
+    """Creación de una nueva señal de alerta."""
 
     if request.method == "POST":
 
@@ -945,7 +945,7 @@ def nueva_senal():
 
 
 
-            flash(f"Se├▒al de alerta ┬½{nueva.titulo}┬╗ registrada exitosamente.", "success")
+            flash(f"Señal de alerta «{nueva.titulo}» registrada exitosamente.", "success")
 
             return redirect(url_for("admin.senales"))
 
@@ -953,7 +953,7 @@ def nueva_senal():
 
             db.session.rollback()
 
-            flash("Error en la base de datos al registrar la se├▒al de alerta.", "error")
+            flash("Error en la base de datos al registrar la señal de alerta.", "error")
 
             return render_template(
 
@@ -981,7 +981,7 @@ def nueva_senal():
 
 def editar_senal(senal_id):
 
-    """Edici├│n de una se├▒al de alerta existente."""
+    """Edición de una señal de alerta existente."""
 
     item = db.session.get(SenalAlerta, senal_id)
 
@@ -1044,7 +1044,7 @@ def editar_senal(senal_id):
 
 
 
-            flash(f"Se├▒al de alerta ┬½{item.titulo}┬╗ actualizada correctamente.", "success")
+            flash(f"Señal de alerta «{item.titulo}» actualizada correctamente.", "success")
 
             return redirect(url_for("admin.senales"))
 
@@ -1052,7 +1052,7 @@ def editar_senal(senal_id):
 
             db.session.rollback()
 
-            flash("Error en la base de datos al actualizar la se├▒al de alerta.", "error")
+            flash("Error en la base de datos al actualizar la señal de alerta.", "error")
 
             return render_template(
 
@@ -1080,7 +1080,7 @@ def editar_senal(senal_id):
 
 def toggle_senal(senal_id):
 
-    """Alterna el estado activo / inactivo de una se├▒al de alerta."""
+    """Alterna el estado activo / inactivo de una señal de alerta."""
 
     item = db.session.get(SenalAlerta, senal_id)
 
@@ -1121,13 +1121,13 @@ def toggle_senal(senal_id):
 
         estado_txt = "activada" if nuevo_estado == 1 else "desactivada"
 
-        flash(f"La se├▒al de alerta ha sido {estado_txt}.", "success")
+        flash(f"La señal de alerta ha sido {estado_txt}.", "success")
 
     except SQLAlchemyError:
 
         db.session.rollback()
 
-        flash("No se pudo cambiar el estado de la se├▒al de alerta.", "error")
+        flash("No se pudo cambiar el estado de la señal de alerta.", "error")
 
 
 
@@ -1143,7 +1143,7 @@ def toggle_senal(senal_id):
 
 def eliminar_senal(senal_id):
 
-    """Elimina una se├▒al de alerta del sistema."""
+    """Elimina una señal de alerta del sistema."""
 
     item = db.session.get(SenalAlerta, senal_id)
 
@@ -1178,13 +1178,13 @@ def eliminar_senal(senal_id):
 
 
 
-        flash(f"Se├▒al de alerta ┬½{titulo}┬╗ eliminada del sistema.", "success")
+        flash(f"Señal de alerta «{titulo}» eliminada del sistema.", "success")
 
     except SQLAlchemyError:
 
         db.session.rollback()
 
-        flash("No fue posible eliminar la se├▒al de alerta.", "error")
+        flash("No fue posible eliminar la señal de alerta.", "error")
 
 
 
@@ -1196,7 +1196,7 @@ def eliminar_senal(senal_id):
 
 # ============================================================================
 
-# CRUD: CENTROS DE ATENCI├ôN
+# CRUD: CENTROS DE ATENCIÓN
 
 # ============================================================================
 
@@ -1228,7 +1228,7 @@ def validar_datos_centro(form_data, centro_actual_id=None):
 
         if len(codigo_minsa) > 20:
 
-            errores.append("El c├│digo MINSA no puede exceder 20 caracteres.")
+            errores.append("El código MINSA no puede exceder 20 caracteres.")
 
         else:
 
@@ -1240,7 +1240,7 @@ def validar_datos_centro(form_data, centro_actual_id=None):
 
             if existente and (not centro_actual_id or existente.id != centro_actual_id):
 
-                errores.append("Ya existe otro centro registrado con ese c├│digo MINSA.")
+                errores.append("Ya existe otro centro registrado con ese código MINSA.")
 
 
 
@@ -1250,7 +1250,7 @@ def validar_datos_centro(form_data, centro_actual_id=None):
 
     if tipo not in tipos_validos:
 
-        errores.append("El tipo de establecimiento seleccionado no es v├ílido.")
+        errores.append("El tipo de establecimiento seleccionado no es válido.")
 
 
 
@@ -1292,7 +1292,7 @@ def validar_datos_centro(form_data, centro_actual_id=None):
 
     if telefono and len(telefono) > 30:
 
-        errores.append("El tel├®fono no puede exceder 30 caracteres.")
+        errores.append("El teléfono no puede exceder 30 caracteres.")
 
 
 
@@ -1320,7 +1320,7 @@ def validar_datos_centro(form_data, centro_actual_id=None):
 
         except ValueError:
 
-            errores.append("La latitud debe ser un n├║mero decimal v├ílido.")
+            errores.append("La latitud debe ser un número decimal válido.")
 
 
 
@@ -1340,7 +1340,7 @@ def validar_datos_centro(form_data, centro_actual_id=None):
 
         except ValueError:
 
-            errores.append("La longitud debe ser un n├║mero decimal v├ílido.")
+            errores.append("La longitud debe ser un número decimal válido.")
 
 
 
@@ -1356,7 +1356,7 @@ def validar_datos_centro(form_data, centro_actual_id=None):
 
         except ValueError:
 
-            errores.append("La fecha de verificaci├│n debe tener formato AAAA-MM-DD v├ílido.")
+            errores.append("La fecha de verificación debe tener formato AAAA-MM-DD válido.")
 
 
 
@@ -1434,7 +1434,7 @@ def validar_datos_centro(form_data, centro_actual_id=None):
 
 def centros():
 
-    """Listado general de centros de atenci├│n para administraci├│n."""
+    """Listado general de centros de atención para administración."""
 
     busqueda = (request.args.get("q") or "").strip()
 
@@ -1512,7 +1512,7 @@ def centros():
 
 def nuevo_centro():
 
-    """Creaci├│n de un nuevo centro de atenci├│n con asignaci├│n de servicios."""
+    """Creación de un nuevo centro de atención con asignación de servicios."""
 
     catalogo_servicios = db.session.scalars(
 
@@ -1599,7 +1599,7 @@ def nuevo_centro():
 
 
 
-            flash(f"Centro de salud ┬½{nuevo.nombre}┬╗ registrado exitosamente.", "success")
+            flash(f"Centro de salud «{nuevo.nombre}» registrado exitosamente.", "success")
 
             return redirect(url_for("admin.centros"))
 
@@ -1653,7 +1653,7 @@ def nuevo_centro():
 
 def editar_centro(centro_id):
 
-    """Edici├│n de un centro de atenci├│n existente y sus servicios asignados."""
+    """Edición de un centro de atención existente y sus servicios asignados."""
 
     item = db.session.get(CentroAtencion, centro_id)
 
@@ -1750,7 +1750,7 @@ def editar_centro(centro_id):
 
 
 
-            flash(f"Centro de salud ┬½{item.nombre}┬╗ actualizado correctamente.", "success")
+            flash(f"Centro de salud «{item.nombre}» actualizado correctamente.", "success")
 
             return redirect(url_for("admin.centros"))
 
@@ -1806,7 +1806,7 @@ def editar_centro(centro_id):
 
 def toggle_centro(centro_id):
 
-    """Alterna el estado activo / inactivo de un centro de atenci├│n."""
+    """Alterna el estado activo / inactivo de un centro de atención."""
 
     item = db.session.get(CentroAtencion, centro_id)
 
@@ -1867,7 +1867,7 @@ def toggle_centro(centro_id):
 
 def eliminar_centro(centro_id):
 
-    """Desactiva o elimina un centro de atenci├│n verificando integridad referencial."""
+    """Desactiva o elimina un centro de atención verificando integridad referencial."""
 
     item = db.session.get(CentroAtencion, centro_id)
 
@@ -1902,7 +1902,7 @@ def eliminar_centro(centro_id):
 
 
 
-        flash(f"Centro ┬½{nombre}┬╗ eliminado del sistema.", "success")
+        flash(f"Centro «{nombre}» eliminado del sistema.", "success")
 
     except IntegrityError:
 
@@ -1931,13 +1931,13 @@ def eliminar_centro(centro_id):
             )
             db.session.commit()
 
-            flash(f"El centro ┬½{nombre}┬╗ tiene controles registrados asociados, por lo que fue desactivado en lugar de eliminado para conservar el historial.", "warning")
+            flash(f"El centro «{nombre}» tiene controles registrados asociados, por lo que fue desactivado en lugar de eliminado para conservar el historial.", "warning")
 
         except SQLAlchemyError:
 
             db.session.rollback()
 
-            flash("No fue posible procesar la eliminaci├│n del centro.", "error")
+            flash("No fue posible procesar la eliminación del centro.", "error")
 
 
 
@@ -1949,7 +1949,7 @@ def eliminar_centro(centro_id):
 
 # ============================================================================
 
-# CRUD: CAT├üLOGO DE SERVICIOS
+# CRUD: CATÁLOGO DE SERVICIOS
 
 # ============================================================================
 
@@ -1991,7 +1991,7 @@ def validar_datos_servicio(form_data, servicio_actual_id=None):
 
     if descripcion and len(descripcion) > 500:
 
-        errores.append("La descripci├│n no puede exceder 500 caracteres.")
+        errores.append("La descripción no puede exceder 500 caracteres.")
 
 
 
@@ -2023,7 +2023,7 @@ def validar_datos_servicio(form_data, servicio_actual_id=None):
 
 def servicios():
 
-    """Listado general del cat├ílogo de servicios para administraci├│n."""
+    """Listado general del catálogo de servicios para administración."""
 
     lista_servicios = db.session.scalars(
 
@@ -2045,7 +2045,7 @@ def servicios():
 
 def nuevo_servicio():
 
-    """Creaci├│n de un nuevo servicio en el cat├ílogo."""
+    """Creación de un nuevo servicio en el catálogo."""
 
     if request.method == "POST":
 
@@ -2086,7 +2086,7 @@ def nuevo_servicio():
 
 
 
-            flash(f"Servicio ┬½{nuevo.nombre}┬╗ registrado exitosamente.", "success")
+            flash(f"Servicio «{nuevo.nombre}» registrado exitosamente.", "success")
 
             return redirect(url_for("admin.servicios"))
 
@@ -2112,7 +2112,7 @@ def nuevo_servicio():
 
 def editar_servicio(servicio_id):
 
-    """Edici├│n de un servicio existente."""
+    """Edición de un servicio existente."""
 
     item = db.session.get(Servicio, servicio_id)
 
@@ -2163,7 +2163,7 @@ def editar_servicio(servicio_id):
 
 
 
-            flash(f"Servicio ┬½{item.nombre}┬╗ actualizado correctamente.", "success")
+            flash(f"Servicio «{item.nombre}» actualizado correctamente.", "success")
 
             return redirect(url_for("admin.servicios"))
 
@@ -2246,7 +2246,7 @@ def toggle_servicio(servicio_id):
 
 def eliminar_servicio(servicio_id):
 
-    """Elimina un servicio si no se encuentra asignado a centros de atenci├│n."""
+    """Elimina un servicio si no se encuentra asignado a centros de atención."""
 
     item = db.session.get(Servicio, servicio_id)
 
@@ -2281,13 +2281,13 @@ def eliminar_servicio(servicio_id):
 
 
 
-        flash(f"Servicio ┬½{nombre}┬╗ eliminado del cat├ílogo.", "success")
+        flash(f"Servicio «{nombre}» eliminado del catálogo.", "success")
 
     except SQLAlchemyError:
 
         db.session.rollback()
 
-        # Si est├í asignado a centros, se desactiva
+        # Si está asignado a centros, se desactiva
 
         item.activo = 0
 
@@ -2310,13 +2310,13 @@ def eliminar_servicio(servicio_id):
             )
             db.session.commit()
 
-            flash(f"El servicio ┬½{nombre}┬╗ est├í asignado a centros de salud, por lo que fue desactivado en lugar de eliminado.", "warning")
+            flash(f"El servicio «{nombre}» está asignado a centros de salud, por lo que fue desactivado en lugar de eliminado.", "warning")
 
         except SQLAlchemyError:
 
             db.session.rollback()
 
-            flash("No fue posible procesar la eliminaci├│n del servicio.", "error")
+            flash("No fue posible procesar la eliminación del servicio.", "error")
 
 
 
