@@ -3,6 +3,7 @@ from datetime import date, datetime, time, timedelta
 from flask import Blueprint, abort, flash, redirect, render_template, request, send_from_directory, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from werkzeug.security import generate_password_hash
 
 from services.home import calcular_semana_gestacional, construir_inicio
 from services.mvp import centros_activos, centro_activo, contenidos_publicados, controles_activos, perfil_y_embarazo, recordatorios_pendientes, servicios_disponibles
@@ -182,7 +183,18 @@ def editar_control(control_id):
 @login_required
 def calendario():
     _, activo = perfil_y_embarazo(current_user.id)
-    return render_template('calendario.html', embarazo=activo, controles=controles_activos(activo), recordatorios=recordatorios_pendientes(current_user.id))
+    recordatorios = recordatorios_pendientes(current_user.id)
+    hoy = date.today()
+    avisos = [
+        {
+            'id': recordatorio.id,
+            'titulo': recordatorio.titulo,
+            'detalle': f"{recordatorio.fecha_hora.strftime('%H:%M')} · {recordatorio.descripcion or 'Recordatorio de Aurora'}",
+        }
+        for recordatorio in recordatorios
+        if recordatorio.fecha_hora.date() == hoy
+    ]
+    return render_template('calendario.html', embarazo=activo, controles=controles_activos(activo), recordatorios=recordatorios, avisos=avisos)
 
 
 @main_bp.route('/recordatorios/nuevo', methods=['GET', 'POST'])
@@ -337,6 +349,29 @@ def perfil():
         cedula = '*' * max(0, len(perfil_actual.cedula) - 4) + perfil_actual.cedula[-4:]
     semana = calcular_semana_gestacional(embarazo_actual.fum, embarazo_actual.fpp) if embarazo_actual else None
     return render_template('perfil.html', perfil=perfil_actual, embarazo=embarazo_actual, semana=semana, cedula=cedula, es_gestante=_usuario_gestante(), form_data=None, date=date.today())
+
+@main_bp.post('/perfil/cambiar-password')
+@login_required
+def cambiar_password():
+    if not _usuario_gestante():
+        abort(403)
+    actual = request.form.get('password_actual', '')
+    nueva = request.form.get('password_nueva', '')
+    confirmacion = request.form.get('password_confirm', '')
+    if not current_user.verificar_password(actual):
+        flash('La contraseña actual no es correcta.', 'error')
+    elif len(nueva) < 8 or nueva != confirmacion:
+        flash('La nueva contraseña debe tener al menos 8 caracteres y coincidir.', 'error')
+    else:
+        current_user.password_hash = generate_password_hash(nueva)
+        try:
+            db.session.commit()
+            flash('Contraseña actualizada.', 'success')
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash('No fue posible actualizar la contraseña.', 'error')
+    return redirect(url_for('main.perfil'))
+
 
 # Ruta para que la PWA encuentre el Service Worker
 @main_bp.route('/service-worker.js')

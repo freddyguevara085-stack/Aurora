@@ -1,10 +1,12 @@
 """Rutas de autenticación de Aurora."""
 
+import os
 from urllib.parse import unquote, urlsplit
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, login_required, logout_user
-from sqlalchemy.exc import IntegrityError
+from itsdangerous import BadSignature, SignatureExpired, URLSafeTimedSerializer
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from werkzeug.security import generate_password_hash
 
 from extensions import db, login_manager
@@ -85,6 +87,73 @@ def login():
         return redirect(next_url or url_for("main.index"))
 
     return render_template("login.html")
+
+
+def _serializador_recuperacion() -> URLSafeTimedSerializer:
+    return URLSafeTimedSerializer(current_app.config["SECRET_KEY"], salt="aurora-recuperar-password")
+
+
+@auth_bp.route("/recuperar-password", methods=["GET", "POST"])
+def recuperar_password():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()[:150]
+        if not email:
+            flash("Ingresa tu correo electrónico.", "error")
+            return render_template("recuperar_password.html"), 400
+
+        usuario = db.session.scalar(db.select(Usuario).filter_by(email=email, activo=1))
+        if usuario:
+            token = _serializador_recuperacion().dumps(usuario.email)
+            enlace = url_for("auth.restablecer_password", token=token, _external=True)
+            current_app.logger.info("Enlace de recuperación para %s: %s", usuario.email, enlace)
+            if os.getenv("MAIL_SERVER"):
+                flash("Te enviamos un enlace para restablecer tu contraseña. Revisa tu correo.", "success")
+            else:
+                flash("No hay servidor de correo configurado. Usa este enlace para restablecer tu contraseña:", "info")
+                flash(enlace, "info")
+        else:
+            flash("Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("recuperar_password.html")
+
+
+@auth_bp.route("/restablecer-password/<token>", methods=["GET", "POST"])
+def restablecer_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+
+    try:
+        email = _serializador_recuperacion().loads(token, max_age=3600)
+    except (SignatureExpired, BadSignature):
+        flash("El enlace de recuperación no es válido o ha expirado.", "error")
+        return redirect(url_for("auth.recuperar_password"))
+
+    usuario = db.session.scalar(db.select(Usuario).filter_by(email=email, activo=1))
+    if not usuario:
+        flash("El enlace de recuperación no es válido o ha expirado.", "error")
+        return redirect(url_for("auth.recuperar_password"))
+
+    if request.method == "POST":
+        nueva = request.form.get("password", "")
+        confirmacion = request.form.get("password_confirm", "")
+        if len(nueva) < 8 or nueva != confirmacion:
+            flash("Confirma una contraseña de al menos 8 caracteres.", "error")
+            return render_template("restablecer_password.html", token=token)
+        usuario.password_hash = generate_password_hash(nueva)
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash("No fue posible actualizar la contraseña.", "error")
+            return render_template("restablecer_password.html", token=token)
+        flash("Contraseña restablecida. Ya puedes iniciar sesión.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("restablecer_password.html", token=token)
 
 
 @auth_bp.route("/registro", methods=["GET", "POST"])

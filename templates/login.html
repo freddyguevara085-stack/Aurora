@@ -14,6 +14,7 @@
     <label for="email">Correo electrónico<input id="email" name="email" type="email" autocomplete="email" placeholder="tu@correo.com" required></label>
     <label for="password">Contraseña<input id="password" name="password" type="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required></label>
     <button class="button button--primary button--wide" type="submit">Iniciar sesión</button>
+    <p class="form-note"><a href="{{ url_for('auth.recuperar_password') }}">¿Olvidaste tu contraseña?</a></p>
     <p class="form-note"><a href="{{ url_for('auth.registro') }}">Crear una cuenta</a></p>
     <p class="form-note"><span class="material-symbols-outlined" aria-hidden="true">lock</span> Tus datos se mantienen protegidos.</p>
   </form>
