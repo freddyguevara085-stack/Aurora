@@ -9,7 +9,6 @@ from services.home import calcular_semana_gestacional, construir_inicio
 from services.mvp import centros_activos, centro_activo, contenidos_publicados, controles_activos, perfil_y_embarazo, recordatorios_pendientes, servicios_disponibles
 from extensions import db
 from models.contenido import ContenidoPrenatal, SenalAlerta
-from models.directorio import CentroAtencion
 from models.gestacion import Embarazo, PerfilGestante
 from models.seguimiento import ControlPrenatal, Recordatorio
 

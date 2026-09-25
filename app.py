@@ -40,18 +40,36 @@ def set_security_headers(response):
 
 @app.errorhandler(403)
 def acceso_denegado(error):
-    return render_template("errors/403.html"), 403
+    return render_template(
+        "errors/error.html",
+        icono="lock",
+        eyebrow="Error 403",
+        titulo="Acceso denegado",
+        mensaje="No tienes permisos para consultar este espacio.",
+    ), 403
 
 
 @app.errorhandler(404)
 def pagina_no_encontrada(error):
-    return render_template("errors/404.html"), 404
+    return render_template(
+        "errors/error.html",
+        icono="search_off",
+        eyebrow="Error 404",
+        titulo="Página no encontrada",
+        mensaje="La página que buscas ya no está disponible o la dirección cambió.",
+    ), 404
 
 
 @app.errorhandler(500)
 def error_servidor(error):
     db.session.rollback()
-    return render_template("errors/500.html"), 500
+    return render_template(
+        "errors/error.html",
+        icono="error",
+        eyebrow="Error 500",
+        titulo="Algo no salió bien",
+        mensaje="Estamos trabajando para recuperar el servicio. Intenta nuevamente en unos momentos.",
+    ), 500
 
 if __name__ == '__main__':
     app.run(debug=app.config["DEBUG"], host='0.0.0.0', port=5000)

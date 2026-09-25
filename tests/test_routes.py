@@ -1,7 +1,5 @@
 from types import SimpleNamespace
 
-from flask_login import login_user
-
 
 def test_admin_requiere_autenticacion(client):
     response = client.get("/admin/")

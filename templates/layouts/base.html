@@ -10,6 +10,7 @@
     <title>{% block title %}Aurora{% endblock %}</title>
 </head>
 <body>
+    <p class="proto-banner" role="note">Demo experimental · Hackathon Nicaragua 2026 · Información orientativa que no sustituye atención médica profesional.</p>
     {% block content %}{% endblock %}
     {% if current_user.is_authenticated and current_user.rol and current_user.rol.nombre == 'usuario' %}
         {% include 'partials/bottom_nav.html' %}

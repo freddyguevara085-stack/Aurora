@@ -1,0 +1,11 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ titulo }} | Aurora{% endblock %}
+{% block content %}
+<main class="app-shell error-page">
+  <span class="material-symbols-outlined error-page__icon" aria-hidden="true">{{ icono }}</span>
+  <p class="eyebrow">{{ eyebrow }}</p>
+  <h1>{{ titulo }}</h1>
+  <p>{{ mensaje }}</p>
+  <a class="button button--primary button--wide" href="{{ url_for('main.index') if current_user.is_authenticated else url_for('auth.login') }}">Volver a Aurora</a>
+</main>
+{% endblock %}

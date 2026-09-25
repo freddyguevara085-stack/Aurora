@@ -11,7 +11,6 @@ from extensions import db
 from models.auditoria import HistorialAuditoria
 from models.contenido import ContenidoPrenatal, SenalAlerta
 from models.directorio import CentroAtencion, CentroServicio, Servicio
-from models.usuario import Usuario
 from services.auditoria import registrar_auditoria
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -26,6 +25,29 @@ def admin_required(f):
             abort(403)
         return f(*args, **kwargs)
     return decorated_function
+
+
+def _alternar(instancia, campo, entidad, etiqueta_exito, redirect_endpoint, **kwargs):
+    """Cambia un campo booleano (0/1), registra auditoría y confirma."""
+    nuevo_estado = 0 if getattr(instancia, campo) == 1 else 1
+    setattr(instancia, campo, nuevo_estado)
+    if hasattr(instancia, "actualizado_por_usuario_id"):
+        instancia.actualizado_por_usuario_id = current_user.id
+    try:
+        registrar_auditoria(
+            usuario_id=current_user.id,
+            accion="cambiar_estado",
+            entidad=entidad,
+            registro_id=instancia.id,
+            detalles={campo: nuevo_estado},
+            ip=request.remote_addr,
+        )
+        db.session.commit()
+        flash(etiqueta_exito[nuevo_estado], "success")
+    except SQLAlchemyError:
+        db.session.rollback()
+        flash(kwargs.get("mensaje_error", "No se pudo cambiar el estado."), "error")
+    return redirect(url_for(redirect_endpoint))
 
 
 # ============================================================================
@@ -220,6 +242,7 @@ def nuevo_contenido():
                 **datos
             )
             db.session.add(nuevo)
+            db.session.flush()
             registrar_auditoria(
                 usuario_id=current_user.id,
                 accion="crear",
@@ -331,29 +354,14 @@ def toggle_publicacion_contenido(contenido_id):
     item = db.session.get(ContenidoPrenatal, contenido_id)
     if not item:
         abort(404)
-
-    nuevo_estado = 0 if item.publicado == 1 else 1
-    item.publicado = nuevo_estado
-    item.actualizado_por_usuario_id = current_user.id
-
-    try:
-        registrar_auditoria(
-            usuario_id=current_user.id,
-            accion="cambiar_estado",
-            entidad="contenidos_prenatales",
-            registro_id=item.id,
-            detalles={"publicado": nuevo_estado},
-            ip=request.remote_addr,
-        )
-        db.session.commit()
-
-        estado_txt = "publicado" if nuevo_estado == 1 else "guardado como borrador"
-        flash(f"El contenido ahora está {estado_txt}.", "success")
-    except SQLAlchemyError:
-        db.session.rollback()
-        flash("No se pudo cambiar el estado de publicación.", "error")
-
-    return redirect(url_for("admin.contenidos"))
+    return _alternar(
+        item,
+        "publicado",
+        "contenidos_prenatales",
+        {1: "El contenido ahora está publicado.", 0: "El contenido ahora está guardado como borrador."},
+        "admin.contenidos",
+        mensaje_error="No se pudo cambiar el estado de publicación.",
+    )
 
 
 # ============================================================================
@@ -464,6 +472,7 @@ def nueva_senal():
                 **datos
             )
             db.session.add(nueva)
+            db.session.flush()
             registrar_auditoria(
                 usuario_id=current_user.id,
                 accion="crear",
@@ -546,29 +555,14 @@ def toggle_senal(senal_id):
     item = db.session.get(SenalAlerta, senal_id)
     if not item:
         abort(404)
-
-    nuevo_estado = 0 if item.activo == 1 else 1
-    item.activo = nuevo_estado
-    item.actualizado_por_usuario_id = current_user.id
-
-    try:
-        registrar_auditoria(
-            usuario_id=current_user.id,
-            accion="cambiar_estado",
-            entidad="senales_alerta",
-            registro_id=item.id,
-            detalles={"activo": nuevo_estado},
-            ip=request.remote_addr,
-        )
-        db.session.commit()
-
-        estado_txt = "activada" if nuevo_estado == 1 else "desactivada"
-        flash(f"La señal de alerta ha sido {estado_txt}.", "success")
-    except SQLAlchemyError:
-        db.session.rollback()
-        flash("No se pudo cambiar el estado de la señal de alerta.", "error")
-
-    return redirect(url_for("admin.senales"))
+    return _alternar(
+        item,
+        "activo",
+        "senales_alerta",
+        {1: "La señal de alerta ha sido activada.", 0: "La señal de alerta ha sido desactivada."},
+        "admin.senales",
+        mensaje_error="No se pudo cambiar el estado de la señal de alerta.",
+    )
 
 
 @admin_bp.route("/senales/<int:senal_id>/eliminar", methods=["POST"])
@@ -907,28 +901,14 @@ def toggle_centro(centro_id):
     item = db.session.get(CentroAtencion, centro_id)
     if not item:
         abort(404)
-
-    nuevo_estado = 0 if item.activo == 1 else 1
-    item.activo = nuevo_estado
-
-    try:
-        registrar_auditoria(
-            usuario_id=current_user.id,
-            accion="cambiar_estado",
-            entidad="centros_atencion",
-            registro_id=item.id,
-            detalles={"activo": nuevo_estado},
-            ip=request.remote_addr,
-        )
-        db.session.commit()
-
-        estado_txt = "activado" if nuevo_estado == 1 else "desactivado"
-        flash(f"El centro de salud ha sido {estado_txt}.", "success")
-    except SQLAlchemyError:
-        db.session.rollback()
-        flash("No se pudo cambiar el estado del centro de salud.", "error")
-
-    return redirect(url_for("admin.centros"))
+    return _alternar(
+        item,
+        "activo",
+        "centros_atencion",
+        {1: "El centro de salud ha sido activado.", 0: "El centro de salud ha sido desactivado."},
+        "admin.centros",
+        mensaje_error="No se pudo cambiar el estado del centro de salud.",
+    )
 
 
 @admin_bp.route("/centros/<int:centro_id>/eliminar", methods=["POST"])
@@ -1035,6 +1015,7 @@ def nuevo_servicio():
         try:
             nuevo = Servicio(**datos)
             db.session.add(nuevo)
+            db.session.flush()
             registrar_auditoria(
                 usuario_id=current_user.id,
                 accion="crear",
@@ -1101,28 +1082,16 @@ def toggle_servicio(servicio_id):
     item = db.session.get(Servicio, servicio_id)
     if not item:
         abort(404)
+    return _alternar(
+        item,
+        "activo",
+        "servicios",
+        {1: "El servicio ha sido activado.", 0: "El servicio ha sido desactivado."},
+        "admin.servicios",
+        mensaje_error="No se pudo cambiar el estado del servicio.",
+    )
 
-    nuevo_estado = 0 if item.activo == 1 else 1
-    item.activo = nuevo_estado
 
-    try:
-        registrar_auditoria(
-            usuario_id=current_user.id,
-            accion="cambiar_estado",
-            entidad="servicios",
-            registro_id=item.id,
-            detalles={"activo": nuevo_estado},
-            ip=request.remote_addr,
-        )
-        db.session.commit()
-
-        estado_txt = "activado" if nuevo_estado == 1 else "desactivado"
-        flash(f"El servicio ha sido {estado_txt}.", "success")
-    except SQLAlchemyError:
-        db.session.rollback()
-        flash("No se pudo cambiar el estado del servicio.", "error")
-
-    return redirect(url_for("admin.servicios"))
 @admin_bp.route("/servicios/<int:servicio_id>/eliminar", methods=["POST"])
 @admin_required
 def eliminar_servicio(servicio_id):

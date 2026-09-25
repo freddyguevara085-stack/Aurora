@@ -60,7 +60,6 @@
 | Flask-SQLAlchemy | Modelos y persistencia ORM |
 | Flask-Login | Autenticación y sesiones |
 | Flask-WTF | Protección CSRF |
-| Flask-Migrate | Integración prevista para migraciones |
 | MySQL | Base de datos relacional |
 | Jinja2 | Plantillas HTML |
 | Service Worker | Caché del shell y fallback offline |

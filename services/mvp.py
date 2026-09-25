@@ -1,11 +1,11 @@
 """Consultas reutilizables de las vistas funcionales del MVP."""
 
-from datetime import date, datetime
+from datetime import datetime
 
 from sqlalchemy import or_, select
 
 from extensions import db
-from models.contenido import ContenidoPrenatal, SenalAlerta
+from models.contenido import ContenidoPrenatal
 from models.directorio import CentroAtencion, CentroServicio, Servicio
 from models.gestacion import Embarazo, PerfilGestante
 from models.seguimiento import ControlPrenatal, Recordatorio
@@ -25,8 +25,8 @@ def controles_activos(embarazo):
     return db.session.scalars(select(ControlPrenatal).where(ControlPrenatal.embarazo_id == embarazo.id).order_by(ControlPrenatal.fecha_control, ControlPrenatal.hora_control)).all()
 
 
-def recordatorios_pendientes(usuario_id):
-    return db.session.scalars(select(Recordatorio).where(Recordatorio.usuario_id == usuario_id, Recordatorio.estado == "pendiente", Recordatorio.fecha_hora >= datetime.now()).order_by(Recordatorio.fecha_hora).limit(10)).all()
+def recordatorios_pendientes(usuario_id, limite=10):
+    return db.session.scalars(select(Recordatorio).where(Recordatorio.usuario_id == usuario_id, Recordatorio.estado == "pendiente", Recordatorio.fecha_hora >= datetime.now()).order_by(Recordatorio.fecha_hora).limit(limite)).all()
 
 
 def contenidos_publicados(trimestre=None, categoria=None):

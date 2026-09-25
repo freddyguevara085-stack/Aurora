@@ -1,14 +1,14 @@
 """Datos de Inicio construidos para el usuario autenticado."""
 
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 
 from sqlalchemy import and_, or_, select
 
 from extensions import db
 from models.contenido import ContenidoPrenatal, SenalAlerta
-from models.seguimiento import ControlPrenatal, Recordatorio
+from models.seguimiento import ControlPrenatal
 from models.usuario import Usuario
-from services.mvp import perfil_y_embarazo
+from services.mvp import perfil_y_embarazo, recordatorios_pendientes
 
 
 def calcular_semana_gestacional(
@@ -45,7 +45,6 @@ def construir_inicio(usuario_id: int) -> dict:
     )
     trimestre = calcular_trimestre(semana)
     hoy = date.today()
-    ahora = datetime.now()
     control = None
     if embarazo:
         control = db.session.scalar(
@@ -85,16 +84,7 @@ def construir_inicio(usuario_id: int) -> dict:
             or_(ContenidoPrenatal.trimestre.is_(None), ContenidoPrenatal.trimestre == trimestre)
         )
 
-    recordatorios = db.session.scalars(
-        select(Recordatorio)
-        .where(
-            Recordatorio.usuario_id == usuario_id,
-            Recordatorio.estado == "pendiente",
-            Recordatorio.fecha_hora >= ahora,
-        )
-        .order_by(Recordatorio.fecha_hora)
-        .limit(3)
-    ).all()
+    recordatorios = recordatorios_pendientes(usuario_id, limite=3)
     contenidos = db.session.scalars(
         select(ContenidoPrenatal)
         .where(*etapa)
@@ -117,5 +107,6 @@ def construir_inicio(usuario_id: int) -> dict:
         "recordatorios": recordatorios,
         "contenidos": contenidos,
         "senales": senales,
+        "consentimiento_pendiente": bool(perfil and not perfil.consentimiento_datos),
         "empty_message": "No hay un embarazo activo asociado a esta cuenta." if not embarazo else None,
     }

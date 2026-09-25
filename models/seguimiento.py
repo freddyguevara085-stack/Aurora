@@ -3,7 +3,6 @@
 from sqlalchemy.dialects.mysql import ENUM
 from sqlalchemy.dialects.mysql import INTEGER as UINT
 from sqlalchemy.dialects.mysql import SMALLINT
-from sqlalchemy.dialects.mysql import TINYINT
 
 from extensions import db
 

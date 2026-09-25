@@ -4,6 +4,7 @@
 <main class="app-shell home-shell">
   <header class="home-header"><a href="{{ url_for('main.index') }}" aria-label="Aurora, inicio"><img src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="32" height="32" alt="Aurora"></a><button class="icon-button" type="button" aria-label="Notificaciones"><span class="material-symbols-outlined">notifications</span></button></header>
   <section class="home-intro"><h1>Hola, {{ home.user_name }}</h1><p>Acompañando el comienzo de una nueva vida.</p></section>
+  {% if home.consentimiento_pendiente %}<a class="consent-notice" href="{{ url_for('main.perfil') }}">Revisa y acepta tu consentimiento informado en tu perfil.<span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></a>{% endif %}
   {% if home.empty_message %}
     {% set empty_title = 'Sin embarazo activo' %}{% set empty_text = home.empty_message %}{% set empty_url = url_for('main.embarazo') %}{% set empty_action = 'Registrar mi embarazo' %}{% include 'partials/empty_state.html' %}
   {% else %}
