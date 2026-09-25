@@ -1,271 +1,287 @@
-# Aurora
+<div align="center">
+  <img src="logo%20para%20el%20readme.png" alt="Logo de Aurora" width="260">
+  <h1>Aurora</h1>
+  <p><strong>Acompañamiento prenatal claro, cercano y organizado.</strong></p>
+  <p>Una aplicación web para ayudar a las gestantes a comprender su etapa de embarazo, organizar sus controles y encontrar orientación para buscar atención.</p>
+</div>
 
-Aurora es una aplicación web de acompañamiento prenatal. Su MVP busca que una gestante pueda entender en qué etapa está, organizar su próximo control y encontrar orientación para buscar ayuda. No diagnostica, no prescribe ni sustituye la atención de profesionales de salud.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white" alt="Python 3">
+  <img src="https://img.shields.io/badge/Flask-3.0-000000?logo=flask&logoColor=white" alt="Flask 3">
+  <img src="https://img.shields.io/badge/MySQL-8.x-4479A1?logo=mysql&logoColor=white" alt="MySQL 8">
+  <img src="https://img.shields.io/badge/Tests-14%20passed-2ea44f" alt="14 pruebas pasando">
+</p>
 
-## Alcance del MVP
+> Aurora ofrece información y organización del seguimiento prenatal. No diagnostica, no prescribe y no sustituye la atención de profesionales de la salud.
 
-El recorrido principal que valida Aurora es: iniciar sesión, completar el perfil y embarazo, consultar la semana gestacional, registrar un control y acceder a señales de alerta y centros de atención.
+## Contenido
 
-### Funciones principales para la gestante
+- [Qué incluye](#qué-incluye)
+- [Tecnologías](#tecnologías)
+- [Requisitos](#requisitos)
+- [Instalación local](#instalación-local)
+- [Base de datos](#base-de-datos)
+- [Configuración](#configuración)
+- [Ejecución](#ejecución)
+- [Pruebas](#pruebas)
+- [Despliegue](#despliegue)
+- [Estructura](#estructura)
+- [Roles](#roles)
+- [PWA y modo offline](#pwa-y-modo-offline)
+- [Seguridad](#seguridad)
+- [Limitaciones y próximos pasos](#limitaciones-y-próximos-pasos)
 
-- Inicio de sesión por correo y contraseña.
-- Perfil con datos personales, ubicación, contacto de emergencia y consentimiento.
-- Registro y edición del embarazo activo, con cálculo visual orientativo de semana, trimestre y FPP desde la FUM cuando corresponde.
-- Registro y consulta de controles prenatales propios.
-- Calendario de controles y consulta de recordatorios pendientes previamente registrados.
-- Señales de alerta con orientación para buscar atención profesional.
-- Directorio de centros activos, con búsqueda, filtros y detalle de servicios.
+## Qué incluye
 
-### Funciones complementarias
+### Para gestantes
 
-- Guía prenatal con filtros por trimestre y categoría.
-- Instalación como PWA y caché de recursos estáticos esenciales. Los datos dinámicos y las páginas privadas requieren conexión al servidor.
-- Página offline precargada con señales de alarma y números de emergencia cuando no hay conexión.
-- Registro público de gestantes y creación inicial del perfil.
-- Edición y reprogramación de controles prenatales, con indicaciones y notas post-consulta.
+- Registro público de cuenta con asignación automática del rol `usuario` y creación del perfil inicial.
+- Inicio y cierre de sesión, recuperación segura de contraseña y cambio de contraseña autenticado.
+- Perfil con datos personales, ubicación, contacto de emergencia y consentimiento de datos.
+- Registro y edición del embarazo activo, con cálculo orientativo de semana gestacional, trimestre y FPP.
+- Registro, consulta, edición y reprogramación de controles prenatales.
+- Estados de control: programado, realizado, reprogramado y cancelado.
+- Indicaciones y notas post-consulta.
+- Calendario de controles y recordatorios personales, de control o informativos.
+- Guía prenatal, señales de alerta y directorio de centros de atención.
 
-### Soporte interno
+### Para administración
 
-El repositorio también contiene un panel administrativo para mantener contenidos, señales, centros y servicios, además de mostrar métricas y eventos recientes de auditoría. Este panel facilita la demostración y operación del MVP, pero no forma parte de la propuesta de valor principal para la gestante.
-
-### Fuera del alcance actual
-
-- Recuperación de contraseña.
-- Creación, edición o envío automático de recordatorios y notificaciones.
-- Funcionamiento completo de la aplicación sin conexión.
-- Interfaz dedicada para el rol `auditor`.
-- Integraciones con expedientes clínicos o sistemas institucionales.
+- Panel protegido para gestionar contenidos, señales de alerta, centros y servicios.
+- Publicación y desactivación de contenidos del MVP.
+- Registro de actividad administrativa mediante auditoría.
 
 ## Tecnologías
 
-| Tecnología | Uso en Aurora |
+| Tecnología | Uso |
 | --- | --- |
-| Python y Flask | Aplicación web, blueprints y servidor de desarrollo. |
-| Flask-SQLAlchemy y PyMySQL | Modelos ORM y conexión a MySQL. |
-| Flask-Login | Sesiones de usuario y protección de rutas. |
-| Flask-WTF | Protección CSRF para formularios. |
-| Flask-Migrate | Integración de migraciones para el proyecto. |
-| Jinja2, HTML y CSS | Plantillas y diseño responsive. |
-| Poppins e iconos Material Symbols locales | Tipografía e iconografía sin CDN. |
-| Service Worker y Web App Manifest | Instalación PWA y caché del shell estático. |
-| MySQL | Persistencia relacional. |
+| Python | Lenguaje principal |
+| Flask | Aplicación web y blueprints |
+| Flask-SQLAlchemy | Modelos y persistencia ORM |
+| Flask-Login | Autenticación y sesiones |
+| Flask-WTF | Protección CSRF |
+| Flask-Migrate | Integración prevista para migraciones |
+| MySQL | Base de datos relacional |
+| Jinja2 | Plantillas HTML |
+| Service Worker | Caché del shell y fallback offline |
+| Waitress | Servidor WSGI para producción en Windows |
+| Pytest | Pruebas automatizadas |
 
-## Estructura del proyecto
+## Requisitos
 
-```text
-Aurora/
-├── app.py                         # Inicialización Flask y registro de blueprints
-├── config.py                      # Configuración desde variables de entorno
-├── extensions.py                  # db, login manager, CSRF y migraciones
-├── commands.py                    # Comando Flask para crear usuarios
-├── controllers/
-│   ├── auth.py                    # Inicio y cierre de sesión
-│   ├── routes.py                  # Flujos de la gestante y recursos PWA
-│   └── admin.py                   # Panel administrativo y validaciones
-├── models/                        # Modelos SQLAlchemy de acceso, gestación, contenido y directorio
-├── services/                      # Consultas de negocio, inicio y auditoría
-├── templates/
-│   ├── admin/                     # Vistas Jinja del panel administrativo
-│   ├── layouts/ y partials/       # Layout, navegación y componentes reutilizables
-│   └── *.html                     # Vistas de autenticación y gestante
-├── static/
-│   ├── assets/                    # Recursos visuales locales
-│   ├── css/style.css              # Estilos de la aplicación
-│   ├── fonts/                     # Poppins e iconos locales
-│   ├── js/app.js                  # Registro del service worker
-│   ├── manifest.json              # Manifest PWA
-│   └── service-worker.js          # Caché del shell estático
-├── Aurora_BD.sql                  # Esquema y catálogo base de MySQL
-├── database/Aurora_MVP_seed.sql   # Datos iniciales idempotentes del MVP
-├── requirements.txt
-└── run.bat
-```
+- Python 3.10 o superior.
+- MySQL 8.x disponible localmente o en un servidor accesible.
+- Git, opcional para clonar el repositorio.
+- PowerShell o CMD en Windows.
 
-La separación anterior corresponde al patrón MVC: los controladores reciben las solicitudes, los modelos representan los datos, los servicios concentran consultas reutilizables y las plantillas renderizan las vistas.
+## Instalación local
 
-## Requisitos previos
+Clona el repositorio y entra en la carpeta del proyecto:
 
-- Python 3 con `venv` y `pip`.
-- MySQL disponible localmente.
-- Git, si se clonará el repositorio.
-- Navegador moderno con soporte de Service Worker para probar la PWA.
-
-## Instalación en Windows
-
-Clona el proyecto y entra a su carpeta:
-
-```bash
+```powershell
 git clone https://github.com/freddyguevara085-stack/Aurora.git
 cd Aurora
 ```
 
-### Entorno virtual y dependencias
-
-Crea el entorno virtual e instala las dependencias según la terminal que utilices:
-
-**Opción A — PowerShell:**
+Crea y activa el entorno virtual:
 
 ```powershell
 py -m venv .venv
 .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-**Opción B — CMD (Símbolo del sistema):**
+Si PowerShell bloquea la activación del entorno, puedes ejecutar directamente `.\.venv\Scripts\python.exe` sin activarlo.
 
-```cmd
-py -m venv .venv
-.venv\Scripts\activate.bat
-python -m pip install -r requirements.txt
-```
+## Base de datos
 
-## Configuración local
+Aurora usa MySQL y distribuye dos scripts:
 
-Copia la plantilla pública de configuración y completa los valores locales necesarios. No subas `.env` al repositorio ni compartas sus valores.
+- [Aurora_BD.sql](Aurora_BD.sql): crea la base de datos, tablas, relaciones, roles, permisos e índices.
+- [database/Aurora_MVP_seed.sql](database/Aurora_MVP_seed.sql): carga contenidos, señales y servicios iniciales.
 
-- En PowerShell:
-  ```powershell
-  Copy-Item .env.example .env
-  ```
-- En CMD:
-  ```cmd
-  copy .env.example .env
-  ```
-
-La aplicación requiere `SECRET_KEY` y utiliza las variables `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_DATABASE`, `MYSQL_USER` y `MYSQL_PASSWORD` para construir la conexión. Los nombres de la base y las credenciales de `.env` deben coincidir con tu instalación local de MySQL.
-
-## Base de datos MySQL
-
-### Importación por consola (CMD)
-
-El script [Aurora_BD.sql](Aurora_BD.sql) crea la base `aurora`, sus tablas, claves, índices, roles y permisos. Para cargar contenidos, señales y servicios iniciales del MVP, se ejecuta el seed idempotente [database/Aurora_MVP_seed.sql](database/Aurora_MVP_seed.sql).
-
-Dado que el operador de redirección `<` está reservado en PowerShell y produce un error de sintaxis, los siguientes comandos deben ejecutarse en **CMD (Símbolo del sistema)** desde la raíz del repositorio:
+Desde CMD:
 
 ```cmd
 mysql -u root -p < Aurora_BD.sql
 mysql -u root -p aurora < database\Aurora_MVP_seed.sql
 ```
 
-> **Nota para PowerShell:** Si prefieres importar utilizando PowerShell en lugar de CMD, utiliza el paso de contenido por tubería (*pipe*):
-> ```powershell
-> Get-Content Aurora_BD.sql | mysql -u root -p
-> Get-Content database\Aurora_MVP_seed.sql | mysql -u root -p aurora
-> ```
-
-### Alternativa gráfica desde MySQL Workbench
-
-Si prefieres importar la base de datos visualmente sin usar la consola:
-
-1. Abre **MySQL Workbench** y conéctate a tu servidor local de MySQL.
-2. **Esquema y catálogos base**: Ve al menú **File > Open SQL Script...** (o pulsa `Ctrl + Shift + O`), selecciona el archivo [Aurora_BD.sql](Aurora_BD.sql) de la raíz del proyecto y presiona el icono de rayo (**Execute / `Ctrl + Shift + Enter`**). Esto creará la base de datos `aurora`, las tablas, índices, roles y permisos.
-3. **Datos iniciales (Seed)**: De la misma forma, abre el archivo [database/Aurora_MVP_seed.sql](database/Aurora_MVP_seed.sql) y ejecútalo (asegurándote de que el esquema `aurora` esté seleccionado o activo) para cargar los contenidos prenatales, señales de alerta y servicios iniciales del MVP.
-
-### Diagrama Entidad-Relación
-
-El diagrama Entidad-Relación (ER) ya existe y se entrega por separado como parte de los entregables oficiales de la competencia (Hackathon Nicaragua 2026, categoría Aficionado). No se incluye un archivo gráfico del diagrama dentro de este repositorio; todas las entidades, claves primarias, foráneas, restricciones de integridad e índices se encuentran íntegramente implementadas y documentadas en [Aurora_BD.sql](Aurora_BD.sql).
-
-## Normalización de la base de datos (1FN y 2FN)
-
-El diseño del esquema relacional en [Aurora_BD.sql](Aurora_BD.sql) fue analizado y estructurado bajo las reglas de normalización:
-
-### Primera Forma Normal (1FN)
-
-- **Criterio**: Requiere que cada campo contenga exclusivamente valores atómicos (indivisibles), que no existan grupos repetitivos ni atributos multivaluados en una misma columna, y que cada tabla cuente con una clave primaria que identifique de forma única cada tupla.
-- **Justificación en el esquema real**:
-  - Las entidades principales (`roles`, `permisos`, `usuarios`, `perfiles_gestantes`, `embarazos`, `controles_prenatales`, `centros_atencion`, `servicios`, `recordatorios`, `contenidos_prenatales` y `senales_alerta`) descomponen la información en columnas con tipos de datos atómicos escalares (`int`, `varchar`, `date`, `decimal`, etc.) y cuentan con claves primarias definidas (`id`).
-  - Las relaciones de muchos a muchos no emplean listas o cadenas delimitadas dentro de un solo campo, sino tablas intermedias asociativas (`roles_permisos` y `centros_servicios`), preservando la atomicidad.
-- **Inconsistencia técnica identificada (reporte sin modificación del SQL)**:
-  - En la tabla `historial_auditoria`, la columna `detalles` se define como tipo `json` (`detalles json null`). En la teoría relacional clásica (1FN estricta), un objeto JSON contiene una estructura semiestructurada no atómica (pares clave-valor). Si bien es una práctica estándar y eficiente en motores modernos como MySQL para almacenar registros de auditoría sin proliferación excesiva de tablas, desde una perspectiva formal estricta representa una excepción a la regla de atomicidad de la 1FN.
-
-### Segunda Forma Normal (2FN)
-
-- **Criterio**: Requiere satisfacer 1FN y garantizar que todos los atributos no clave dependan funcionalmente de la totalidad de la clave primaria (dependencia funcional completa), sin dependencias parciales respecto a subconjuntos de claves compuestas.
-- **Tablas con clave primaria simple**:
-  - En todas las tablas cuya clave primaria consta de una única columna subrogada (`id`) —tales como `usuarios`, `perfiles_gestantes`, `embarazos`, `centros_atencion`, `servicios`, `recordatorios`, `contenidos_prenatales` y `senales_alerta`— no existe la posibilidad matemática de una dependencia parcial de la clave primaria (al no existir un subconjunto propio de una clave de un solo atributo). Por lo tanto, cumplen 2FN intrínsecamente.
-- **Claves compuestas y ausencia de dependencias parciales**:
-  - **`roles_permisos`** (clave primaria compuesta: `(rol_id, permiso_id)`):
-    - Atributo no clave: `asignado_at` (marca temporal de asignación).
-    - *Justificación*: El campo `asignado_at` indica el momento exacto en que un permiso específico fue concedido a un rol específico. No depende de `rol_id` en solitario (el rol existe independientemente de cuándo se asignó un permiso particular) ni de `permiso_id` en solitario (el permiso existe con anterioridad a su vinculación). Depende funcionalmente de la combinación completa `(rol_id, permiso_id)`. Al no existir dependencias parciales, cumple 2FN.
-  - **`centros_servicios`** (clave primaria compuesta: `(centro_atencion_id, servicio_id)`):
-    - Atributos no clave: `disponible`, `observaciones`, `fecha_verificacion`, `created_at`, `updated_at`.
-    - *Justificación*: Los atributos `disponible` (si la sede ofrece o no el servicio), `observaciones` (condiciones locales de atención) y `fecha_verificacion` (fecha en la que se constató el servicio en esa sede) describen exclusivamente la prestación de un servicio concreto en una sede puntual. Los datos generales del centro (nombre, municipio, teléfono, ubicación) residen en `centros_atencion`, y los del servicio (nombre, descripción general) en `servicios`. Ningún atributo no clave depende únicamente de `centro_atencion_id` ni únicamente de `servicio_id`, sino de la clave compuesta completa `(centro_atencion_id, servicio_id)`. Se garantiza la ausencia de dependencias parciales, cumpliendo 2FN.
-  - **`controles_prenatales`**:
-    - Posee una clave primaria subrogada `id` y una clave candidata única compuesta `(embarazo_id, numero_control)`. Todos los atributos descriptivos del control (`fecha_control`, `hora_control`, `edad_gestacional_semanas`, `estado`, `indicaciones`, `notas`, etc.) dependen funcionalmente de esa consulta médica específica en ese embarazo; no dependen únicamente del número ordinal de control ni únicamente del embarazo.
-
-## Ejecutar Flask localmente
-
-Con `.venv` activado y `.env` configurado:
+Desde PowerShell:
 
 ```powershell
-.\.venv\Scripts\python.exe app.py
+Get-Content Aurora_BD.sql | mysql -u root -p
+Get-Content database\Aurora_MVP_seed.sql | mysql -u root -p aurora
 ```
 
-También puedes usar:
+Para producción, utiliza un usuario MySQL dedicado con privilegios mínimos. No uses `root` ni una contraseña vacía.
 
-```cmd
-run.bat
+## Configuración
+
+Copia la plantilla y crea un archivo `.env` local:
+
+```powershell
+Copy-Item .env.example .env
 ```
 
-Abre [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
+Variables principales:
 
-Para crear una cuenta local mediante el comando interactivo de Flask:
+```dotenv
+SECRET_KEY=una-clave-larga-y-aleatoria
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_DATABASE=aurora
+MYSQL_USER=aurora_app
+MYSQL_PASSWORD=tu-contraseña
+```
+
+Para producción añade:
+
+```dotenv
+AURORA_ENV=production
+AURORA_DEBUG=0
+PORT=5000
+SESSION_COOKIE_SECURE=1
+MAIL_SERVER=smtp.example.com
+MAIL_PORT=587
+MAIL_USE_TLS=1
+MAIL_USERNAME=usuario-smtp
+MAIL_PASSWORD=contraseña-smtp
+MAIL_DEFAULT_SENDER=Aurora <no-reply@example.com>
+```
+
+Nunca publiques `.env`, contraseñas, tokens ni claves SMTP. El archivo está excluido por `.gitignore`.
+
+## Ejecución
+
+### Desarrollo
+
+Con el entorno virtual activo:
+
+```powershell
+$env:AURORA_ENV="development"
+$env:AURORA_DEBUG="1"
+python app.py
+```
+
+También puedes ejecutar `run.bat`.
+
+Abre [http://127.0.0.1:5000](http://127.0.0.1:5000).
+
+### Crear un usuario administrativo local
 
 ```powershell
 flask --app app create-user
 ```
 
-## Rutas principales
+El comando solicita los datos de forma interactiva y nunca recibe la contraseña como argumento.
 
-| Área | Rutas |
+## Pruebas
+
+Ejecuta la suite desde la raíz del proyecto:
+
+```powershell
+python -m pytest -q
+```
+
+La suite cubre, entre otros casos:
+
+- Cálculo de semana gestacional y validación de fechas.
+- Protección del panel administrativo.
+- Protección de rutas de recordatorios.
+- Registro y recuperación de contraseña.
+- Invalidación de tokens de recuperación reutilizados.
+- Cabeceras HTTP de seguridad.
+
+## Despliegue
+
+En Windows, `run.bat` selecciona el modo mediante `AURORA_ENV`:
+
+```cmd
+set AURORA_ENV=production
+set SESSION_COOKIE_SECURE=1
+run.bat
+```
+
+En producción, [wsgi.py](wsgi.py) inicia Waitress en `0.0.0.0` y usa la variable `PORT`:
+
+```powershell
+$env:AURORA_ENV="production"
+$env:PORT="5000"
+python wsgi.py
+```
+
+Coloca HTTPS delante de Waitress mediante un proxy o balanceador, configura copias de seguridad de MySQL y verifica la restauración antes de aceptar datos reales.
+
+## Estructura
+
+```text
+Aurora/
+├── app.py                         # Inicialización Flask y registro de extensiones
+├── wsgi.py                        # Entrada WSGI con Waitress
+├── config.py                      # Configuración desde variables de entorno
+├── extensions.py                  # Base de datos, login y CSRF
+├── commands.py                    # Comandos CLI de Flask
+├── controllers/
+│   ├── auth.py                    # Login, registro y recuperación
+│   ├── routes.py                  # Flujos de gestante y PWA
+│   └── admin.py                   # Panel administrativo
+├── models/                        # Modelos SQLAlchemy
+├── services/                      # Consultas y servicios de negocio
+├── templates/                     # Vistas Jinja2
+├── static/                        # CSS, JavaScript, fuentes, assets y PWA
+├── tests/                         # Pruebas pytest
+├── Aurora_BD.sql                  # Esquema principal MySQL
+├── database/Aurora_MVP_seed.sql   # Datos iniciales
+├── requirements.txt               # Dependencias
+└── run.bat                        # Arranque local o producción en Windows
+```
+
+## Roles
+
+| Rol | Acceso |
 | --- | --- |
-| Autenticación | `GET/POST /login`, `POST /logout` |
-| Inicio y perfil | `/`, `GET/POST /perfil` |
-| Embarazo | `GET/POST /embarazo`, `/embarazo?editar=1` |
-| Controles | `/controles`, `GET/POST /controles/nuevo`, `/calendario` |
-| Información | `/guia`, `/guia/<contenido_id>`, `/alertas` |
-| Directorio | `/centros`, `/centros/<centro_id>` |
-| Administración | `/admin/`, `/admin/contenidos`, `/admin/senales`, `/admin/centros`, `/admin/servicios` y sus formularios de alta, edición, cambio de estado y eliminación |
-| PWA | `/manifest.json`, `/service-worker.js` |
+| `usuario` | Perfil, embarazo, controles, recordatorios, calendario, guía, alertas y centros propios/disponibles. |
+| `administrador` | Panel de contenidos, señales, centros, servicios y auditoría reciente. |
+| `auditor` | Definido en el esquema, pero sin interfaz funcional dedicada en el MVP. |
 
-## Roles y permisos
+## PWA y modo offline
 
-| Rol | Estado real en el MVP |
-| --- | --- |
-| `usuario` | Puede acceder a su perfil, embarazo, controles, calendario, guía, alertas y directorio. Las consultas se limitan al perfil asociado a `current_user.id`. |
-| `administrador` | Es el único rol autorizado por `admin_required` para acceder al panel y gestionar contenidos, señales, centros y servicios. El panel muestra actividad reciente de auditoría. |
-| `auditor` | Está previsto en el esquema con el permiso `consultar_auditoria`, pero queda fuera del alcance funcional actual porque no existe una ruta o interfaz específica para este rol. |
+El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan recursos estáticos esenciales y una página offline con señales de alarma y números de emergencia de Nicaragua:
 
-Los permisos se modelan en las tablas `roles`, `permisos` y `roles_permisos`. La autorización actualmente aplicada en las rutas administrativas exige explícitamente el rol `administrador`.
+- Emergencias / MINSA: **102**
+- Policía Nacional: **118**
+- Cruz Blanca: **128**
+- Bomberos Unificados: **115**
 
-## Seguridad aplicada
+El modo offline no sincroniza datos privados ni convierte la aplicación completa en una app offline-first. Los controles, perfiles, recordatorios y demás datos dinámicos requieren conexión con el servidor.
 
-- Contraseñas verificadas mediante hashes de Werkzeug; el comando de creación de usuarios genera hashes y no recibe contraseñas por argumentos.
-- CSRF global con Flask-WTF en los formularios POST.
-- Rutas protegidas con `login_required`.
-- Restricción de administración mediante `admin_required` y comprobación de rol.
-- Consultas de embarazo, perfil y controles ligadas a la persona autenticada; no aceptan identificadores de perfil, embarazo o usuario enviados por cliente para seleccionar datos ajenos.
-- `POST /logout` protegido por sesión y CSRF; `GET /logout` no está disponible.
-- Redirección `next` de login normalizada para aceptar solo rutas locales seguras.
-- Rollback ante errores SQL en operaciones de escritura.
+## Seguridad
 
-## PWA y caché estática
+- Contraseñas almacenadas con hash de Werkzeug.
+- Protección CSRF global para formularios POST.
+- Rutas protegidas con Flask-Login.
+- Separación de acceso administrativo mediante rol.
+- Tokens de recuperación firmados, temporales y ligados al hash actual de la contraseña.
+- Tokens de recuperación enviados por SMTP o mostrados únicamente en la consola local cuando `DEBUG` está activo.
+- Cookies HttpOnly, SameSite y `Secure` configurable para HTTPS.
+- Cabeceras `nosniff`, `SAMEORIGIN`, Referrer-Policy, XSS Protection y HSTS en modo seguro.
+- Consultas ORM parametrizadas y aislamiento de controles/embarazos por usuario autenticado.
 
-El navegador registra el service worker desde `static/js/app.js`. Tras una visita inicial con conexión, `static/service-worker.js` almacena el manifest, CSS, JavaScript, tipografías e imágenes esenciales del shell de Aurora.
+## Limitaciones y próximos pasos
 
-Esta capacidad permite instalar la aplicación y reutilizar recursos visuales ya descargados; no ofrece un modo funcional sin conexión. Las páginas privadas no se agregan al shell y los datos dinámicos requieren acceso al servidor.
+Antes de publicar con datos reales, se recomienda completar:
 
-## Limitaciones del MVP
+- Migraciones versionadas con Alembic/Flask-Migrate.
+- Rate limiting para login, registro y recuperación de contraseña.
+- MFA para cuentas administrativas.
+- Invalidación centralizada de sesiones al cambiar contraseña o desactivar cuentas.
+- Pruebas de integración contra MySQL y pruebas de aislamiento entre usuarios.
+- Monitorización, backups y restauración comprobada.
+- Política de privacidad, retención y eliminación de datos personales.
+- Validación clínica y legal del contenido prenatal y de los números de emergencia.
 
-- Aurora brinda acompañamiento informativo; no diagnostica, no prescribe y no sustituye la atención profesional.
-- La fecha probable de parto y la semana mostrada son orientativas.
-- El directorio comunica cuando un centro no tiene verificación institucional registrada. Confirma teléfono, horario y servicios directamente con el establecimiento antes de acudir.
-- Las cuentas se crean localmente mediante un comando administrativo; no existe registro público ni recuperación de contraseña.
-- Los recordatorios existentes solo se consultan. El MVP no los crea, envía ni convierte en notificaciones del dispositivo.
-- Los controles pueden registrarse y consultarse, pero todavía no editarse o reprogramarse desde la interfaz de la gestante.
-- El proyecto aún no incluye una suite de pruebas automatizadas.
-- Un despliegue con datos reales requeriría validación clínica y legal, controles adicionales de privacidad y seguridad, copias de respaldo y una configuración de producción.
+## Licencia
 
-## Estado actual
-
-El MVP incluye el recorrido principal de la gestante, autenticación, persistencia MySQL, contenidos de apoyo, directorio de centros y un panel administrativo de soporte. La prioridad antes de ampliar el alcance es validar el recorrido principal con usuarias, incorporar pruebas automatizadas y cerrar los requisitos necesarios para un despliegue seguro.
+Este repositorio no incluye actualmente un archivo de licencia. Define una licencia antes de distribuirlo públicamente.
