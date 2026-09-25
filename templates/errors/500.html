@@ -1,0 +1,11 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Error de servidor | Aurora{% endblock %}
+{% block content %}
+<main class="app-shell error-page">
+  <span class="material-symbols-outlined error-page__icon" aria-hidden="true">error</span>
+  <p class="eyebrow">Error 500</p>
+  <h1>Algo no salió bien</h1>
+  <p>Estamos trabajando para recuperar el servicio. Intenta nuevamente en unos momentos.</p>
+  <a class="button button--primary button--wide" href="{{ url_for('main.index') if current_user.is_authenticated else url_for('auth.login') }}">Volver a Aurora</a>
+</main>
+{% endblock %}

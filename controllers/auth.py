@@ -4,8 +4,12 @@ from urllib.parse import unquote, urlsplit
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_user, login_required, logout_user
+from sqlalchemy.exc import IntegrityError
+from werkzeug.security import generate_password_hash
 
 from extensions import db, login_manager
+from models.acceso import Rol
+from models.gestacion import PerfilGestante
 from models.usuario import Usuario
 
 
@@ -81,6 +85,49 @@ def login():
         return redirect(next_url or url_for("main.index"))
 
     return render_template("login.html")
+
+
+@auth_bp.route("/registro", methods=["GET", "POST"])
+def registro():
+    if current_user.is_authenticated:
+        return redirect(url_for("main.index"))
+
+    if request.method == "POST":
+        nombres = request.form.get("nombres", "").strip()[:100]
+        email = request.form.get("email", "").strip().lower()[:150]
+        password = request.form.get("password", "")
+        confirmacion = request.form.get("password_confirm", "")
+        rol = db.session.scalar(db.select(Rol).filter_by(nombre="usuario"))
+
+        if not nombres or not email or len(password) < 8 or password != confirmacion:
+            flash("Completa los datos y confirma una contraseña de al menos 8 caracteres.", "error")
+            return render_template("registro.html"), 400
+        if not rol or db.session.scalar(db.select(Usuario).filter_by(email=email)):
+            flash("No fue posible crear la cuenta con esos datos.", "error")
+            return render_template("registro.html"), 400
+
+        try:
+            usuario = Usuario(
+                rol_id=rol.id,
+                nombres=nombres,
+                apellidos="",
+                email=email,
+                password_hash=generate_password_hash(password),
+                activo=1,
+            )
+            db.session.add(usuario)
+            db.session.flush()
+            db.session.add(PerfilGestante(usuario_id=usuario.id))
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash("No fue posible crear la cuenta con esos datos.", "error")
+            return render_template("registro.html"), 400
+
+        flash("Cuenta creada. Ya puedes iniciar sesión.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("registro.html")
 
 
 @auth_bp.post("/logout")

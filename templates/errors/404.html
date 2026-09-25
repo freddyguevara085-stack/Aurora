@@ -1,0 +1,11 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Página no encontrada | Aurora{% endblock %}
+{% block content %}
+<main class="app-shell error-page">
+  <span class="material-symbols-outlined error-page__icon" aria-hidden="true">search_off</span>
+  <p class="eyebrow">Error 404</p>
+  <h1>Página no encontrada</h1>
+  <p>La página que buscas ya no está disponible o la dirección cambió.</p>
+  <a class="button button--primary button--wide" href="{{ url_for('main.index') if current_user.is_authenticated else url_for('auth.login') }}">Volver a Aurora</a>
+</main>
+{% endblock %}

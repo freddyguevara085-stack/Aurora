@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, send_from_directory, url_for
 from flask_login import current_user, login_required
@@ -10,7 +10,7 @@ from extensions import db
 from models.contenido import ContenidoPrenatal, SenalAlerta
 from models.directorio import CentroAtencion
 from models.gestacion import Embarazo, PerfilGestante
-from models.seguimiento import ControlPrenatal
+from models.seguimiento import ControlPrenatal, Recordatorio
 
 main_bp = Blueprint('main', __name__)
 
@@ -118,18 +118,64 @@ def nuevo_control():
             edad = request.form.get('edad_gestacional') or None
             edad = float(edad) if edad else None
             fecha_control = date.fromisoformat(request.form.get('fecha_control', ''))
+            hora_raw = request.form.get('hora_control') or None
+            hora_control = time.fromisoformat(hora_raw) if hora_raw else None
             centro_id = int(request.form.get('centro_atencion_id')) if request.form.get('centro_atencion_id') else None
             estado = request.form.get('estado', 'programado')
             if numero < 1 or (edad is not None and not 0 <= edad <= 45) or estado not in {'programado', 'realizado', 'reprogramado', 'cancelado'} or (centro_id and not centro_activo(centro_id)):
                 raise ValueError
-            db.session.add(ControlPrenatal(embarazo_id=activo.id, registrado_por_usuario_id=current_user.id, numero_control=numero, fecha_control=fecha_control, edad_gestacional_semanas=edad, centro_atencion_id=centro_id, estado=estado, indicaciones=request.form.get('indicaciones') or None))
+            db.session.add(ControlPrenatal(embarazo_id=activo.id, registrado_por_usuario_id=current_user.id, numero_control=numero, fecha_control=fecha_control, hora_control=hora_control, edad_gestacional_semanas=edad, centro_atencion_id=centro_id, estado=estado, indicaciones=request.form.get('indicaciones') or None, notas=request.form.get('notas') or None))
             db.session.commit()
             return redirect(url_for('main.controles'))
         except (ValueError, TypeError):
             flash('Revisa los datos del control.', 'error')
         except SQLAlchemyError:
             db.session.rollback(); flash('Ya existe ese número de control.', 'error')
-    return render_template('control_form.html', centros=centros)
+    return render_template('control_form.html', centros=centros, control=None, form_data=request.form if request.method == 'POST' else None)
+
+
+@main_bp.route('/controles/<int:control_id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_control(control_id):
+    _, activo = perfil_y_embarazo(current_user.id)
+    control = db.session.scalar(
+        db.select(ControlPrenatal).where(
+            ControlPrenatal.id == control_id,
+            ControlPrenatal.embarazo_id == (activo.id if activo else None),
+        )
+    )
+    if not control:
+        abort(404)
+
+    centros = centros_activos()
+    if request.method == 'POST':
+        try:
+            fecha_control = date.fromisoformat(request.form.get('fecha_control', ''))
+            hora_raw = request.form.get('hora_control') or None
+            estado = request.form.get('estado', '')
+            centro_raw = request.form.get('centro_atencion_id') or None
+            if estado not in {'programado', 'realizado', 'reprogramado', 'cancelado'}:
+                raise ValueError
+            if centro_raw and not centro_activo(int(centro_raw)):
+                raise ValueError
+            control.fecha_control = fecha_control
+            control.hora_control = time.fromisoformat(hora_raw) if hora_raw else None
+            control.estado = estado
+            control.centro_atencion_id = int(centro_raw) if centro_raw else None
+            control.indicaciones = request.form.get('indicaciones') or None
+            control.notas = request.form.get('notas') or None
+            db.session.commit()
+            flash('Control actualizado.', 'success')
+            return redirect(url_for('main.controles'))
+        except (ValueError, TypeError):
+            db.session.rollback()
+            flash('Revisa la fecha, hora, estado y centro del control.', 'error')
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash('No fue posible actualizar el control.', 'error')
+        return render_template('control_form.html', centros=centros, control=control, form_data=request.form)
+
+    return render_template('control_form.html', centros=centros, control=control, form_data=None)
 
 
 @main_bp.route('/calendario')
@@ -137,6 +183,69 @@ def nuevo_control():
 def calendario():
     _, activo = perfil_y_embarazo(current_user.id)
     return render_template('calendario.html', embarazo=activo, controles=controles_activos(activo), recordatorios=recordatorios_pendientes(current_user.id))
+
+
+@main_bp.route('/recordatorios/nuevo', methods=['GET', 'POST'])
+@login_required
+def nuevo_recordatorio():
+    if not _usuario_gestante():
+        abort(403)
+
+    _, activo = perfil_y_embarazo(current_user.id)
+    controles = controles_activos(activo)
+    if request.method == 'POST':
+        titulo = request.form.get('titulo', '').strip()
+        descripcion = request.form.get('descripcion', '').strip() or None
+        tipo = request.form.get('tipo', 'personal')
+        fecha_hora_raw = request.form.get('fecha_hora', '').strip()
+        control_raw = request.form.get('control_prenatal_id', '').strip()
+
+        try:
+            fecha_hora = datetime.fromisoformat(fecha_hora_raw)
+            control_id = int(control_raw) if control_raw else None
+            if (
+                not titulo
+                or len(titulo) > 150
+                or len(descripcion or '') > 500
+                or fecha_hora <= datetime.now()
+                or tipo not in {'control', 'personal', 'informativo'}
+            ):
+                raise ValueError
+            if control_id is not None and not activo:
+                raise ValueError
+            control = None
+            if control_id is not None:
+                control = db.session.scalar(
+                    db.select(ControlPrenatal).where(
+                        ControlPrenatal.id == control_id,
+                        ControlPrenatal.embarazo_id == activo.id,
+                    )
+                )
+                if not control:
+                    raise ValueError
+
+            db.session.add(
+                Recordatorio(
+                    usuario_id=current_user.id,
+                    control_prenatal_id=control.id if control else None,
+                    titulo=titulo,
+                    descripcion=descripcion,
+                    tipo=tipo,
+                    fecha_hora=fecha_hora,
+                    estado='pendiente',
+                )
+            )
+            db.session.commit()
+            flash('Recordatorio creado correctamente.', 'success')
+            return redirect(url_for('main.calendario'))
+        except (ValueError, TypeError):
+            db.session.rollback()
+            flash('Revisa el título, la fecha, el tipo y el control asociado.', 'error')
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash('No fue posible guardar el recordatorio.', 'error')
+
+    return render_template('recordatorio_form.html', controles=controles, form_data=request.form if request.method == 'POST' else None)
 
 
 @main_bp.route('/guia')
@@ -238,3 +347,8 @@ def service_worker():
 @main_bp.route('/manifest.json')
 def manifest():
     return send_from_directory('static', 'manifest.json')
+
+
+@main_bp.route('/offline.html')
+def offline():
+    return send_from_directory('static', 'offline.html')

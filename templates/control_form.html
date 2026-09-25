@@ -1,1 +1,22 @@
-{% extends 'layouts/base.html' %}{% block title %}Registrar control | Aurora{% endblock %}{% block content %}<main class="app-shell"><a class="back" href="{{ url_for('main.controles') }}">Mis controles</a><h1>Registrar control</h1>{% include 'partials/flash.html' %}<form class="card" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Número de control <input name="numero_control" type="number" min="1" required></label><label>Fecha <input name="fecha_control" type="date" required></label><label>Centro <select name="centro_atencion_id"><option value="">Sin especificar</option>{% for centro in centros %}<option value="{{ centro.id }}">{{ centro.nombre }}</option>{% endfor %}</select></label><label>Edad gestacional <input name="edad_gestacional" type="number" min="0" max="45" step="0.1"></label><label>Estado <select name="estado"><option value="programado">Programado</option><option value="realizado">Realizado</option><option value="reprogramado">Reprogramado</option><option value="cancelado">Cancelado</option></select></label><label>Indicaciones <textarea name="indicaciones"></textarea></label><button class="button button--primary button--wide">Guardar control</button></form></main>{% endblock %}
+{% extends 'layouts/base.html' %}
+{% block title %}{{ 'Editar control' if control else 'Registrar control' }} | Aurora{% endblock %}
+{% block content %}
+<main class="app-shell">
+	<a class="back" href="{{ url_for('main.controles') }}">Mis controles</a>
+	<h1>{{ 'Editar control' if control else 'Registrar control' }}</h1>
+	{% include 'partials/flash.html' %}
+	{% set values = form_data or control %}
+	<form class="card" method="post">
+		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+		<label>Número de control <input name="numero_control" type="number" min="1" value="{{ values.numero_control if values else '' }}" {% if control %}readonly{% else %}required{% endif %}></label>
+		<label>Fecha <input name="fecha_control" type="date" value="{{ values.fecha_control if values and form_data else (values.fecha_control.isoformat() if values else '') }}" required></label>
+		<label>Hora <input name="hora_control" type="time" value="{{ values.hora_control if values and form_data else (values.hora_control.strftime('%H:%M') if values and values.hora_control else '') }}"></label>
+		<label>Centro <select name="centro_atencion_id"><option value="">Sin especificar</option>{% for centro in centros %}<option value="{{ centro.id }}" {% if values and values.centro_atencion_id|string == centro.id|string %}selected{% endif %}>{{ centro.nombre }}</option>{% endfor %}</select></label>
+		{% if not control %}<label>Edad gestacional <input name="edad_gestacional" type="number" min="0" max="45" step="0.1"></label>{% endif %}
+		<label>Estado <select name="estado">{% for estado, etiqueta in [('programado', 'Programado'), ('realizado', 'Realizado'), ('reprogramado', 'Reprogramado'), ('cancelado', 'Cancelado')] %}<option value="{{ estado }}" {% if values and values.estado == estado %}selected{% endif %}>{{ etiqueta }}</option>{% endfor %}</select></label>
+		<label>Indicaciones <textarea name="indicaciones">{{ values.indicaciones if values else '' }}</textarea></label>
+		<label>Notas post-consulta <textarea name="notas">{{ values.notas if values else '' }}</textarea></label>
+		<button class="button button--primary button--wide" type="submit">{{ 'Guardar cambios' if control else 'Guardar control' }}</button>
+	</form>
+</main>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Crear cuenta | Aurora{% endblock %}
+{% block content %}
+<main class="app-shell login-shell">
+  <section class="login-hero" aria-labelledby="registro-title">
+    <img src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="80" height="80" alt="Aurora">
+    <p class="login-brand">Aurora</p>
+    <h1 id="registro-title">Crea tu cuenta</h1>
+    <p>Empieza a organizar tu acompañamiento prenatal.</p>
+  </section>
+  {% include 'partials/flash.html' %}
+  <form class="login-card" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="nombres">Nombre<input id="nombres" name="nombres" type="text" autocomplete="name" required></label>
+    <label for="email">Correo electrónico<input id="email" name="email" type="email" autocomplete="email" required></label>
+    <label for="password">Contraseña<input id="password" name="password" type="password" minlength="8" autocomplete="new-password" required></label>
+    <label for="password_confirm">Confirmar contraseña<input id="password_confirm" name="password_confirm" type="password" minlength="8" autocomplete="new-password" required></label>
+    <button class="button button--primary button--wide" type="submit">Crear cuenta</button>
+    <p class="form-note"><a href="{{ url_for('auth.login') }}">Ya tengo una cuenta</a></p>
+  </form>
+</main>
+{% endblock %}

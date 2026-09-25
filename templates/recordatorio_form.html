@@ -1,0 +1,41 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Nuevo recordatorio | Aurora{% endblock %}
+{% block content %}
+<main class="app-shell section-shell">
+  {% set back_url = url_for('main.calendario') %}
+  {% set back_label = 'Volver al calendario' %}
+  {% set page_title = 'Nuevo recordatorio' %}
+  {% include 'partials/page_header.html' %}
+  {% include 'partials/flash.html' %}
+  <form class="card" method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="titulo">Título
+      <input id="titulo" name="titulo" type="text" maxlength="150" value="{{ request.form.get('titulo', '') if form_data else '' }}" required>
+    </label>
+    <label for="fecha_hora">Fecha y hora
+      <input id="fecha_hora" name="fecha_hora" type="datetime-local" value="{{ request.form.get('fecha_hora', '') if form_data else '' }}" required>
+    </label>
+    <label for="tipo">Tipo
+      <select id="tipo" name="tipo">
+        {% for valor, etiqueta in [('personal', 'Personal'), ('control', 'Control'), ('informativo', 'Informativo')] %}
+          <option value="{{ valor }}" {% if (request.form.get('tipo', 'personal') if form_data else 'personal') == valor %}selected{% endif %}>{{ etiqueta }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label for="control_prenatal_id">Control relacionado
+      <select id="control_prenatal_id" name="control_prenatal_id">
+        <option value="">Sin asociar</option>
+        {% for control in controles %}
+          <option value="{{ control.id }}" {% if form_data and request.form.get('control_prenatal_id') == control.id|string %}selected{% endif %}>
+            Control {{ control.numero_control }} · {{ control.fecha_control.strftime('%d/%m/%Y') }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+    <label for="descripcion">Descripción
+      <textarea id="descripcion" name="descripcion" maxlength="500">{{ request.form.get('descripcion', '') if form_data else '' }}</textarea>
+    </label>
+    <button class="button button--primary button--wide" type="submit">Guardar recordatorio</button>
+  </form>
+</main>
+{% endblock %}

@@ -20,6 +20,9 @@ El recorrido principal que valida Aurora es: iniciar sesión, completar el perfi
 
 - Guía prenatal con filtros por trimestre y categoría.
 - Instalación como PWA y caché de recursos estáticos esenciales. Los datos dinámicos y las páginas privadas requieren conexión al servidor.
+- Página offline precargada con señales de alarma y números de emergencia cuando no hay conexión.
+- Registro público de gestantes y creación inicial del perfil.
+- Edición y reprogramación de controles prenatales, con indicaciones y notas post-consulta.
 
 ### Soporte interno
 
@@ -27,10 +30,9 @@ El repositorio también contiene un panel administrativo para mantener contenido
 
 ### Fuera del alcance actual
 
-- Registro público y recuperación de contraseña.
+- Recuperación de contraseña.
 - Creación, edición o envío automático de recordatorios y notificaciones.
-- Edición o reprogramación de controles ya registrados.
-- Funcionamiento completo sin conexión.
+- Funcionamiento completo de la aplicación sin conexión.
 - Interfaz dedicada para el rol `auditor`.
 - Integraciones con expedientes clínicos o sistemas institucionales.
 
