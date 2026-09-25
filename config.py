@@ -14,6 +14,7 @@ class Config:
 
     SESSION_COOKIE_HTTPONLY = True
     SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', '0').strip().lower() in {'1', 'true', 'yes', 'on'}
 
     MYSQL_HOST = os.getenv('MYSQL_HOST', '127.0.0.1')
     MYSQL_PORT = int(os.getenv('MYSQL_PORT', '3306'))

@@ -1,6 +1,11 @@
 """Rutas de autenticación de Aurora."""
 
+import hmac
 import os
+import smtplib
+import sys
+from email.message import EmailMessage
+from html import escape
 from urllib.parse import unquote, urlsplit
 
 from flask import Blueprint, current_app, flash, redirect, render_template, request, url_for
@@ -90,7 +95,50 @@ def login():
 
 
 def _serializador_recuperacion() -> URLSafeTimedSerializer:
-    return URLSafeTimedSerializer(current_app.config["SECRET_KEY"], salt="aurora-recuperar-password")
+    return URLSafeTimedSerializer(
+        current_app.config["SECRET_KEY"],
+        salt=current_app.config["SECRET_KEY"],
+    )
+
+
+def enviar_correo_recuperacion(destinatario: str, enlace: str) -> None:
+    """Envía el enlace por SMTP o lo muestra solo en consola durante DEBUG local."""
+    servidor = os.getenv("MAIL_SERVER")
+    if not servidor:
+        if current_app.config.get("DEBUG"):
+            print(f"Enlace de recuperación para {destinatario}: {enlace}", file=sys.stdout)
+        return
+
+    puerto = int(os.getenv("MAIL_PORT", "587"))
+    usar_tls = os.getenv("MAIL_USE_TLS", "1").strip().lower() in {"1", "true", "yes", "on"}
+    usuario_smtp = os.getenv("MAIL_USERNAME")
+    password_smtp = os.getenv("MAIL_PASSWORD")
+    remitente = os.getenv("MAIL_DEFAULT_SENDER") or usuario_smtp
+    if not remitente:
+        raise RuntimeError("MAIL_DEFAULT_SENDER debe estar definida cuando MAIL_SERVER está configurado.")
+
+    mensaje = EmailMessage()
+    mensaje["Subject"] = "Restablece tu contraseña de Aurora"
+    mensaje["From"] = remitente
+    mensaje["To"] = destinatario
+    mensaje.set_content(
+        "Recibimos una solicitud para restablecer tu contraseña de Aurora. "
+        f"Abre este enlace dentro de una hora: {enlace}"
+    )
+    enlace_html = escape(enlace, quote=True)
+    mensaje.add_alternative(
+        "<p>Recibimos una solicitud para restablecer tu contraseña de Aurora.</p>"
+        f'<p><a href="{enlace_html}">Restablecer contraseña</a></p>'
+        "<p>Este enlace vence en una hora y solo puede utilizarse una vez.</p>",
+        subtype="html",
+    )
+
+    with smtplib.SMTP(servidor, puerto, timeout=10) as smtp:
+        if usar_tls:
+            smtp.starttls()
+        if usuario_smtp:
+            smtp.login(usuario_smtp, password_smtp or "")
+        smtp.send_message(mensaje)
 
 
 @auth_bp.route("/recuperar-password", methods=["GET", "POST"])
@@ -100,22 +148,18 @@ def recuperar_password():
 
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()[:150]
-        if not email:
-            flash("Ingresa tu correo electrónico.", "error")
-            return render_template("recuperar_password.html"), 400
-
-        usuario = db.session.scalar(db.select(Usuario).filter_by(email=email, activo=1))
-        if usuario:
-            token = _serializador_recuperacion().dumps(usuario.email)
-            enlace = url_for("auth.restablecer_password", token=token, _external=True)
-            current_app.logger.info("Enlace de recuperación para %s: %s", usuario.email, enlace)
-            if os.getenv("MAIL_SERVER"):
-                flash("Te enviamos un enlace para restablecer tu contraseña. Revisa tu correo.", "success")
-            else:
-                flash("No hay servidor de correo configurado. Usa este enlace para restablecer tu contraseña:", "info")
-                flash(enlace, "info")
-        else:
-            flash("Si el correo está registrado, recibirás un enlace para restablecer tu contraseña.", "success")
+        if email:
+            usuario = db.session.scalar(db.select(Usuario).filter_by(email=email, activo=1))
+            if usuario:
+                payload = {"email": usuario.email, "pwd_stamp": usuario.password_hash[-12:]}
+                token = _serializador_recuperacion().dumps(payload)
+                enlace = url_for("auth.restablecer_password", token=token, _external=True)
+                current_app.logger.info("Solicitud de recuperación para correo: %s", usuario.email)
+                try:
+                    enviar_correo_recuperacion(usuario.email, enlace)
+                except (OSError, RuntimeError, smtplib.SMTPException):
+                    current_app.logger.exception("No fue posible enviar la recuperación para correo: %s", usuario.email)
+        flash("Si el correo está registrado, se enviaron las instrucciones para restablecer tu contraseña.", "success")
         return redirect(url_for("auth.login"))
 
     return render_template("recuperar_password.html")
@@ -127,13 +171,16 @@ def restablecer_password(token):
         return redirect(url_for("main.index"))
 
     try:
-        email = _serializador_recuperacion().loads(token, max_age=3600)
+        payload = _serializador_recuperacion().loads(token, max_age=3600)
+        if not isinstance(payload, dict) or not payload.get("email") or not payload.get("pwd_stamp"):
+            raise BadSignature
     except (SignatureExpired, BadSignature):
         flash("El enlace de recuperación no es válido o ha expirado.", "error")
         return redirect(url_for("auth.recuperar_password"))
 
+    email = payload["email"]
     usuario = db.session.scalar(db.select(Usuario).filter_by(email=email, activo=1))
-    if not usuario:
+    if not usuario or not hmac.compare_digest(usuario.password_hash[-12:], payload["pwd_stamp"]):
         flash("El enlace de recuperación no es válido o ha expirado.", "error")
         return redirect(url_for("auth.recuperar_password"))
 

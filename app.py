@@ -7,7 +7,7 @@ from commands import register_commands
 from controllers.admin import admin_bp
 from controllers.auth import auth_bp
 from controllers.routes import main_bp
-from extensions import csrf, db, login_manager, migrate
+from extensions import csrf, db, login_manager
 import models
 
 app = Flask(__name__)
@@ -20,12 +20,22 @@ login_manager.login_view = "auth.login"
 login_manager.login_message = "Inicia sesión para continuar."
 login_manager.login_message_category = "error"
 csrf.init_app(app)
-migrate.init_app(app, db)
 
 app.register_blueprint(main_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(admin_bp)
 register_commands(app)
+
+
+@app.after_request
+def set_security_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    if app.config.get("SESSION_COOKIE_SECURE"):
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
 
 
 @app.errorhandler(403)

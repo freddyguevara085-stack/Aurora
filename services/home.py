@@ -6,9 +6,9 @@ from sqlalchemy import and_, or_, select
 
 from extensions import db
 from models.contenido import ContenidoPrenatal, SenalAlerta
-from models.gestacion import Embarazo, PerfilGestante
 from models.seguimiento import ControlPrenatal, Recordatorio
 from models.usuario import Usuario
+from services.mvp import perfil_y_embarazo
 
 
 def calcular_semana_gestacional(
@@ -37,20 +37,7 @@ def calcular_trimestre(semana: int | None) -> int | None:
 def construir_inicio(usuario_id: int) -> dict:
     """Obtiene solo los datos de Inicio asociados al usuario autenticado."""
     usuario = db.session.get(Usuario, usuario_id)
-    perfil = db.session.scalar(
-        select(PerfilGestante).where(PerfilGestante.usuario_id == usuario_id)
-    )
-    embarazo = None
-    if perfil:
-        embarazo = db.session.scalar(
-            select(Embarazo)
-            .where(
-                Embarazo.perfil_gestante_id == perfil.id,
-                Embarazo.estado == "activo",
-            )
-            .order_by(Embarazo.created_at.desc())
-            .limit(1)
-        )
+    perfil, embarazo = perfil_y_embarazo(usuario_id)
 
     semana = calcular_semana_gestacional(
         embarazo.fum if embarazo else None,
@@ -123,7 +110,6 @@ def construir_inicio(usuario_id: int) -> dict:
 
     return {
         "user_name": usuario.nombres.split()[0] if usuario and usuario.nombres else "",
-        "role_name": usuario.rol.nombre if usuario and usuario.rol else "",
         "week": semana,
         "trimester": trimestre,
         "progress": round((semana or 0) / 42 * 100) if semana is not None else None,

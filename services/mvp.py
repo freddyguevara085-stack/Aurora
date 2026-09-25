@@ -2,7 +2,7 @@
 
 from datetime import date, datetime
 
-from sqlalchemy import and_, or_, select
+from sqlalchemy import or_, select
 
 from extensions import db
 from models.contenido import ContenidoPrenatal, SenalAlerta

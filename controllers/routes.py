@@ -2,7 +2,7 @@ from datetime import date, datetime, time, timedelta
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, send_from_directory, url_for
 from flask_login import current_user, login_required
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 
 from services.home import calcular_semana_gestacional, construir_inicio
