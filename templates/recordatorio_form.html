@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Nuevo recordatorio | Aurora{% endblock %}
 {% block content %}
-<main class="app-shell section-shell">
+<main id="main" tabindex="-1" class="app-shell section-shell">
   {% set back_url = url_for('main.calendario') %}
   {% set back_label = 'Volver al calendario' %}
   {% set page_title = 'Nuevo recordatorio' %}

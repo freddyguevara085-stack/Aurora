@@ -16,6 +16,10 @@ class Config:
     SESSION_COOKIE_SAMESITE = 'Lax'
     SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', '0').strip().lower() in {'1', 'true', 'yes', 'on'}
 
+    # Habilita comandos que cargan datos de demostración. Debe quedar desactivado
+    # en producción para no insertar centros ni perfiles ficticios por accidente.
+    DEMO_MODE = os.getenv('AURORA_DEMO', '0').strip().lower() in {'1', 'true', 'yes', 'on'}
+
     MYSQL_HOST = os.getenv('MYSQL_HOST', '127.0.0.1')
     MYSQL_PORT = int(os.getenv('MYSQL_PORT', '3306'))
     MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'aurora')

@@ -9,7 +9,7 @@
     <p>Servicios que pueden ser asignados a los centros de atención médica.</p>
   </div>
   <a href="{{ url_for('admin.nuevo_servicio') }}" class="button button--primary">
-    <span class="material-symbols-outlined">add</span> Nuevo Servicio
+    <span class="material-symbols-outlined" aria-hidden="true">add</span> Nuevo Servicio
   </a>
 </div>
 
@@ -17,13 +17,14 @@
   {% if servicios %}
     <div class="admin-table-container">
       <table class="admin-table">
+        <caption class="sr-only">Servicios administrables</caption>
         <thead>
           <tr>
-            <th>Nombre del Servicio</th>
-            <th>Descripción</th>
-            <th>Centros Asociados</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th scope="col">Nombre del Servicio</th>
+            <th scope="col">Descripción</th>
+            <th scope="col">Centros Asociados</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -51,21 +52,21 @@
               </td>
               <td>
                 <div class="admin-row-actions">
-                  <a href="{{ url_for('admin.editar_servicio', servicio_id=item.id) }}" class="admin-action-btn" title="Editar">
-                    <span class="material-symbols-outlined">edit</span>
+                  <a href="{{ url_for('admin.editar_servicio', servicio_id=item.id) }}" class="admin-action-btn" title="Editar" aria-label="Editar servicio">
+                    <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                   </a>
 
                   <form action="{{ url_for('admin.toggle_servicio', servicio_id=item.id) }}" method="post" class="inline-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="admin-action-btn" title="{{ 'Desactivar' if item.activo else 'Activar' }}">
-                      <span class="material-symbols-outlined">{{ 'toggle_on' if item.activo else 'toggle_off' }}</span>
+                    <button type="submit" class="admin-action-btn" title="{{ 'Desactivar' if item.activo else 'Activar' }}" aria-label="{{ 'Desactivar' if item.activo else 'Activar' }} servicio">
+                      <span class="material-symbols-outlined" aria-hidden="true">{{ 'toggle_on' if item.activo else 'toggle_off' }}</span>
                     </button>
                   </form>
 
                   <form action="{{ url_for('admin.eliminar_servicio', servicio_id=item.id) }}" method="post" class="inline-form" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este servicio?');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar">
-                      <span class="material-symbols-outlined">delete</span>
+                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar" aria-label="Eliminar servicio">
+                      <span class="material-symbols-outlined" aria-hidden="true">delete</span>
                     </button>
                   </form>
                 </div>
@@ -77,7 +78,7 @@
     </div>
   {% else %}
     <div class="empty">
-      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);">medical_services</span>
+      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);" aria-hidden="true">medical_services</span>
       <h3>No hay servicios registrados</h3>
       <p>Comienza agregando los servicios disponibles para asociarlos a los centros de salud.</p>
     </div>

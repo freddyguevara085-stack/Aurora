@@ -2,10 +2,9 @@
 
 from datetime import date, timedelta
 
-from sqlalchemy import and_, or_, select
+from sqlalchemy import select
 
 from extensions import db
-from models.contenido import ContenidoPrenatal, SenalAlerta
 from models.seguimiento import ControlPrenatal
 from models.usuario import Usuario
 from services.mvp import perfil_y_embarazo, recordatorios_pendientes
@@ -58,45 +57,9 @@ def construir_inicio(usuario_id: int) -> dict:
             .limit(1)
         )
 
-    etapa = [ContenidoPrenatal.publicado == 1]
-    if semana is None:
-        etapa.extend(
-            (
-                ContenidoPrenatal.semana_desde.is_(None),
-                ContenidoPrenatal.semana_hasta.is_(None),
-                ContenidoPrenatal.trimestre.is_(None),
-            )
-        )
-    else:
-        etapa.append(
-            or_(
-                and_(
-                    ContenidoPrenatal.semana_desde.is_(None),
-                    ContenidoPrenatal.semana_hasta.is_(None),
-                ),
-                and_(
-                    ContenidoPrenatal.semana_desde <= semana,
-                    ContenidoPrenatal.semana_hasta >= semana,
-                ),
-            )
-        )
-        etapa.append(
-            or_(ContenidoPrenatal.trimestre.is_(None), ContenidoPrenatal.trimestre == trimestre)
-        )
-
     recordatorios = recordatorios_pendientes(usuario_id, limite=3)
-    contenidos = db.session.scalars(
-        select(ContenidoPrenatal)
-        .where(*etapa)
-        .order_by(ContenidoPrenatal.fecha_revision.desc())
-        .limit(3)
-    ).all()
-    senales = db.session.scalars(
-        select(SenalAlerta)
-        .where(SenalAlerta.activo == 1)
-        .order_by(SenalAlerta.orden_visual, SenalAlerta.id)
-        .limit(3)
-    ).all()
+    contenidos = []
+    senales = []
 
     return {
         "user_name": usuario.nombres.split()[0] if usuario and usuario.nombres else "",

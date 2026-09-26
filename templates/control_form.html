@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% block title %}{{ 'Editar control' if control else 'Registrar control' }} | Aurora{% endblock %}
 {% block content %}
-<main class="app-shell">
+<main id="main" tabindex="-1" class="app-shell">
 	<a class="back" href="{{ url_for('main.controles') }}">Mis controles</a>
 	<h1>{{ 'Editar control' if control else 'Registrar control' }}</h1>
 	{% include 'partials/flash.html' %}

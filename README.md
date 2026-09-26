@@ -9,7 +9,7 @@
   <img src="https://img.shields.io/badge/Python-3.x-3776AB?logo=python&logoColor=white" alt="Python 3">
   <img src="https://img.shields.io/badge/Flask-3.0-000000?logo=flask&logoColor=white" alt="Flask 3">
   <img src="https://img.shields.io/badge/MySQL-8.x-4479A1?logo=mysql&logoColor=white" alt="MySQL 8">
-  <img src="https://img.shields.io/badge/Tests-14%20passed-2ea44f" alt="14 pruebas pasando">
+  <img src="https://img.shields.io/badge/Tests-pytest-2ea44f" alt="Pruebas con pytest">
 </p>
 
 > Aurora ofrece información y organización del seguimiento prenatal. No diagnostica, no prescribe y no sustituye la atención de profesionales de la salud.
@@ -37,11 +37,11 @@
 
 - Registro público de cuenta con asignación automática del rol `usuario` y creación del perfil inicial.
 - Inicio y cierre de sesión, recuperación segura de contraseña y cambio de contraseña autenticado.
-- Perfil con datos personales, ubicación, contacto de emergencia y consentimiento de datos.
+- Perfil de embarazo y ubicación opcional; los datos personales y contactos adicionales son opcionales.
 - Registro y edición del embarazo activo, con cálculo orientativo de semana gestacional, trimestre y FPP.
 - Registro, consulta, edición y reprogramación de controles prenatales.
 - Estados de control: programado, realizado, reprogramado y cancelado.
-- Indicaciones y notas post-consulta.
+- Organización de citas y preguntas para conversar con personal de salud; Aurora no prescribe.
 - Calendario de controles y recordatorios personales, de control o informativos.
 - Guía prenatal, señales de alerta y directorio de centros de atención.
 
@@ -245,16 +245,28 @@ Aurora/
 | `administrador` | Panel de contenidos, señales, centros, servicios y auditoría reciente. |
 | `auditor` | Definido en el esquema, pero sin interfaz funcional dedicada en el MVP. |
 
-## PWA y modo offline
+## PWA y disponibilidad sin conexión
 
-El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan recursos estáticos esenciales y una página offline con señales de alarma y números de emergencia de Nicaragua:
+El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan algunos recursos estáticos y una página general de contingencia. La disponibilidad sin conexión es parcial: perfiles, controles, guía dinámica, centros y recordatorios requieren conexión. Aurora no envía notificaciones en segundo plano; los recordatorios se consultan dentro de la aplicación.
 
-- Emergencias / MINSA: **102**
-- Policía Nacional: **118**
-- Cruz Blanca: **128**
-- Bomberos Unificados: **115**
+El directorio de demostración solo incluye centros tomados del listado oficial del MINSA (nombre, tipo y ubicación). Teléfonos, horarios, coordenadas y servicios no aparecen en la fuente y no se muestran. `seed-demo` no asigna servicios ni registra fechas de verificación y solo se ejecuta con `AURORA_DEMO=1`. Confirma directamente con el establecimiento antes de acudir.
 
-El modo offline no sincroniza datos privados ni convierte la aplicación completa en una app offline-first. Los controles, perfiles, recordatorios y demás datos dinámicos requieren conexión con el servidor.
+## Demo para revisión clínica
+
+El contenido clínico no se publica: guía, señales e Inicio permanecen deshabilitados (fail-closed) hasta que exista un proceso de revisión clínica documentado. Para revisarlo con profesionales existe una vista separada, restringida al rol `administrador` y marcada como demo.
+
+Los datos de demostración (perfil ficticio y centros oficiales del MINSA) solo se cargan en una base de demo. `seed-demo` exige `AURORA_DEMO=1`; sin esa variable se cancela para no ensuciar la base real.
+
+1. Activar el modo demo (solo en la base/entorno de demo):
+   - PowerShell: `$env:AURORA_DEMO = "1"`
+   - Linux/macOS: `export AURORA_DEMO=1`
+2. Cargar datos ficticios y centros oficiales: `flask --app app seed-demo`
+3. Crear una cuenta revisora con rol `administrador`; la contraseña se pide de forma interactiva y no queda escrita en el código:
+   `flask --app app create-user` → elegir el id del rol `administrador`.
+4. Iniciar la aplicación: `python app.py`
+5. Ingresar en `http://localhost:5000/login` con la cuenta revisora y abrir `http://localhost:5000/demo/revision-clinica`.
+
+La vista muestra el aviso **PENDIENTE DE REVISIÓN CLÍNICA — NO USAR PARA ATENCIÓN** y cita el nombre de la fuente, la URL directa y la fecha de consulta de cada dato. Las fechas de consulta no son fechas de revisión clínica.
 
 ## Seguridad
 
@@ -278,8 +290,8 @@ Antes de publicar con datos reales, se recomienda completar:
 - Invalidación centralizada de sesiones al cambiar contraseña o desactivar cuentas.
 - Pruebas de integración contra MySQL y pruebas de aislamiento entre usuarios.
 - Monitorización, backups y restauración comprobada.
-- Política de privacidad, retención y eliminación de datos personales.
-- Validación clínica y legal del contenido prenatal y de los números de emergencia.
+- Política de privacidad, retención y eliminación de datos personales antes de cualquier uso real.
+- Revisión clínica responsable, fuentes concretas y validación local del directorio y de teléfonos de emergencia antes de publicar información de salud.
 
 ## Licencia
 

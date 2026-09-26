@@ -1,0 +1,15 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ titulo }} | Aurora{% endblock %}
+{% block content %}
+<main id="main" tabindex="-1" class="app-shell section-shell">
+  {% set back_url = url_for('main.perfil') if current_user.is_authenticated else url_for('main.index') %}
+  {% set back_label = 'Volver a Mi perfil' if current_user.is_authenticated else 'Inicio' %}
+  {% set page_title = titulo %}
+  {% include 'partials/page_header.html' %}
+  <article class="card article">
+    <span class="material-symbols-outlined error-page__icon" aria-hidden="true">{{ icono }}</span>
+    <h2>{{ titulo }}</h2>
+    {% for parrafo in contenido %}<p>{{ parrafo }}</p>{% endfor %}
+  </article>
+</main>
+{% endblock %}

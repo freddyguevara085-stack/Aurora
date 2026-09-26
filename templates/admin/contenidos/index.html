@@ -9,7 +9,7 @@
     <p>Artículos educativos orientativos para las diferentes etapas del embarazo.</p>
   </div>
   <a href="{{ url_for('admin.nuevo_contenido') }}" class="button button--primary">
-    <span class="material-symbols-outlined">add</span> Nuevo Contenido
+    <span class="material-symbols-outlined" aria-hidden="true">add</span> Nuevo Contenido
   </a>
 </div>
 
@@ -52,14 +52,15 @@
   {% if contenidos %}
     <div class="admin-table-container">
       <table class="admin-table">
+        <caption class="sr-only">Contenidos prenatales administrables</caption>
         <thead>
           <tr>
-            <th>Título</th>
-            <th>Categoría</th>
-            <th>Etapa</th>
-            <th>Estado</th>
-            <th>Revisión</th>
-            <th>Acciones</th>
+            <th scope="col">Título</th>
+            <th scope="col">Categoría</th>
+            <th scope="col">Etapa</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Revisión</th>
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -92,21 +93,21 @@
               <td><small>{{ item.fecha_revision.strftime('%d/%m/%Y') }}</small></td>
               <td>
                 <div class="admin-row-actions">
-                  <a href="{{ url_for('admin.editar_contenido', contenido_id=item.id) }}" class="admin-action-btn" title="Editar">
-                    <span class="material-symbols-outlined">edit</span>
+                  <a href="{{ url_for('admin.editar_contenido', contenido_id=item.id) }}" class="admin-action-btn" title="Editar" aria-label="Editar contenido">
+                    <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                   </a>
 
                   <form action="{{ url_for('admin.toggle_publicacion_contenido', contenido_id=item.id) }}" method="post" class="inline-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="admin-action-btn" title="{{ 'Despublicar' if item.publicado else 'Publicar' }}">
-                      <span class="material-symbols-outlined">{{ 'visibility_off' if item.publicado else 'visibility' }}</span>
+                    <button type="submit" class="admin-action-btn" title="{{ 'Despublicar' if item.publicado else 'Publicar' }}" aria-label="{{ 'Despublicar' if item.publicado else 'Publicar' }} contenido">
+                      <span class="material-symbols-outlined" aria-hidden="true">{{ 'visibility_off' if item.publicado else 'visibility' }}</span>
                     </button>
                   </form>
 
                   <form action="{{ url_for('admin.eliminar_contenido', contenido_id=item.id) }}" method="post" class="inline-form" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este contenido?');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar">
-                      <span class="material-symbols-outlined">delete</span>
+                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar" aria-label="Eliminar contenido">
+                      <span class="material-symbols-outlined" aria-hidden="true">delete</span>
                     </button>
                   </form>
                 </div>
@@ -118,7 +119,7 @@
     </div>
   {% else %}
     <div class="empty">
-      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);">menu_book</span>
+      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);" aria-hidden="true">menu_book</span>
       <h3>No se encontraron contenidos</h3>
       <p>No hay artículos que coincidan con los filtros o aún no se han registrado.</p>
     </div>

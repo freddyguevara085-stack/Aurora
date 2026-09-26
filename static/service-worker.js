@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aurora-shell-v7';
+const CACHE_NAME = 'aurora-shell-v11';
 const APP_SHELL = [
   '/manifest.json',
   '/offline.html',
@@ -9,7 +9,7 @@ const APP_SHELL = [
   '/static/fonts/poppins/poppins-600.woff2',
   '/static/fonts/poppins/poppins-700.woff2',
   '/static/fonts/material-symbols/material-symbols-outlined.ttf',
-  '/static/assets/inicio/aurora-logo.png',
+  '/static/icons/app-icon-192.png',
   '/static/assets/inicio/guide-image.png',
   '/static/assets/inicio/notification.svg',
   '/static/assets/inicio/pregnancy-progress-ring.svg',

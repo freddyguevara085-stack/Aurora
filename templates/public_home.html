@@ -1,0 +1,20 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Aurora | Acompañamiento prenatal{% endblock %}
+{% block content %}
+<main id="main" tabindex="-1" class="app-shell section-shell">
+  <img src="{{ url_for('static', filename='icons/app-icon-192.png') }}" width="96" height="96" alt="Aurora" style="display:block;margin:0 auto 12px;">
+  <h1>Aurora</h1>
+  <p>Organiza tus controles y consulta información general para preparar tu atención prenatal.</p>
+  <p class="notice">Aurora es un prototipo. No diagnostica, no prescribe ni sustituye la orientación de profesionales de salud.</p>
+  <nav aria-label="Información pública">
+    <ul>
+      <li><a href="{{ url_for('main.alertas') }}">Señales de alerta</a></li>
+      <li><a href="{{ url_for('main.centros') }}">Directorio de centros</a></li>
+      <li><a href="{{ url_for('main.guia') }}">Guía y orientación</a></li>
+      <li><a href="{{ url_for('main.fuentes') }}">Fuentes y alcance</a></li>
+    </ul>
+  </nav>
+  <a class="button button--primary button--wide" href="{{ url_for('auth.login') }}">Iniciar sesión</a>
+  <a class="button button--wide" href="{{ url_for('auth.registro') }}">Crear cuenta</a>
+</main>
+{% endblock %}

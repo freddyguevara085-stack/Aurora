@@ -9,7 +9,7 @@
     <p>Registra la información de contacto, ubicación y servicios que ofrece el establecimiento.</p>
   </div>
   <a href="{{ url_for('admin.centros') }}" class="button button--secondary">
-    <span class="material-symbols-outlined">arrow_back</span> Volver al directorio
+    <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span> Volver al directorio
   </a>
 </div>
 
@@ -175,7 +175,7 @@
       </div>
 
       <label for="fecha_verificacion">
-        Fecha de Verificación de Datos
+        Fecha de revisión registrada
         {% set f_ver = form_data.get('fecha_verificacion', '') if form_data else (centro.fecha_verificacion.strftime('%Y-%m-%d') if centro and centro.fecha_verificacion else '') %}
         <input
           type="date"
@@ -184,11 +184,12 @@
           value="{{ f_ver }}"
         >
       </label>
+      <p class="form-help">Solo registra la fecha tras confirmar los datos directamente. Sin fecha, el centro o servicio se mostrará como por confirmar; el cambio queda asociado a tu cuenta en la auditoría.</p>
     </fieldset>
 
     <fieldset>
       <legend>Servicios Disponibles en este Centro</legend>
-      <p class="form-help">Selecciona todos los servicios que actualmente ofrece este establecimiento de salud:</p>
+      <p class="form-help">Selecciona solo servicios confirmados directamente con el establecimiento. La fecha de revisión aplica a las asignaciones guardadas.</p>
 
       <div class="services-checkbox-grid">
         {% for serv in servicios %}
@@ -218,7 +219,7 @@
 
     <div class="form-actions-bar">
       <button type="submit" class="button button--primary">
-        <span class="material-symbols-outlined">save</span>
+        <span class="material-symbols-outlined" aria-hidden="true">save</span>
         {{ 'Registrar Centro' if accion == 'crear' else 'Guardar Cambios' }}
       </button>
       <a href="{{ url_for('admin.centros') }}" class="button button--secondary">Cancelar</a>

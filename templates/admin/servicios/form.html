@@ -9,7 +9,7 @@
     <p>Define los tipos de atención médica materno-infantil disponibles.</p>
   </div>
   <a href="{{ url_for('admin.servicios') }}" class="button button--secondary">
-    <span class="material-symbols-outlined">arrow_back</span> Volver al catálogo
+    <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span> Volver al catálogo
   </a>
 </div>
 
@@ -56,7 +56,7 @@
 
     <div class="form-actions-bar">
       <button type="submit" class="button button--primary">
-        <span class="material-symbols-outlined">save</span>
+        <span class="material-symbols-outlined" aria-hidden="true">save</span>
         {{ 'Registrar Servicio' if accion == 'crear' else 'Guardar Cambios' }}
       </button>
       <a href="{{ url_for('admin.servicios') }}" class="button button--secondary">Cancelar</a>

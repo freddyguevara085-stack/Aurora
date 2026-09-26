@@ -2,7 +2,7 @@
 {% block title %}Centros de salud | Aurora{% endblock %}
 
 {% block content %}
-<main class="app-shell">
+<main id="main" tabindex="-1" class="app-shell">
     {% set back_url = url_for('main.index') %}
     {% set back_label = 'Inicio' %}
     {% set page_title = 'Centros de salud' %}
@@ -11,8 +11,8 @@
     <section class="verification-notice" role="note">
         <span class="material-symbols-outlined" aria-hidden="true">warning</span>
         <div>
-            <strong>Directorio con información por confirmar</strong>
-            <p>Los centros sin fecha de verificación institucional pueden tener datos desactualizados. Confirma teléfono, horario y servicios directamente con el establecimiento antes de acudir.</p>
+            <strong>Directorio de demostración</strong>
+            <p>Una fecha indica que alguien del equipo registró una revisión; no garantiza disponibilidad actual. Confirma teléfono, horario y servicios directamente con el establecimiento antes de acudir.</p>
         </div>
     </section>
 
@@ -37,14 +37,14 @@
     <article class="card">
         <span class="chip">{{ centro.tipo_establecimiento|replace('_', ' ') }}</span>
         {% if centro.fecha_verificacion %}
-        <span class="status-badge status-badge--success">Verificado {{ centro.fecha_verificacion.strftime('%d/%m/%Y') }}</span>
+        <span class="status-badge status-badge--success">Revisión registrada {{ centro.fecha_verificacion.strftime('%d/%m/%Y') }}</span>
         {% else %}
         <span class="status-badge status-badge--warning">Datos sin verificar</span>
         {% endif %}
         <h2>{{ centro.nombre }}</h2>
         <p>{{ centro.municipio }}, {{ centro.departamento }}</p>
         <a class="text-link" href="{{ url_for('main.detalle_centro', centro_id=centro.id) }}">
-            Ver información <span class="material-symbols-outlined">chevron_right</span>
+            Ver información <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
         </a>
     </article>
     {% else %}

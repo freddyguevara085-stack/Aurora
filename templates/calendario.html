@@ -1,1 +1,43 @@
-{% extends 'layouts/base.html' %}{% block title %}Calendario | Aurora{% endblock %}{% block content %}<main class="app-shell">{% set back_url = url_for('main.controles') %}{% set back_label = 'Controles' %}{% set page_title = 'Calendario' %}{% include 'partials/page_header.html' %}<a class="button button--primary button--wide" href="{{ url_for('main.nuevo_recordatorio') }}">+ Nuevo recordatorio</a><button type="button" class="button button--wide" data-aurora-notify hidden>Activar notificaciones en este dispositivo</button><script type="application/json" id="aurora-avisos">{{ avisos|tojson }}</script>{% if not embarazo %}{% set empty_title = 'Tu calendario está vacío' %}{% set empty_text = 'Aquí aparecerán tus controles y recordatorios próximos.' %}{% set empty_url = none %}{% set empty_action = none %}{% include 'partials/empty_state.html' %}{% endif %}<section class="card"><h2>Controles</h2>{% for item in controles %}<p>{{ item.fecha_control.strftime('%d/%m/%Y') }} · Control {{ item.numero_control }}</p>{% else %}{% set empty_title = 'Sin controles registrados' %}{% set empty_text = 'Los controles prenatales aparecerán aquí.' %}{% set empty_url = none %}{% set empty_action = none %}{% include 'partials/empty_state.html' %}{% endfor %}</section><section class="card"><h2>Recordatorios</h2>{% for item in recordatorios %}<p>{{ item.fecha_hora.strftime('%d/%m/%Y %H:%M') }} · {{ item.titulo }}</p>{% else %}{% set empty_title = 'Tu calendario está vacío' %}{% set empty_text = 'Aquí aparecerán tus controles y recordatorios próximos.' %}{% set empty_url = none %}{% set empty_action = none %}{% include 'partials/empty_state.html' %}{% endfor %}</section></main>{% endblock %}
+{% extends 'layouts/base.html' %}
+{% block title %}Calendario | Aurora{% endblock %}
+{% block content %}
+<main id="main" tabindex="-1" class="app-shell">
+  {% set back_url = url_for('main.controles') %}
+  {% set back_label = 'Controles' %}
+  {% set page_title = 'Calendario' %}
+  {% include 'partials/page_header.html' %}
+  <p class="form-help">Los recordatorios aparecen al consultar Aurora; no se envían avisos en segundo plano.</p>
+  <a class="button button--primary button--wide" href="{{ url_for('main.nuevo_recordatorio') }}">+ Nuevo recordatorio</a>
+  {% if not embarazo %}
+    {% set empty_title = 'Tu calendario está vacío' %}
+    {% set empty_text = 'Aquí aparecerán tus controles y recordatorios próximos.' %}
+    {% set empty_url = none %}
+    {% set empty_action = none %}
+    {% include 'partials/empty_state.html' %}
+  {% endif %}
+  <section class="card">
+    <h2>Controles</h2>
+    {% for item in controles %}
+      <p>{{ item.fecha_control.strftime('%d/%m/%Y') }} · Control {{ item.numero_control }}</p>
+    {% else %}
+      {% set empty_title = 'Sin controles registrados' %}
+      {% set empty_text = 'Los controles prenatales aparecerán aquí.' %}
+      {% set empty_url = none %}
+      {% set empty_action = none %}
+      {% include 'partials/empty_state.html' %}
+    {% endfor %}
+  </section>
+  <section class="card">
+    <h2>Recordatorios</h2>
+    {% for item in recordatorios %}
+      <p>{{ item.fecha_hora.strftime('%d/%m/%Y %H:%M') }} · {{ item.titulo }}</p>
+    {% else %}
+      {% set empty_title = 'Tu calendario está vacío' %}
+      {% set empty_text = 'Aquí aparecerán tus recordatorios próximos.' %}
+      {% set empty_url = none %}
+      {% set empty_action = none %}
+      {% include 'partials/empty_state.html' %}
+    {% endfor %}
+  </section>
+</main>
+{% endblock %}

@@ -5,7 +5,6 @@ from datetime import datetime
 from sqlalchemy import or_, select
 
 from extensions import db
-from models.contenido import ContenidoPrenatal
 from models.directorio import CentroAtencion, CentroServicio, Servicio
 from models.gestacion import Embarazo, PerfilGestante
 from models.seguimiento import ControlPrenatal, Recordatorio
@@ -30,12 +29,8 @@ def recordatorios_pendientes(usuario_id, limite=10):
 
 
 def contenidos_publicados(trimestre=None, categoria=None):
-    query = select(ContenidoPrenatal).where(ContenidoPrenatal.publicado == 1)
-    if trimestre in (1, 2, 3):
-        query = query.where(or_(ContenidoPrenatal.trimestre.is_(None), ContenidoPrenatal.trimestre == trimestre))
-    if categoria:
-        query = query.where(ContenidoPrenatal.categoria == categoria)
-    return db.session.scalars(query.order_by(ContenidoPrenatal.fecha_revision.desc()).limit(30)).all()
+    # ponytail: fail closed until Aurora has a documented clinical-review workflow.
+    return []
 
 
 def centro_activo(centro_id):
@@ -53,4 +48,13 @@ def centros_activos(busqueda="", tipo=""):
 
 
 def servicios_disponibles(centro_id):
-    return db.session.scalars(select(Servicio).join(CentroServicio).where(CentroServicio.centro_atencion_id == centro_id, CentroServicio.disponible == 1, Servicio.activo == 1).order_by(Servicio.nombre)).all()
+    return db.session.scalars(
+        select(CentroServicio)
+        .join(Servicio)
+        .where(
+            CentroServicio.centro_atencion_id == centro_id,
+            CentroServicio.disponible == 1,
+            Servicio.activo == 1,
+        )
+        .order_by(Servicio.nombre)
+    ).all()

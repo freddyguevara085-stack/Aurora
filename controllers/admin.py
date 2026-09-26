@@ -2,6 +2,7 @@
 
 from datetime import date
 from functools import wraps
+from urllib.parse import urlsplit
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import func, or_, select
@@ -25,6 +26,16 @@ def admin_required(f):
             abort(403)
         return f(*args, **kwargs)
     return decorated_function
+
+
+def _url_fuente_valida(url):
+    if not url:
+        return True
+    try:
+        partes = urlsplit(url)
+    except ValueError:
+        return False
+    return partes.scheme in {"http", "https"} and bool(partes.netloc)
 
 
 def _alternar(instancia, campo, entidad, etiqueta_exito, redirect_endpoint, **kwargs):
@@ -122,6 +133,8 @@ def validar_datos_contenido(form_data):
     fuente_url = (form_data.get("fuente_url") or "").strip() or None
     if fuente_url and len(fuente_url) > 500:
         errores.append("La URL de la fuente no puede exceder 500 caracteres.")
+    if not _url_fuente_valida(fuente_url):
+        errores.append("La URL de la fuente debe usar HTTP o HTTPS.")
 
     fecha_rev_raw = (form_data.get("fecha_revision") or "").strip()
     fecha_revision = None
@@ -165,6 +178,8 @@ def validar_datos_contenido(form_data):
                 errores.append("Las semanas de gestación deben ser números enteros.")
 
     publicado = 1 if form_data.get("publicado") in ("1", "true", "on") else 0
+    if publicado:
+        errores.append("La publicación requiere revisión clínica documentada, todavía no disponible en Aurora.")
 
     datos = {
         "titulo": titulo,
@@ -354,6 +369,9 @@ def toggle_publicacion_contenido(contenido_id):
     item = db.session.get(ContenidoPrenatal, contenido_id)
     if not item:
         abort(404)
+    if not item.publicado:
+        flash("La publicación está deshabilitada hasta contar con revisión clínica documentada.", "error")
+        return redirect(url_for("admin.contenidos"))
     return _alternar(
         item,
         "publicado",
@@ -404,6 +422,8 @@ def validar_datos_senal(form_data):
     fuente_url = (form_data.get("fuente_url") or "").strip() or None
     if fuente_url and len(fuente_url) > 500:
         errores.append("La URL de la fuente no puede exceder 500 caracteres.")
+    if not _url_fuente_valida(fuente_url):
+        errores.append("La URL de la fuente debe usar HTTP o HTTPS.")
 
     fecha_rev_raw = (form_data.get("fecha_revision") or "").strip()
     fecha_revision = None
@@ -416,6 +436,8 @@ def validar_datos_senal(form_data):
             errores.append("La fecha de revisión debe tener formato AAAA-MM-DD válido.")
 
     activo = 1 if form_data.get("activo") in ("1", "true", "on") else 0
+    if activo:
+        errores.append("La publicación requiere revisión clínica documentada, todavía no disponible en Aurora.")
 
     datos = {
         "titulo": titulo,
@@ -555,6 +577,9 @@ def toggle_senal(senal_id):
     item = db.session.get(SenalAlerta, senal_id)
     if not item:
         abort(404)
+    if not item.activo:
+        flash("La publicación está deshabilitada hasta contar con revisión clínica documentada.", "error")
+        return redirect(url_for("admin.senales"))
     return _alternar(
         item,
         "activo",
@@ -674,6 +699,8 @@ def validar_datos_centro(form_data, centro_actual_id=None):
     if fecha_ver_raw:
         try:
             fecha_verificacion = date.fromisoformat(fecha_ver_raw)
+            if fecha_verificacion > date.today():
+                errores.append("La fecha de revisión no puede estar en el futuro.")
         except ValueError:
             errores.append("La fecha de verificación debe tener formato AAAA-MM-DD válido.")
 

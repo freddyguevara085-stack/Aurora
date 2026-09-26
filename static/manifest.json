@@ -1,7 +1,7 @@
 {
   "name": "Aurora",
   "short_name": "Aurora",
-  "description": "Aplicación de acompañamiento prenatal offline-first",
+  "description": "Acompañamiento prenatal con disponibilidad parcial sin conexión",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#faf9fc",
@@ -9,8 +9,14 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/static/assets/inicio/aurora-logo.png",
-      "sizes": "32x32",
+      "src": "/static/icons/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/icons/app-icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     }

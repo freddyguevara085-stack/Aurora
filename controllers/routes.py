@@ -5,10 +5,11 @@ from flask_login import current_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 
+from controllers.admin import admin_required
+from demo_nicaragua import BORRADORES, CONTEXTO, FECHA_CONSULTA, FUENTES
 from services.home import calcular_semana_gestacional, construir_inicio
 from services.mvp import centros_activos, centro_activo, contenidos_publicados, controles_activos, perfil_y_embarazo, recordatorios_pendientes, servicios_disponibles
 from extensions import db
-from models.contenido import ContenidoPrenatal, SenalAlerta
 from models.gestacion import Embarazo, PerfilGestante
 from models.seguimiento import ControlPrenatal, Recordatorio
 
@@ -16,8 +17,9 @@ main_bp = Blueprint('main', __name__)
 
 # Ruta principal (la vista HTML)
 @main_bp.route('/')
-@login_required
 def index():
+    if not current_user.is_authenticated:
+        return render_template('public_home.html')
     home_data = construir_inicio(current_user.id)
     return render_template('index.html', home=home_data)
 
@@ -183,17 +185,7 @@ def editar_control(control_id):
 def calendario():
     _, activo = perfil_y_embarazo(current_user.id)
     recordatorios = recordatorios_pendientes(current_user.id)
-    hoy = date.today()
-    avisos = [
-        {
-            'id': recordatorio.id,
-            'titulo': recordatorio.titulo,
-            'detalle': f"{recordatorio.fecha_hora.strftime('%H:%M')} · {recordatorio.descripcion or 'Recordatorio de Aurora'}",
-        }
-        for recordatorio in recordatorios
-        if recordatorio.fecha_hora.date() == hoy
-    ]
-    return render_template('calendario.html', embarazo=activo, controles=controles_activos(activo), recordatorios=recordatorios, avisos=avisos)
+    return render_template('calendario.html', embarazo=activo, controles=controles_activos(activo), recordatorios=recordatorios)
 
 
 @main_bp.route('/recordatorios/nuevo', methods=['GET', 'POST'])
@@ -260,38 +252,32 @@ def nuevo_recordatorio():
 
 
 @main_bp.route('/guia')
-@login_required
 def guia():
     trimestre = request.args.get('trimestre', type=int)
     categoria = (request.args.get('categoria') or '').strip()[:80]
-    _, activo = perfil_y_embarazo(current_user.id)
+    activo = None
+    if current_user.is_authenticated:
+        _, activo = perfil_y_embarazo(current_user.id)
     semana = calcular_semana_gestacional(activo.fum, activo.fpp) if activo else None
     return render_template('guia.html', contenidos=contenidos_publicados(trimestre, categoria), trimestre=trimestre, categoria=categoria, semana=semana)
 
 
 @main_bp.route('/guia/<int:contenido_id>')
-@login_required
 def detalle_guia(contenido_id):
-    contenido = db.session.scalar(db.select(ContenidoPrenatal).where(ContenidoPrenatal.id == contenido_id, ContenidoPrenatal.publicado == 1))
-    if not contenido: abort(404)
-    return render_template('guia_detalle.html', contenido=contenido)
+    abort(404)
 
 
 @main_bp.route('/alertas')
-@login_required
 def alertas():
-    senales = db.session.scalars(db.select(SenalAlerta).where(SenalAlerta.activo == 1).order_by(SenalAlerta.orden_visual, SenalAlerta.id).limit(30)).all()
-    return render_template('alertas.html', senales=senales)
+    return render_template('alertas.html', senales=[])
 
 
 @main_bp.route('/centros')
-@login_required
 def centros():
     return render_template('centros.html', centros=centros_activos((request.args.get('q') or '').strip(), (request.args.get('tipo') or '').strip()), q=(request.args.get('q') or '').strip()[:80], tipo=(request.args.get('tipo') or '').strip())
 
 
 @main_bp.route('/centros/<int:centro_id>')
-@login_required
 def detalle_centro(centro_id):
     centro = centro_activo(centro_id)
     if not centro: abort(404)
@@ -322,7 +308,16 @@ def perfil():
             fecha_invalida = True
         if fecha_invalida:
             semana = calcular_semana_gestacional(embarazo_actual.fum, embarazo_actual.fpp) if embarazo_actual else None
-            return render_template('perfil.html', perfil=perfil_actual, embarazo=embarazo_actual, semana=semana, cedula=None, es_gestante=True, form_data=request.form, date=date.today())
+            return render_template(
+                'perfil.html',
+                perfil=perfil_actual,
+                embarazo=embarazo_actual,
+                semana=semana,
+                cedula=None,
+                es_gestante=True,
+                form_data=request.form,
+                date=date.today(),
+            )
         perfil_actual = perfil_actual or PerfilGestante(usuario_id=current_user.id)
         perfil_actual.cedula = (request.form.get('cedula') or '').strip()[:20] or None
         perfil_actual.fecha_nacimiento = nacimiento
@@ -347,7 +342,16 @@ def perfil():
     if perfil_actual and perfil_actual.cedula:
         cedula = '*' * max(0, len(perfil_actual.cedula) - 4) + perfil_actual.cedula[-4:]
     semana = calcular_semana_gestacional(embarazo_actual.fum, embarazo_actual.fpp) if embarazo_actual else None
-    return render_template('perfil.html', perfil=perfil_actual, embarazo=embarazo_actual, semana=semana, cedula=cedula, es_gestante=_usuario_gestante(), form_data=None, date=date.today())
+    return render_template(
+        'perfil.html',
+        perfil=perfil_actual,
+        embarazo=embarazo_actual,
+        semana=semana,
+        cedula=cedula,
+        es_gestante=_usuario_gestante(),
+        form_data=None,
+        date=date.today(),
+    )
 
 @main_bp.post('/perfil/cambiar-password')
 @login_required
@@ -386,3 +390,57 @@ def manifest():
 @main_bp.route('/offline.html')
 def offline():
     return send_from_directory('static', 'offline.html')
+
+
+@main_bp.route('/fuentes')
+def fuentes():
+    return render_template(
+        'informacion.html',
+        titulo='Fuentes de información',
+        icono='menu_book',
+        contenido=[
+            'Aurora organiza información de acompañamiento prenatal para fines educativos.',
+            'Las señales de alerta y recomendaciones deben revisarse con profesionales de la salud antes de usarse en un contexto real.',
+            'El contenido publicado incluye la fuente y la fecha de revisión registrada por el equipo administrador.',
+        ],
+    )
+
+
+@main_bp.route('/privacidad')
+def privacidad():
+    return render_template(
+        'informacion.html',
+        titulo='Privacidad',
+        icono='shield',
+        contenido=[
+            'Aurora utiliza los datos del perfil y del embarazo para mostrar el seguimiento de la cuenta autenticada.',
+            'No compartas datos clínicos reales en esta versión de demostración.',
+            'Antes de un uso real deben definirse la política de privacidad, la retención y la eliminación de datos.',
+        ],
+    )
+
+
+@main_bp.route('/acerca')
+def acerca():
+    return render_template(
+        'informacion.html',
+        titulo='Acerca de Aurora',
+        icono='help',
+        contenido=[
+            'Aurora es un prototipo de acompañamiento prenatal desarrollado para organizar información, controles y recordatorios.',
+            'No diagnostica, no prescribe y no sustituye la atención de profesionales de la salud.',
+            'Versión de demostración para recibir comentarios de gestantes y profesionales.',
+        ],
+    )
+
+
+@main_bp.route('/demo/revision-clinica')
+@admin_required
+def revision_clinica():
+    return render_template(
+        'revision_clinica.html',
+        fuentes=FUENTES,
+        borradores=BORRADORES,
+        contexto=CONTEXTO,
+        fecha_consulta=FECHA_CONSULTA,
+    )

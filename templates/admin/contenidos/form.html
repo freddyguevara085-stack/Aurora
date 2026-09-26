@@ -6,10 +6,10 @@
 <div class="admin-page-header">
   <div>
     <h1>{{ 'Nuevo Contenido Prenatal' if accion == 'crear' else 'Editar Contenido' }}</h1>
-    <p>La información debe ser clara, verificada y de fuentes oficiales de salud.</p>
+      <p>Guarda borradores. La publicación está deshabilitada hasta contar con revisión clínica documentada.</p>
   </div>
   <a href="{{ url_for('admin.contenidos') }}" class="button button--secondary">
-    <span class="material-symbols-outlined">arrow_back</span> Volver a la lista
+    <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span> Volver a la lista
   </a>
 </div>
 
@@ -156,17 +156,17 @@
 
     <fieldset>
       <legend>Publicación</legend>
-      {% set is_pub = (form_data.get('publicado') in ['1', 'true', 'on']) if form_data else (contenido.publicado == 1 if contenido else true) %}
+      {% set is_pub = (form_data.get('publicado') in ['1', 'true', 'on']) if form_data else (contenido.publicado == 1 if contenido else false) %}
       <label class="checkbox-row">
         <input type="checkbox" name="publicado" value="1" {% if is_pub %}checked{% endif %}>
-        <strong>Publicar inmediatamente en la Guía Prenatal</strong>
+        <strong>Publicación temporalmente deshabilitada</strong>
       </label>
       <small class="form-help">Si desmarcas esta opción, el contenido se guardará como borrador y no será visible para las gestantes.</small>
     </fieldset>
 
     <div class="form-actions-bar">
       <button type="submit" class="button button--primary">
-        <span class="material-symbols-outlined">save</span>
+        <span class="material-symbols-outlined" aria-hidden="true">save</span>
         {{ 'Crear Contenido' if accion == 'crear' else 'Guardar Cambios' }}
       </button>
       <a href="{{ url_for('admin.contenidos') }}" class="button button--secondary">Cancelar</a>

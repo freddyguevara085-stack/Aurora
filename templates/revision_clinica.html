@@ -1,0 +1,52 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Revisión clínica (demo) | Aurora{% endblock %}
+{% block content %}
+<main id="main" tabindex="-1" class="app-shell section-shell">
+  {% set back_url = url_for('main.index') %}
+  {% set back_label = 'Inicio' %}
+  {% set page_title = 'Revisión clínica (demo)' %}
+  {% include 'partials/page_header.html' %}
+
+  <section class="verification-notice" role="alert" style="border-width:2px;">
+    <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    <div>
+      <strong>PENDIENTE DE REVISIÓN CLÍNICA — NO USAR PARA ATENCIÓN</strong>
+      <p>Vista de demostración para profesionales. Ningún elemento ha sido aprobado por un profesional de salud y no debe usarse para atención real.</p>
+    </div>
+  </section>
+
+  <p class="form-help">Los textos siguientes son afirmaciones atribuidas a la fuente citada, propuestas como borrador. No son recomendaciones de Aurora y no tienen fecha de revisión clínica.</p>
+
+  <section class="guide-recommended">
+    <h2>Borradores clínicos propuestos</h2>
+    {% for item in borradores %}
+    <article class="card">
+      <span class="chip">{{ item.categoria }}</span>
+      <h3 style="margin-top:8px;">{{ item.titulo }}</h3>
+      <p>{{ item.texto }}</p>
+      <small class="muted-row">Fuente: <a href="{{ fuentes[item.fuente].url }}" rel="noopener noreferrer">{{ fuentes[item.fuente].nombre }}</a> · consultada {{ fecha_consulta }}</small>
+      <span class="status-badge status-badge--warning" style="display:block;margin-top:8px;">Pendiente de revisión clínica</span>
+    </article>
+    {% endfor %}
+  </section>
+
+  <section class="card">
+    <h2>Contexto verificado (no clínico)</h2>
+    <ul style="padding-left:18px;">
+      {% for item in contexto %}
+      <li style="margin-bottom:10px;">{{ item.dato }}<br><small>Fuente: <a href="{{ fuentes[item.fuente].url }}" rel="noopener noreferrer">{{ fuentes[item.fuente].nombre }}</a> · consultada {{ fecha_consulta }}</small></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Fuentes consultadas</h2>
+    <ul style="padding-left:18px;">
+      {% for clave, fuente in fuentes.items() %}
+      <li style="margin-bottom:6px;"><a href="{{ fuente.url }}" rel="noopener noreferrer">{{ fuente.nombre }}</a></li>
+      {% endfor %}
+    </ul>
+    <p class="form-help">Fecha de consulta: {{ fecha_consulta }}. Esta fecha no constituye una revisión clínica.</p>
+  </section>
+</main>
+{% endblock %}

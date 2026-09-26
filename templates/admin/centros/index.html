@@ -9,7 +9,7 @@
     <p>Administra los establecimientos de atención médica, puestos de salud y casas maternas.</p>
   </div>
   <a href="{{ url_for('admin.nuevo_centro') }}" class="button button--primary">
-    <span class="material-symbols-outlined">add</span> Nuevo Centro
+    <span class="material-symbols-outlined" aria-hidden="true">add</span> Nuevo Centro
   </a>
 </div>
 
@@ -55,14 +55,15 @@
   {% if centros %}
     <div class="admin-table-container">
       <table class="admin-table">
+        <caption class="sr-only">Centros de salud administrables</caption>
         <thead>
           <tr>
-            <th>Centro / Establecimiento</th>
-            <th>Tipo</th>
-            <th>Ubicación</th>
-            <th>Servicios</th>
-            <th>Estado</th>
-            <th>Acciones</th>
+            <th scope="col">Centro / Establecimiento</th>
+            <th scope="col">Tipo</th>
+            <th scope="col">Ubicación</th>
+            <th scope="col">Servicios</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -99,28 +100,28 @@
                   <span class="status-badge status-badge--warning">Inactivo</span>
                 {% endif %}
                 {% if item.fecha_verificacion %}
-                  <small class="verification-state verification-state--verified">Verificado: {{ item.fecha_verificacion.strftime('%d/%m/%Y') }}</small>
+                  <small class="verification-state verification-state--verified">Revisión registrada: {{ item.fecha_verificacion.strftime('%d/%m/%Y') }}</small>
                 {% else %}
                   <small class="verification-state">Sin verificación institucional</small>
                 {% endif %}
               </td>
               <td>
                 <div class="admin-row-actions">
-                  <a href="{{ url_for('admin.editar_centro', centro_id=item.id) }}" class="admin-action-btn" title="Editar">
-                    <span class="material-symbols-outlined">edit</span>
+                  <a href="{{ url_for('admin.editar_centro', centro_id=item.id) }}" class="admin-action-btn" title="Editar" aria-label="Editar centro">
+                    <span class="material-symbols-outlined" aria-hidden="true">edit</span>
                   </a>
 
                   <form action="{{ url_for('admin.toggle_centro', centro_id=item.id) }}" method="post" class="inline-form">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="admin-action-btn" title="{{ 'Desactivar' if item.activo else 'Activar' }}">
-                      <span class="material-symbols-outlined">{{ 'toggle_on' if item.activo else 'toggle_off' }}</span>
+                    <button type="submit" class="admin-action-btn" title="{{ 'Desactivar' if item.activo else 'Activar' }}" aria-label="{{ 'Desactivar' if item.activo else 'Activar' }} centro">
+                      <span class="material-symbols-outlined" aria-hidden="true">{{ 'toggle_on' if item.activo else 'toggle_off' }}</span>
                     </button>
                   </form>
 
                   <form action="{{ url_for('admin.eliminar_centro', centro_id=item.id) }}" method="post" class="inline-form" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este centro de salud?');">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar">
-                      <span class="material-symbols-outlined">delete</span>
+                    <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar" aria-label="Eliminar centro">
+                      <span class="material-symbols-outlined" aria-hidden="true">delete</span>
                     </button>
                   </form>
                 </div>
@@ -132,7 +133,7 @@
     </div>
   {% else %}
     <div class="empty">
-      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);">local_hospital</span>
+      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);" aria-hidden="true">local_hospital</span>
       <h3>No se encontraron centros de salud</h3>
       <p>No hay establecimientos que coincidan con la búsqueda o aún no se han registrado.</p>
     </div>

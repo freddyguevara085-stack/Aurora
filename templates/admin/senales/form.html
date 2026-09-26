@@ -9,7 +9,7 @@
     <p>Define signos de advertencia que orientan a la gestante a buscar atención médica inmediata.</p>
   </div>
   <a href="{{ url_for('admin.senales') }}" class="button button--secondary">
-    <span class="material-symbols-outlined">arrow_back</span> Volver a la lista
+    <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span> Volver a la lista
   </a>
 </div>
 
@@ -114,16 +114,16 @@
 
     <fieldset>
       <legend>Disponibilidad</legend>
-      {% set is_act = (form_data.get('activo') in ['1', 'true', 'on']) if form_data else (senal.activo == 1 if senal else true) %}
+      {% set is_act = (form_data.get('activo') in ['1', 'true', 'on']) if form_data else (senal.activo == 1 if senal else false) %}
       <label class="checkbox-row">
         <input type="checkbox" name="activo" value="1" {% if is_act %}checked{% endif %}>
-        <strong>Señal activa y visible en la aplicación</strong>
+        <strong>Publicación temporalmente deshabilitada hasta revisión clínica</strong>
       </label>
     </fieldset>
 
     <div class="form-actions-bar">
       <button type="submit" class="button button--primary">
-        <span class="material-symbols-outlined">save</span>
+        <span class="material-symbols-outlined" aria-hidden="true">save</span>
         {{ 'Registrar Señal' if accion == 'crear' else 'Guardar Cambios' }}
       </button>
       <a href="{{ url_for('admin.senales') }}" class="button button--secondary">Cancelar</a>

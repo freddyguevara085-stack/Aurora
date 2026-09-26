@@ -1,9 +1,9 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Iniciar sesión | Aurora{% endblock %}
 {% block content %}
-<main class="app-shell login-shell">
+<main id="main" tabindex="-1" class="app-shell login-shell">
   <section class="login-hero" aria-labelledby="login-title">
-    <img src="{{ url_for('static', filename='assets/inicio/aurora-logo.png') }}" width="96" height="96" alt="Aurora">
+    <img src="{{ url_for('static', filename='icons/app-icon-192.png') }}" width="96" height="96" alt="Aurora">
     <p class="login-brand">Aurora</p>
     <h1 id="login-title">Bienvenida de nuevo</h1>
     <p>Accede a tu acompañamiento prenatal.</p>
