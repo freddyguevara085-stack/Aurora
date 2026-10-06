@@ -1,4 +1,5 @@
 .card-surface,.card,.empty,.notice{background:var(--white);border-radius:var(--radius-card);box-shadow:var(--shadow)}
+.notice{box-sizing:border-box;width:100%;max-width:100%;margin:16px 0;padding:16px;line-height:1.5}
 .flash{margin:12px 0;padding:12px 14px;border-radius:12px;background:var(--pink);color:var(--aurora-on-pink)}
 .flash--error{background:var(--aurora-error-bg);color:#93000a}
 .empty{margin:24px 0;padding:24px;text-align:center}
@@ -694,8 +695,25 @@
 /* 2. Cuadrícula de 2 columnas para Fecha y Hora */
 .form-grid-2col {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
+}
+
+.form-grid-2col > .form-group,
+.form-grid-2col .form-input {
+  min-width: 0;
+}
+
+.form-grid-2col .form-input {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 400px) {
+  .form-grid-2col {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 
