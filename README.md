@@ -278,18 +278,19 @@ Aurora/
 
 El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan algunos recursos estáticos y una página general de contingencia. La disponibilidad sin conexión es parcial: perfil, embarazo, controles, preguntas, traslado, contactos y recordatorios requieren conexión y no se guardan en caché. La página de contingencia no muestra datos de la cuenta. Aurora no envía notificaciones en segundo plano; los recordatorios se consultan dentro de la aplicación.
 
-Los centros de demostración provienen del listado oficial del MINSA (nombre, tipo y ubicación). Teléfonos, horarios, coordenadas y servicios no aparecen en la fuente y no se muestran. `seed-demo` solo se ejecuta con `AURORA_DEMO=1` y no registra fechas de verificación; confirma directamente con el establecimiento antes de acudir.
+Los centros de demostración provienen del listado oficial del MINSA (nombre, tipo y ubicación; consultado el 2026-10-06). Teléfonos, horarios, coordenadas y servicios no aparecen en la fuente y no se muestran. `seed-demo` solo se ejecuta con `AURORA_DEMO=1` y no registra fechas de verificación; confirma directamente con el establecimiento antes de acudir.
 
 ## Demo y revisión de contenido clínico
 
 El contenido clínico no se publica: la guía y las señales permanecen deshabilitadas (fail-closed) hasta que exista un proceso de revisión clínica documentado. Para revisarlo con profesionales existe una vista separada, restringida al rol `administrador` y marcada como demo.
 
-Los datos de demostración (perfil ficticio y centros oficiales del MINSA) solo se cargan en una base de demo. `seed-demo` exige `AURORA_DEMO=1`; sin esa variable se cancela para no ensuciar la base real.
+Los datos de demostración (cuatro perfiles ficticios y centros oficiales del MINSA) solo se cargan en una base de demo. `seed-demo` exige `AURORA_DEMO=1`; sin esa variable se cancela para no ensuciar la base real. El comando muestra contraseñas aleatorias; guárdalas y compártelas en privado, porque una nueva ejecución las cambia.
 
 1. Activar el modo demo (solo en la base/entorno de demo):
    - PowerShell: `$env:AURORA_DEMO = "1"`
    - Linux/macOS: `export AURORA_DEMO=1`
-2. Cargar datos ficticios y centros oficiales: `flask --app app seed-demo`
+2. Cargar cuatro cuentas ficticias y centros oficiales: `flask --app app seed-demo`
+   - Railway (solo para este comando): `railway ssh -s web -- env AURORA_DEMO=1 flask --app app seed-demo`
 3. Crear una cuenta revisora con rol `administrador`; la contraseña se pide de forma interactiva y no queda escrita en el código:
    `flask --app app create-user` → elegir el id del rol `administrador`.
 4. Iniciar la aplicación: `python app.py`

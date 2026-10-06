@@ -5,19 +5,19 @@ IMPORTANTE: la fecha de consulta NO es una fecha de revisión clínica. Aurora
 todavía no ha sido revisada por profesionales de salud, por lo que todo el
 material clínico permanece como borrador y fuera de las páginas públicas.
 
-Fuentes consultadas el 2026-09-25:
+Fuentes consultadas el 2026-10-06:
 - OPS/OMS - Salud materna: https://www.paho.org/es/temas/salud-materna
 - OPS/OMS - Nicaragua: https://www.paho.org/es/nicaragua
 - MINSA Nicaragua - Inicio: https://www.minsa.gob.ni/
-- MINSA Nicaragua - Red de Salud, Hospitales: https://www.minsa.gob.ni/red-de-salud/hospitales
-- MINSA Nicaragua - Red de Salud, Casa Materna: https://www.minsa.gob.ni/red-de-salud/casa-materna
+- MINSA Nicaragua - Red de Salud, Hospitales: https://www.minsa.gob.ni/index.php/red-de-salud/hospitales
+- MINSA Nicaragua - Red de Salud, Casa Materna: https://www.minsa.gob.ni/index.php/red-de-salud/casa-materna
 """
 
 # Cuenta ficticia que recibe los datos de demostración. Solo se usa cuando
 # DEMO_MODE está activo; nunca identifica datos reales.
 CUENTA_DEMO_EMAIL = "maria.demo@aurora.ni"
 
-FECHA_CONSULTA = "2026-09-25"
+FECHA_CONSULTA = "2026-10-06"
 
 FUENTES = {
     "ops_salud_materna": {
@@ -34,11 +34,11 @@ FUENTES = {
     },
     "minsa_hospitales": {
         "nombre": "MINSA Nicaragua - Red de Salud: Hospitales",
-        "url": "https://www.minsa.gob.ni/red-de-salud/hospitales",
+        "url": "https://www.minsa.gob.ni/index.php/red-de-salud/hospitales",
     },
     "minsa_casas_maternas": {
         "nombre": "MINSA Nicaragua - Red de Salud: Casa Materna",
-        "url": "https://www.minsa.gob.ni/red-de-salud/casa-materna",
+        "url": "https://www.minsa.gob.ni/index.php/red-de-salud/casa-materna",
     },
 }
 

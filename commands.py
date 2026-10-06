@@ -1,6 +1,7 @@
 """Comandos administrativos interactivos de Aurora."""
 
 from datetime import date, datetime, time, timedelta
+import secrets
 import click
 from werkzeug.security import generate_password_hash
 
@@ -55,13 +56,13 @@ def register_commands(app) -> None:
 
     @app.cli.command("seed-demo")
     def seed_demo() -> None:
-        """Carga una gestante demo ficticia y centros confirmados por el MINSA."""
+        """Carga cuatro cuentas ficticias y centros listados por el MINSA."""
         if not app.config.get("DEMO_MODE"):
             raise click.ClickException(
                 "seed-demo solo carga datos de demostración. Ejecútalo en una base de "
                 "demo con AURORA_DEMO=1; nunca en la base real."
             )
-        click.echo("Preparando datos de demostración (perfil ficticio y centros oficiales)...")
+        click.echo("Preparando cuatro perfiles ficticios y centros oficiales...")
 
         # Retira las filas de centros demo que versiones anteriores marcaban como verificadas.
         codigos_demo = ["MINSA-MGA-001", "MINSA-MGA-002", "MINSA-MGA-003", "MINSA-MGA-004", "MINSA-MGA-005", "MINSA-LEO-001", "MINSA-MAS-001", "MINSA-GRA-001", "MINSA-EST-002", "MINSA-MAT-001"]
@@ -113,7 +114,7 @@ def register_commands(app) -> None:
             centros_nuevos += 1
         db.session.flush()
 
-        # 4. Asegurar cuenta demo gestante
+        # 4. Asegurar cuenta de prueba principal
         rol_usuario = db.session.scalar(db.select(Rol).filter_by(nombre="usuario"))
         if not rol_usuario:
             rol_usuario = Rol(nombre="usuario", descripcion="Gestante de Aurora")
@@ -121,22 +122,23 @@ def register_commands(app) -> None:
             db.session.flush()
 
         email_demo = CUENTA_DEMO_EMAIL
+        password_demo = secrets.token_urlsafe(12)
         usuario_demo = db.session.scalar(db.select(Usuario).filter_by(email=email_demo))
         if not usuario_demo:
             usuario_demo = Usuario(
                 rol_id=rol_usuario.id,
-                nombres="María José",
-                apellidos="Pérez Gómez",
+                nombres="Caso ficticio semana 24",
+                apellidos="",
                 email=email_demo,
-                password_hash=generate_password_hash("Password123!"),
+                password_hash=generate_password_hash(password_demo),
                 activo=1,
             )
             db.session.add(usuario_demo)
             db.session.flush()
         else:
-            usuario_demo.nombres = "María José"
-            usuario_demo.apellidos = "Pérez Gómez"
-            usuario_demo.password_hash = generate_password_hash("Password123!")
+            usuario_demo.nombres = "Caso ficticio semana 24"
+            usuario_demo.apellidos = ""
+            usuario_demo.password_hash = generate_password_hash(password_demo)
             usuario_demo.activo = 1
             db.session.flush()
 
@@ -201,11 +203,11 @@ def register_commands(app) -> None:
                 embarazo_id=embarazo.id,
                 centro_atencion_id=centro_referencia.id if centro_referencia else None,
                 requiere_casa_materna=0,
-                acompanante_nombre="Rosa Guevara (Hermana)",
-                acompanante_telefono="8888-0000",
-                cuidador_hijos="Abuela materna en casa",
+                acompanante_nombre="Acompañante ficticio",
+                acompanante_telefono=None,
+                cuidador_hijos="Dato de ejemplo",
                 transporte_tipo="caponera_taxi",
-                transporte_contacto="Don Carlos (Taxi barrio) - 8777-1111",
+                transporte_contacto="Transporte ficticio; sin teléfono",
                 bulto_listo=1,
                 recursos_traslado_listos=1,
                 notas=None,
@@ -222,18 +224,18 @@ def register_commands(app) -> None:
         db.session.flush()
         contactos_comunitarios_def = [
             (
-                "Doña Silvia Martínez",
+                "Contacto ficticio 1",
                 "brigadista",
-                "8888-2345",
-                "Barrio Jorge Smith",
-                "Enlace con el centro de salud municipal",
+                None,
+                "Barrio de ejemplo",
+                "Dato ficticio; no corresponde a una persona real.",
             ),
             (
-                "Don Pedro Fonseca",
+                "Contacto ficticio 2",
                 "traslado_local",
-                "8765-4321",
-                "Sector San Antonio",
-                "Camioneta disponible para traslado hacia el centro de salud u hospital",
+                None,
+                "Sector de ejemplo",
+                "Dato ficticio; no corresponde a una persona real.",
             ),
         ]
         for nombre, rol, telefono, comunidad, notas in contactos_comunitarios_def:
@@ -316,14 +318,154 @@ def register_commands(app) -> None:
                     estado="pendiente",
                 )
             )
+
+        credenciales = [(email_demo, password_demo)]
+        for email, nombre, semana, departamento, municipio in [
+            ("prueba.semana08@example.com", "Caso ficticio semana 8", 8, "Managua", "Managua"),
+            ("prueba.semana20@example.com", "Caso ficticio semana 20", 20, "Boaco", "Boaco"),
+            ("prueba.semana34@example.com", "Caso ficticio semana 34", 34, "Estelí", "Estelí"),
+        ]:
+            password = secrets.token_urlsafe(12)
+            cuenta = db.session.scalar(db.select(Usuario).filter_by(email=email))
+            if not cuenta:
+                cuenta = Usuario(
+                    rol_id=rol_usuario.id,
+                    nombres=nombre,
+                    apellidos="",
+                    email=email,
+                    password_hash=generate_password_hash(password),
+                    activo=1,
+                )
+                db.session.add(cuenta)
+                db.session.flush()
+            else:
+                cuenta.nombres = nombre
+                cuenta.apellidos = ""
+                cuenta.password_hash = generate_password_hash(password)
+                cuenta.activo = 1
+
+            perfil_prueba = db.session.scalar(
+                db.select(PerfilGestante).filter_by(usuario_id=cuenta.id)
+            )
+            if not perfil_prueba:
+                perfil_prueba = PerfilGestante(usuario_id=cuenta.id)
+                db.session.add(perfil_prueba)
+                db.session.flush()
+            perfil_prueba.cedula = None
+            perfil_prueba.fecha_nacimiento = None
+            perfil_prueba.telefono = None
+            perfil_prueba.municipio = municipio
+            perfil_prueba.departamento = departamento
+            perfil_prueba.direccion_residencia = None
+            perfil_prueba.contacto_emergencia_nombre = None
+            perfil_prueba.contacto_emergencia_telefono = None
+            perfil_prueba.consentimiento_datos = 0
+            perfil_prueba.fecha_consentimiento = None
+            db.session.flush()
+
+            embarazo_prueba = db.session.scalar(
+                db.select(Embarazo).filter_by(
+                    perfil_gestante_id=perfil_prueba.id, estado="activo"
+                )
+            )
+            fum_prueba = hoy - timedelta(days=semana * 7)
+            if not embarazo_prueba:
+                embarazo_prueba = Embarazo(
+                    perfil_gestante_id=perfil_prueba.id,
+                    fum=fum_prueba,
+                    fpp=fum_prueba + timedelta(days=280),
+                    metodo_fpp="fum",
+                    estado="activo",
+                )
+                db.session.add(embarazo_prueba)
+                db.session.flush()
+            else:
+                embarazo_prueba.fum = fum_prueba
+                embarazo_prueba.fpp = fum_prueba + timedelta(days=280)
+                embarazo_prueba.metodo_fpp = "fum"
+
+            db.session.execute(
+                db.delete(Recordatorio).where(Recordatorio.usuario_id == cuenta.id)
+            )
+            db.session.execute(
+                db.delete(PlanParto).where(PlanParto.embarazo_id == embarazo_prueba.id)
+            )
+            db.session.execute(
+                db.delete(ContactoComunitario).where(
+                    ContactoComunitario.perfil_gestante_id == perfil_prueba.id
+                )
+            )
+            db.session.execute(
+                db.delete(ControlPrenatal).where(
+                    ControlPrenatal.embarazo_id == embarazo_prueba.id
+                )
+            )
+            db.session.execute(
+                db.delete(PreguntaConsulta).where(PreguntaConsulta.usuario_id == cuenta.id)
+            )
+            db.session.flush()
+
+            control_prueba = ControlPrenatal(
+                embarazo_id=embarazo_prueba.id,
+                registrado_por_usuario_id=cuenta.id,
+                numero_control=1,
+                fecha_control=hoy + timedelta(days=7),
+                hora_control=time(10, 0),
+                edad_gestacional_semanas=float(semana + 1),
+                estado="programado",
+                indicaciones=None,
+            )
+            db.session.add(control_prueba)
+            db.session.flush()
+            db.session.add(
+                PlanParto(
+                    embarazo_id=embarazo_prueba.id,
+                    requiere_casa_materna=0,
+                    acompanante_nombre="Acompañante ficticio",
+                    cuidador_hijos="Dato de ejemplo",
+                    transporte_tipo="familiar_vecino",
+                    transporte_contacto="Transporte ficticio; sin teléfono",
+                    bulto_listo=0,
+                    recursos_traslado_listos=0,
+                    notas="Registro ficticio para conocer la aplicación.",
+                )
+            )
+            db.session.add(
+                ContactoComunitario(
+                    perfil_gestante_id=perfil_prueba.id,
+                    nombre="Contacto de prueba",
+                    rol="otro",
+                    comunidad_barrio="Ubicación de ejemplo",
+                    notas="Dato ficticio; no corresponde a una persona real.",
+                )
+            )
+            db.session.add(
+                PreguntaConsulta(
+                    usuario_id=cuenta.id,
+                    pregunta="¿Dónde puedo revisar mi próxima cita de ejemplo?",
+                    estado="pendiente",
+                )
+            )
+            db.session.add(
+                Recordatorio(
+                    usuario_id=cuenta.id,
+                    control_prenatal_id=control_prueba.id,
+                    titulo="Próximo control de ejemplo",
+                    descripcion="Dato ficticio para explorar la agenda.",
+                    tipo="control",
+                    fecha_hora=datetime.combine(hoy + timedelta(days=6), time(10, 0)),
+                    estado="pendiente",
+                )
+            )
+            credenciales.append((email, password))
+
         db.session.commit()
 
         click.echo(f"- Centros confirmados por el MINSA: {centros_nuevos} nuevos.")
-        click.echo("- Gestante demo configurada con éxito:")
-        click.echo(f"  * Correo:      {email_demo}")
-        click.echo("  * Contraseña:  Password123!")
-        click.echo("  * Perfil, embarazo semana 24, 3 controles realizados + 1 programado, 2 preguntas, 3 recordatorios, plan de traslado y apoyo, y contactos personales listos.")
-        click.echo("  * Datos ficticios, sin cédula, teléfonos ni contacto de emergencia.")
+        click.echo("- Cuatro cuentas de prueba listas; comparte cada credencial en privado:")
+        for email, password in credenciales:
+            click.echo(f"  * {email} / {password}")
+        click.echo("  * Perfiles, agendas y apoyos ficticios; sin teléfonos reales.")
         click.echo("  * Teléfonos y horarios de centros: no confirmados en la fuente.")
         click.echo("  * Contenido clínico: no se publica; permanece como borrador.")
         click.echo("¡Datos de demostración listos!")
