@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Aurora — Presentación para el concurso</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root{
+    --purple:#6C4BA3; --lav:#A78BD6; --pink:#F8A8C1; --coral:#FF8F9F;
+    --sun:#FFD59E; --warm:#FFF8F5; --ink:#2D1F3F; --muted:#5C5364;
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif; color:var(--ink);
+    background:linear-gradient(160deg,#f3edfa 0%,var(--warm) 45%,#fdeecf 100%);
+    overflow:hidden;
+  }
+  #bar{position:fixed; top:0; left:0; height:5px; background:linear-gradient(90deg,var(--purple),var(--coral),var(--sun)); width:0; transition:width .3s; z-index:10}
+  #deck{height:100vh; width:100vw}
+  .slide{
+    display:none; height:100%; width:100%; padding:6vh 8vw;
+    flex-direction:column; justify-content:center; gap:2.2vh;
+  }
+  .slide.active{display:flex}
+  .kicker{font-size:clamp(13px,1.4vw,18px); font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--purple)}
+  h1{font-size:clamp(38px,6.5vw,84px); line-height:1.03; font-weight:800; letter-spacing:-.02em}
+  h1 .grad{background:linear-gradient(90deg,var(--purple),var(--coral) 60%,var(--sun)); -webkit-background-clip:text; background-clip:text; color:transparent}
+  h2{font-size:clamp(28px,4.4vw,56px); line-height:1.08; font-weight:800; letter-spacing:-.015em}
+  h2 em{font-style:normal; color:var(--purple)}
+  p,li{font-size:clamp(16px,1.9vw,26px); color:var(--muted); line-height:1.45; max-width:62ch}
+  .cols{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:2.5vw; align-items:start}
+  .card{background:#fff; border:1px solid #e9e1f3; border-radius:20px; padding:2.4vh 1.6vw; box-shadow:0 10px 30px rgba(45,31,63,.08)}
+  .card h3{font-size:clamp(17px,2vw,25px); color:var(--ink); margin-bottom:.6vh}
+  .card p{font-size:clamp(14px,1.5vw,19px)}
+  .big{display:flex; gap:1.2vw; align-items:baseline; flex-wrap:wrap}
+  .num{font-size:clamp(40px,6vw,80px); font-weight:800; color:var(--purple); letter-spacing:-.03em}
+  .num small{font-size:.45em; color:var(--coral); font-weight:700}
+  ul{list-style:none; display:flex; flex-direction:column; gap:1.6vh}
+  ul li{padding-left:1.6em; position:relative}
+  ul li::before{content:""; position:absolute; left:0; top:.55em; width:.7em; height:.7em; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--coral))}
+  .phone{border-radius:26px; box-shadow:0 22px 50px rgba(45,31,63,.25); width:min(23vh,26vw); height:auto; border:4px solid #fff; background:#000}
+  .phones{display:flex; gap:2.2vw; justify-content:center; flex-wrap:wrap}
+  video.bigplayer{width:min(42vh,32vw); border-radius:26px; box-shadow:0 22px 50px rgba(45,31,63,.3); background:#000; border:4px solid #fff}
+  .hint{position:fixed; bottom:2.2vh; right:3vw; font-size:14px; color:var(--muted); opacity:.75}
+  .pageno{position:fixed; bottom:2.2vh; left:3vw; font-size:14px; color:var(--muted); opacity:.6}
+  .logo{width:12vh; height:12vh; border-radius:28px; box-shadow:0 14px 34px rgba(45,31,63,.2)}
+  .row{display:flex; gap:4vw; align-items:center; flex-wrap:wrap}
+  #notes{
+    display:none; position:fixed; left:0; right:0; bottom:0; max-height:34vh; overflow:auto;
+    background:rgba(45,31,63,.94); color:#fff; padding:14px 4vw 18px; font-size:15px; line-height:1.5; z-index:20;
+  }
+  #notes.on{display:block}
+  #notes b{color:var(--sun)}
+  .tag{display:inline-block; background:#f1eafb; color:var(--purple); font-weight:700; font-size:clamp(12px,1.2vw,16px); border-radius:999px; padding:.35em 1em; margin-right:.5em}
+  .center{align-items:center; text-align:center}
+  .center p,.center h2{margin-left:auto; margin-right:auto}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="deck">
+
+  <section class="slide center" data-note="<b>0:00–0:30 · Saludo (30 s).</b> Buenos días/tardes. Soy [nombre] y hoy les presento Aurora: control prenatal digital para cada mamá de Nicaragua, incluso sin internet.">
+    <img class="logo" src="app-icon.png" alt="Aurora">
+    <div class="kicker">Concurso de emprendimiento · [Fecha]</div>
+    <h1>Aurora<span class="grad">.</span><br><span class="grad">Cuidamos cada embarazo.</span></h1>
+    <p>Control prenatal digital para Nicaragua — accesible, cercano y funcional <b>sin conexión</b>.</p>
+    <p style="font-size:14px;opacity:.7">Presentador: [tu nombre] · [tu contacto]</p>
+  </section>
+
+  <section class="slide" data-note="<b>0:30–2:00 · Problema (1:30).</b> Cite las cifras con calma. Énfasis: no es falta de ganas, es falta de acceso. Las pacientes de la comunidad llegan al hospital de referencia tarde o no llegan.">
+    <div class="kicker">El problema</div>
+    <h2>Muchas mamás llegan <em>tarde</em> al control prenatal</h2>
+    <div class="big">
+      <div class="num">17.5<small>/1000</small></div><p>muertes maternas por cada 1000 nacidos vivos en Nicaragua (2023)</p>
+      <div class="num">94.9<small>%</small></div><p>de los partos ocurren en hospitales, pero el tamizaje prenatal temprano sigue siendo la gran brecha</p>
+    </div>
+    <ul>
+      <li>Consultas de control prenatal dispersas en papeles, sin seguimiento continuo.</li>
+      <li>Viajes largos y costosos desde la comunidad al hospital de referencia.</li>
+      <li>Información confiable escasa: creencias y mitos llenan el vacío.</li>
+    </ul>
+  </section>
+
+  <section class="slide" data-note="<b>2:00–3:30 · Solución (1:30).</b> Aurora centraliza el embarazo en el bolsillo de la paciente: fecha probable de parto, señales de alarma, pasos por trimestre, citas y farmacias cercanas. PWA: se instala como app desde el navegador, funciona offline y no necesita Play Store.">
+    <div class="kicker">La solución</div>
+    <h2>Un <em>acompañante prenatal</em> en el bolsillo</h2>
+    <div class="cols">
+      <div class="card"><h3>🩺 Control centralizado</h3><p>Fecha probable de parto, citas, señales de alarma y pasos del embarazo por trimestre.</p></div>
+      <div class="card"><h3>📍 Cerca de ti</h3><p>Unidades y farmacias de turno en tu departamento, con contactos directos.</p></div>
+      <div class="card"><h3>📶 Funciona sin internet</h3><p>Es una PWA: se instala desde el navegador y guarda lo esencial en caché.</p></div>
+      <div class="card"><h3>🤖 Orientación inmediata</h3><p>Asistente prenatal que orienta (no reemplaza al médico) sobre síntomas y dudas.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-note="<b>3:30–5:30 · El producto (2:00).</b> 'Esto no es un mockup: es la app real corriendo.' Pasee por las 4 pantallas señalando: inicio con semana de gestación y próxima cita; controles por trimestre; guía de pasos; unidades y farmacias por departamento.">
+    <div class="kicker">El producto — real, no mockups</div>
+    <h2>La app corriendo <em>ahora mismo</em></h2>
+    <div class="phones">
+      <div style="text-align:center"><video class="phone" src="clips/home.mp4" muted loop autoplay playsinline preload="metadata"></video><p style="font-size:14px;margin-top:8px">Inicio</p></div>
+      <div style="text-align:center"><video class="phone" src="clips/controles.mp4" muted loop autoplay playsinline preload="metadata"></video><p style="font-size:14px;margin-top:8px">Controles</p></div>
+      <div style="text-align:center"><video class="phone" src="clips/guia.mp4" muted loop autoplay playsinline preload="metadata"></video><p style="font-size:14px;margin-top:8px">Guía por trimestre</p></div>
+      <div style="text-align:center"><video class="phone" src="clips/centros.mp4" muted loop autoplay playsinline preload="metadata"></video><p style="font-size:14px;margin-top:8px">Centros y farmacias</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-note="<b>5:30–6:30 · Offline (1:00).</b> Diferenciador fuerte para Nicaragua: en zonas sin datos móviles la app sigue disponible. Explique breve: se instala, cachea lo esencial y muestra una página offline útil, no un error del navegador.">
+    <div class="kicker">Pensado para Nicaragua</div>
+    <div class="row">
+      <video class="phone" src="clips/offline.mp4" muted loop autoplay playsinline preload="metadata" style="width:min(36vh,30vw)"></video>
+      <div>
+        <h2>Sin señal. <em>Sin problema.</em></h2>
+        <p>La app se instala desde el navegador y mantiene su información esencial disponible <b>sin conexión</b>: la guía, las señales de alarma y el contacto de emergencia siguen a mano en el campo.</p>
+        <p><span class="tag">PWA</span><span class="tag">Service Worker</span><span class="tag">Sin Play Store</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide center" data-note="<b>6:30–7:15 · Video promocional (45 s).</b> Deje correr el video de 30 s (doble clic para play/pausa). Si el jurado pregunta: grabado con Playwright sobre la app real y editado con Remotion — capacidad de producción propia.">
+    <div class="kicker">Video promocional</div>
+    <h2>Aurora en <em>30 segundos</em></h2>
+    <video class="bigplayer" src="aurora-promo.mp4" controls playsinline preload="metadata"></video>
+    <p style="font-size:14px;opacity:.7">9:16 para redes · grabado sobre la app real (Playwright) y editado programáticamente (Remotion)</p>
+  </section>
+
+  <section class="slide" data-note="<b>7:15–8:15 · Modelo de negocio y mercado (1:00).</b> Fase 1: gratuita y pública — crecemos por referidos boca a boca y clínicas aliadas. Fase 2: suscripción privada C$ 500–700/mes (recordatorios, historial exportable para la consulta, acompañamiento). Mercado: miles de embarazos/año en Nicaragua; réplica regional con contenido localizado.">
+    <div class="kicker">Modelo de negocio</div>
+    <h2>Gratis para crecer, <em>private por valor</em></h2>
+    <div class="cols">
+      <div class="card"><h3>Fase 1 · Gratuita</h3><p>App pública para todas las mamás. Adquisición boca a boca, clínicas y promotoras de salud aliadas.</p></div>
+      <div class="card"><h3>Fase 2 · Suscripción</h3><p>Plan privado <b>C$ 500–700/mes</b>: recordatorios inteligentes, historial exportable para la consulta, acompañamiento premium.</p></div>
+      <div class="card"><h3>Mercado</h3><p>Nicaragua como nicho inicial; modelo replicable en Centroamérica localizando contenidos y directorios de salud.</p></div>
+    </div>
+  </section>
+
+  <section class="slide" data-note="<b>8:15–9:15 · Por qué ganamos (1:00).</b> Ate cada criterio con evidencia: innovación (offline-first + IA de orientación), factibilidad (ya construida y funcionando, no un promise), impacto social (vida materna), escalabilidad (C.A.), ejecución (este video y esta demo son hechos, no planes).">
+    <div class="kicker">Por qué Aurora gana</div>
+    <h2>No prometemos: <em>ya está construido</em></h2>
+    <ul>
+      <li><b>Innovación:</b> primera app prenatal de Nicaragua offline-first, con orientación por IA.</li>
+      <li><b>Factibilidad:</b> el producto corre hoy en un teléfono — acaban de verlo en vivo.</li>
+      <li><b>Impacto:</b> ataca la mortalidad materna desde la detección temprana.</li>
+      <li><b>Escalabilidad:</b> mismo motor, contenido localizable por país.</li>
+      <li><b>Ejecución:</b> demo y video producidos con herramientas propias del equipo.</li>
+    </ul>
+  </section>
+
+  <section class="slide center" data-note="<b>9:15–10:00 · Cierre (45 s).</b> Termine con la visión y una frase de anclaje: 'Cada mamá debería llegar a tiempo a su cita. Con Aurora, llegan.' Agradezca y abra a preguntas.">
+    <img class="logo" src="app-icon.png" alt="Aurora">
+    <h2>Cada mamá debería <em>llegar a tiempo</em>.<br>Con Aurora, llegan.</h2>
+    <p>Control prenatal digital para Nicaragua — accesible, cercano y funcional sin conexión.</p>
+    <p><b>[tu nombre]</b> · [correo] · [teléfono]</p>
+    <p style="font-size:14px;opacity:.7">Gracias — preguntas</p>
+  </section>
+
+</div>
+<div id="notes"></div>
+<div class="pageno" id="pageno"></div>
+<div class="hint">→ / espacio: siguiente · ←: anterior · N: notas · F: pantalla completa</div>
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const bar = document.getElementById('bar');
+  const notes = document.getElementById('notes');
+  const pageno = document.getElementById('pageno');
+  let i = 0;
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === i));
+    bar.style.width = ((i + 1) / slides.length * 100) + '%';
+    pageno.textContent = (i + 1) + ' / ' + slides.length;
+    notes.innerHTML = slides[i].dataset.note || '';
+    slides.forEach((s, k) => s.querySelectorAll('video[controls]').forEach(v => { if (k !== i) v.pause(); }));
+  }
+  addEventListener('keydown', e => {
+    if (['ArrowRight', ' ', 'PageDown', 'Enter'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    else if (e.key in { n: 1, N: 1 }) notes.classList.toggle('on');
+    else if (e.key in { f: 1, F: 1 }) document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+  });
+  addEventListener('click', e => { if (!e.target.closest('video')) show(i + 1); });
+  show(0);
+</script>
+</body>
+</html>

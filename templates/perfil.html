@@ -1,193 +1,221 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Mi perfil | Aurora{% endblock %}
+
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell section-shell profile-page">
-  {% set back_url = url_for('main.index') %}{% set back_label = 'Volver a Inicio' %}{% set page_title = 'Mi perfil' %}{% include 'partials/page_header.html' %}
+<main id="main" tabindex="-1" class="app-shell section-shell profile-page aurora-page-container">
   {% include 'partials/flash.html' %}
 
-  <!-- Cabecera de identidad limpia -->
-  <section class="profile-identity">
-    <span>{{ current_user.nombres[0]|upper }}</span>
-    <h2>{{ current_user.nombres }} {{ current_user.apellidos }}</h2>
-    <p class="profile-identity__subtitle">{{ current_user.email }}{% if embarazo and semana is not none %} · Semana {{ semana }}{% endif %}</p>
-  </section>
+  <!-- 1. Cabecera y Avatar Centrado -->
+  <header class="profile-header">
+    <div class="profile-avatar" aria-hidden="true">
+      <span>{{ (current_user.nombres[0] if current_user.nombres else (current_user.email[0] if current_user.email else 'U'))|upper }}</span>
+    </div>
+    <h1 class="profile-name">{{ current_user.nombres or 'Usuaria' }}{% if current_user.apellidos %} {{ current_user.apellidos }}{% endif %}</h1>
+    <p class="profile-email">{{ current_user.email or '' }}</p>
+  </header>
 
   {% if es_gestante %}
-  <!-- Ficha de la gestante: limpia y en formato lista -->
-  <section class="profile-card card-surface">
-    <header>
-      <h3>Ficha de la gestante</h3>
-      <a href="#editor-perfil" onclick="const ed=document.getElementById('editor-perfil'); if(ed){ ed.open=true; ed.scrollIntoView({behavior:'smooth'}); }">
-        <span class="material-symbols-outlined">edit</span> Editar
-      </a>
+  <!-- 2. Ficha de la gestante -->
+  <section class="profile-card card-surface aurora-card" aria-labelledby="ficha-title">
+    <header class="profile-card__header">
+      <h2 id="ficha-title" class="profile-card__title">Ficha de la gestante</h2>
     </header>
-    <ul class="settings-list">
-      <li>
-        <div class="settings-action">
-          <span class="material-symbols-outlined">badge</span>
-          <span>Cédula</span>
-          <small>{{ cedula or 'Sin registrar' }}</small>
-        </div>
-      </li>
-      <li>
-        <div class="settings-action">
-          <span class="material-symbols-outlined">location_on</span>
-          <span>Municipio</span>
-          <small>{{ perfil.municipio if perfil and perfil.municipio else 'Sin definir' }}</small>
-        </div>
-      </li>
+    <div class="profile-card__body">
+      <div class="profile-info-row">
+        <span class="material-symbols-outlined profile-row__icon" aria-hidden="true">badge</span>
+        <span class="profile-row__label">Cédula</span>
+        <strong class="profile-row__value">{{ cedula or 'Sin registrar' }}</strong>
+      </div>
+      <div class="profile-info-row">
+        <span class="material-symbols-outlined profile-row__icon" aria-hidden="true">location_on</span>
+        <span class="profile-row__label">Municipio / Depto.</span>
+        <strong class="profile-row__value">
+          {% if perfil and perfil.municipio %}
+            {{ perfil.municipio }}{% if perfil.departamento %}, {{ perfil.departamento }}{% endif %}
+          {% else %}
+            Sin definir
+          {% endif %}
+        </strong>
+      </div>
+      <div class="profile-info-row">
+        <span class="material-symbols-outlined profile-row__icon" aria-hidden="true">pregnant_woman</span>
+        <span class="profile-row__label">Semana de gestación</span>
+        <strong class="profile-row__value">
+          {% if semana is not none %}Semana {{ semana }}{% else %}Por registrar{% endif %}
+        </strong>
+      </div>
       {% if perfil and perfil.contacto_emergencia_telefono %}
-      <li>
-        <a class="settings-action" href="tel:{{ perfil.contacto_emergencia_telefono }}">
-          <span class="material-symbols-outlined" style="color:#ba1a1a">call</span>
-          <span>Emergencia: {{ perfil.contacto_emergencia_nombre or 'Contacto' }}</span>
-          <small style="color:#ba1a1a;font-weight:600">{{ perfil.contacto_emergencia_telefono }}</small>
-          <span class="material-symbols-outlined">chevron_right</span>
-        </a>
-      </li>
+      <div class="profile-info-row">
+        <span class="material-symbols-outlined profile-row__icon profile-row__icon--emergency" aria-hidden="true">call</span>
+        <span class="profile-row__label">Emergencia: {{ perfil.contacto_emergencia_nombre or 'Contacto' }}</span>
+        <a class="profile-row__link" href="tel:{{ perfil.contacto_emergencia_telefono }}">{{ perfil.contacto_emergencia_telefono }}</a>
+      </div>
       {% endif %}
-    </ul>
+    </div>
+
+    <!-- Acción unificada de edición al pie de la tarjeta -->
+    <details id="editor-perfil" class="profile-card__drawer" {% if form_data %}open{% endif %}>
+      <summary class="profile-card__trigger">
+        <span>Editar información personal y médica</span>
+        <span class="chevron" aria-hidden="true">›</span>
+      </summary>
+      <div class="profile-card__drawer-content">
+        <form class="stack-form" method="post" action="{{ url_for('main.perfil') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <p class="form-help">Todos los campos son opcionales. Registra solo lo que te resulte útil para organizar tu apoyo.</p>
+
+          <fieldset>
+            <legend>Información personal</legend>
+            <label>
+              Cédula
+              <input name="cedula" maxlength="20" value="{{ form_data.get('cedula', '') if form_data else '' }}" placeholder="{{ cedula or 'Opcional' }}">
+            </label>
+            <label>
+              Fecha de nacimiento
+              <input name="fecha_nacimiento" type="date" max="{{ date.today().isoformat() }}" value="{{ form_data.get('fecha_nacimiento', perfil.fecha_nacimiento.isoformat() if perfil and perfil.fecha_nacimiento else '') if form_data else (perfil.fecha_nacimiento.isoformat() if perfil and perfil.fecha_nacimiento else '') }}">
+            </label>
+            <label>
+              Teléfono
+              <input name="telefono" type="tel" autocomplete="tel" maxlength="30" value="{{ form_data.get('telefono', perfil.telefono or '') if form_data else (perfil.telefono or '' if perfil else '') }}">
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Ubicación</legend>
+            <label>
+              Municipio
+              <input name="municipio" maxlength="100" value="{{ form_data.get('municipio', perfil.municipio or '') if form_data else (perfil.municipio or '' if perfil else '') }}">
+            </label>
+            <label>
+              Departamento
+              <input name="departamento" maxlength="100" value="{{ form_data.get('departamento', perfil.departamento or '') if form_data else (perfil.departamento or '' if perfil else '') }}">
+            </label>
+            <label>
+              Dirección de residencia
+              <textarea name="direccion_residencia">{{ form_data.get('direccion_residencia', perfil.direccion_residencia or '') if form_data else (perfil.direccion_residencia or '' if perfil else '') }}</textarea>
+            </label>
+          </fieldset>
+
+          <fieldset>
+            <legend>Contacto de emergencia</legend>
+            <label>
+              Nombre
+              <input name="contacto_emergencia_nombre" maxlength="150" value="{{ form_data.get('contacto_emergencia_nombre', perfil.contacto_emergencia_nombre or '') if form_data else (perfil.contacto_emergencia_nombre or '' if perfil else '') }}">
+            </label>
+            <label>
+              Teléfono
+              <input name="contacto_emergencia_telefono" type="tel" maxlength="30" value="{{ form_data.get('contacto_emergencia_telefono', perfil.contacto_emergencia_telefono or '') if form_data else (perfil.contacto_emergencia_telefono or '' if perfil else '') }}">
+            </label>
+          </fieldset>
+
+          <label class="checkbox-row">
+            <input name="consentimiento_datos" type="checkbox" value="1" {% if (form_data and form_data.get('consentimiento_datos') == '1') or (not form_data and perfil and perfil.consentimiento_datos) %}checked{% endif %}>
+            Acepto guardar en esta demo los datos que decida registrar para organizar mi embarazo. Entiendo que Aurora no ofrece atención médica.
+          </label>
+          <input type="hidden" name="consentimiento_datos" value="0">
+
+          <button class="button button--primary button--wide button--tactile" style="margin-top:16px">Guardar cambios</button>
+        </form>
+      </div>
+    </details>
   </section>
-
-  <!-- Ajustes de la aplicación -->
-  <section class="profile-card card-surface">
-    <h3>Ajustes</h3>
-    <ul class="settings-list">
-      <li>
-        <button class="settings-action" type="button" data-aurora-font-size>
-          <span class="material-symbols-outlined">format_size</span>
-          <span>Tamaño de texto</span>
-          <small data-aurora-font-label>Normal</small>
-          <span class="material-symbols-outlined">chevron_right</span>
-        </button>
-      </li>
-    </ul>
-  </section>
-
-  <!-- Información y legal -->
-  <section class="profile-card card-surface">
-    <h3>Información</h3>
-    <ul class="settings-list">
-      <li>
-        <a class="settings-action" href="{{ url_for('main.fuentes') }}">
-          <span class="material-symbols-outlined">info</span>
-          <span>Fuentes oficiales</span>
-          <span class="material-symbols-outlined">chevron_right</span>
-        </a>
-      </li>
-      <li>
-        <a class="settings-action" href="{{ url_for('main.privacidad') }}">
-          <span class="material-symbols-outlined">shield</span>
-          <span>Privacidad de datos</span>
-          <span class="material-symbols-outlined">chevron_right</span>
-        </a>
-      </li>
-      <li>
-        <a class="settings-action" href="{{ url_for('main.acerca') }}">
-          <span class="material-symbols-outlined">help</span>
-          <span>Acerca de Aurora</span>
-          <span class="material-symbols-outlined">chevron_right</span>
-        </a>
-      </li>
-    </ul>
-  </section>
-
-  <!-- Editar datos personales -->
-  <details id="editor-perfil" class="profile-editor card-surface">
-    <summary>Editar datos personales</summary>
-    <form class="stack-form" method="post">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <p class="form-help">Los campos son opcionales. Tu cédula se mostrará enmascarada después de guardarla.</p>
-
-      <fieldset>
-        <legend>Información personal</legend>
-        <label>
-          Cédula
-          <input name="cedula" maxlength="20" value="{{ form_data.get('cedula', '') if form_data else '' }}" placeholder="{{ cedula or 'Opcional' }}">
-        </label>
-        <label>
-          Fecha de nacimiento
-          <input name="fecha_nacimiento" type="date" max="{{ date.today().isoformat() }}" value="{{ form_data.get('fecha_nacimiento', perfil.fecha_nacimiento.isoformat() if perfil and perfil.fecha_nacimiento else '') if form_data else (perfil.fecha_nacimiento.isoformat() if perfil and perfil.fecha_nacimiento else '') }}">
-        </label>
-        <label>
-          Teléfono
-          <input name="telefono" maxlength="30" value="{{ form_data.get('telefono', perfil.telefono or '') if form_data else (perfil.telefono or '' if perfil else '') }}">
-        </label>
-      </fieldset>
-
-      <fieldset>
-        <legend>Ubicación</legend>
-        <label>
-          Municipio
-          <input name="municipio" maxlength="100" value="{{ form_data.get('municipio', perfil.municipio or '') if form_data else (perfil.municipio or '' if perfil else '') }}">
-        </label>
-        <label>
-          Departamento
-          <input name="departamento" maxlength="100" value="{{ form_data.get('departamento', perfil.departamento or '') if form_data else (perfil.departamento or '' if perfil else '') }}">
-        </label>
-        <label>
-          Dirección de residencia
-          <textarea name="direccion_residencia">{{ form_data.get('direccion_residencia', perfil.direccion_residencia or '') if form_data else (perfil.direccion_residencia or '' if perfil else '') }}</textarea>
-        </label>
-      </fieldset>
-
-      <fieldset>
-        <legend>Contacto de emergencia</legend>
-        <label>
-          Nombre
-          <input name="contacto_emergencia_nombre" maxlength="150" value="{{ form_data.get('contacto_emergencia_nombre', perfil.contacto_emergencia_nombre or '') if form_data else (perfil.contacto_emergencia_nombre or '' if perfil else '') }}">
-        </label>
-        <label>
-          Teléfono
-          <input name="contacto_emergencia_telefono" maxlength="30" value="{{ form_data.get('contacto_emergencia_telefono', perfil.contacto_emergencia_telefono or '') if form_data else (perfil.contacto_emergencia_telefono or '' if perfil else '') }}">
-        </label>
-      </fieldset>
-
-      <label class="checkbox-row">
-        <input name="consentimiento_datos" type="checkbox" value="1" {% if (form_data and form_data.get('consentimiento_datos') == '1') or (not form_data and perfil and perfil.consentimiento_datos) %}checked{% endif %}>
-        Consiento el tratamiento de mis datos de salud.
-      </label>
-      <input type="hidden" name="consentimiento_datos" value="0">
-
-      <button class="button button--primary button--wide" style="margin-top:12px">Guardar cambios</button>
-    </form>
-  </details>
-
-  <!-- Cambiar contraseña -->
-  <details class="profile-editor card-surface">
-    <summary>Cambiar contraseña</summary>
-    <form class="stack-form" method="post" action="{{ url_for('main.cambiar_password') }}">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <p class="form-help">Usa al menos 8 caracteres.</p>
-      <label>
-        Contraseña actual
-        <input name="password_actual" type="password" autocomplete="current-password" required>
-      </label>
-      <label>
-        Nueva contraseña
-        <input name="password_nueva" type="password" minlength="8" autocomplete="new-password" required>
-      </label>
-      <label>
-        Confirmar nueva contraseña
-        <input name="password_confirm" type="password" minlength="8" autocomplete="new-password" required>
-      </label>
-      <button class="button button--primary button--wide">Cambiar contraseña</button>
-    </form>
-  </details>
-
   {% else %}
+  <section class="profile-card card-surface aurora-card">
     {% set empty_title = 'Sin perfil gestante' %}
-    {% set empty_text = 'Esta cuenta no posee un perfil gestante.' %}
+    {% set empty_text = 'Esta cuenta no posee un perfil gestante registrado.' %}
     {% set empty_url = none %}
     {% set empty_action = none %}
+    {% set empty_icon = 'person' %}
     {% include 'partials/empty_state.html' %}
+  </section>
   {% endif %}
 
-  <!-- Cerrar sesión -->
-  <form class="logout-form" action="{{ url_for('auth.logout') }}" method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit">Cerrar sesión</button>
-  </form>
+  <!-- 3. Tarjeta 1: Cuenta y Accesibilidad -->
+  <section class="profile-card card-surface aurora-card" aria-labelledby="cuenta-title">
+    <header class="profile-card__header">
+      <h2 id="cuenta-title" class="profile-card__title">Cuenta y accesibilidad</h2>
+    </header>
+    <div class="settings-group">
+      <details class="settings-drawer-item">
+        <summary class="settings-action-row settings-action-row--clickable">
+          <span class="material-symbols-outlined settings-row__icon" aria-hidden="true">lock</span>
+          <span class="settings-row__label">Cambiar contraseña</span>
+          <span class="chevron settings-row__chevron" aria-hidden="true">›</span>
+        </summary>
+        <div class="settings-drawer-content">
+          <form class="stack-form" method="post" action="{{ url_for('main.cambiar_password') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <p class="form-help">Usa al menos 8 caracteres para proteger tu cuenta.</p>
+            <label>
+              Contraseña actual
+              <input name="password_actual" type="password" autocomplete="current-password" required>
+            </label>
+            <label>
+              Nueva contraseña
+              <input name="password_nueva" type="password" minlength="8" autocomplete="new-password" required>
+            </label>
+            <label>
+              Confirmar nueva contraseña
+              <input name="password_confirm" type="password" minlength="8" autocomplete="new-password" required>
+            </label>
+            <button class="button button--primary button--wide button--tactile" style="margin-top:12px">Actualizar contraseña</button>
+          </form>
+        </div>
+      </details>
 
+      <div class="settings-divider"></div>
+
+      <button class="settings-action-row settings-action-row--clickable" type="button" data-aurora-font-size>
+        <span class="material-symbols-outlined settings-row__icon" aria-hidden="true">format_size</span>
+        <span class="settings-row__label">Tamaño de texto</span>
+        <span class="settings-row__badge" data-aurora-font-label>Normal</span>
+        <span class="chevron settings-row__chevron" aria-hidden="true">›</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- 4. Tarjeta 2: Información y Legal -->
+  <section class="profile-card card-surface aurora-card" aria-labelledby="info-title">
+    <header class="profile-card__header">
+      <h2 id="info-title" class="profile-card__title">Información y legal</h2>
+    </header>
+    <div class="settings-group">
+      <a class="settings-action-row settings-action-row--clickable" href="{{ url_for('main.fuentes') }}">
+        <span class="material-symbols-outlined settings-row__icon" aria-hidden="true">info</span>
+        <span class="settings-row__label">Fuentes oficiales</span>
+        <span class="chevron settings-row__chevron" aria-hidden="true">›</span>
+      </a>
+
+      <div class="settings-divider"></div>
+
+      <a class="settings-action-row settings-action-row--clickable" href="{{ url_for('main.privacidad') }}">
+        <span class="material-symbols-outlined settings-row__icon" aria-hidden="true">shield</span>
+        <span class="settings-row__label">Privacidad de datos</span>
+        <span class="chevron settings-row__chevron" aria-hidden="true">›</span>
+      </a>
+
+      <div class="settings-divider"></div>
+
+      <a class="settings-action-row settings-action-row--clickable" href="{{ url_for('main.acerca') }}">
+        <span class="material-symbols-outlined settings-row__icon" aria-hidden="true">help</span>
+        <span class="settings-row__label">Acerca de Aurora</span>
+        <span class="chevron settings-row__chevron" aria-hidden="true">›</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 5. Botón de Cerrar Sesión Ergonómico y Seguro -->
+  <div class="profile-logout-wrap">
+    <form method="post" action="{{ url_for('auth.logout') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn-logout">Cerrar sesión</button>
+    </form>
+  </div>
+
+  {# ── Nota de disponibilidad sin conexión ── #}
+  <p class="offline-note">
+    <span class="material-symbols-outlined" aria-hidden="true">offline_bolt</span>
+    <span>Algunas páginas pueden consultarse sin conexión. Tus datos y el resto de Aurora requieren conexión.</span>
+  </p>
 </main>
 {% endblock %}

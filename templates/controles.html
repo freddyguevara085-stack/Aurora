@@ -1,15 +1,160 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Mis controles | Aurora{% endblock %}
+
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell section-shell controls-page">
-  {% set back_url = url_for('main.embarazo') %}{% set back_label = 'Volver a Mi embarazo' %}{% set page_title = 'Mis controles' %}{% include 'partials/page_header.html' %}
+<main id="main" tabindex="-1" class="app-shell section-shell controls-page aurora-page-container">
+  {% set back_url = url_for('main.embarazo') %}
+  {% set back_label = 'Volver a Mi embarazo' %}
+  {% set page_title = 'Mis controles' %}
+  {% include 'partials/page_header.html' %}
+
   {% include 'partials/flash.html' %}
+
   {% if embarazo %}
-  <section class="controls-section"><h2>Próximo control</h2>{% if proximo %}<article class="next-appointment card-surface"><span class="corner-glow"></span><header><span class="round-icon"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span></span><div><h3>{{ proximo.fecha_control.strftime('%d/%m/%Y') }}</h3><p>{{ proximo.hora_control.strftime('%H:%M') if proximo.hora_control else 'Hora por confirmar' }}</p></div></header><p class="muted-row"><span class="material-symbols-outlined" aria-hidden="true">location_on</span>{{ proximo.centro_atencion.nombre if proximo.centro_atencion else 'Centro por confirmar' }}</p><div class="appointment-actions"><a href="{{ url_for('main.calendario') }}"><span class="material-symbols-outlined" aria-hidden="true">visibility</span> Ver en calendario</a><a href="{{ url_for('main.editar_control', control_id=proximo.id) }}" aria-label="Editar o reprogramar control"><span class="material-symbols-outlined" aria-hidden="true">edit</span></a></div></article>{% else %}<div class="empty compact-empty"><h3>No hay un próximo control</h3><p>Registra una cita para organizar tu seguimiento.</p></div>{% endif %}</section>
-  <section class="controls-section history"><h2>Controles anteriores</h2>{% if anteriores %}<div class="timeline">{% for control in anteriores %}<article class="history-card card-surface"><span class="timeline-dot"></span><header><h3>Control prenatal</h3><time datetime="{{ control.fecha_control.isoformat() }}">{{ control.fecha_control.strftime('%d/%m/%Y') }}</time></header><p class="muted-row"><span class="material-symbols-outlined" aria-hidden="true">location_on</span>{{ control.centro_atencion.nombre if control.centro_atencion else 'Centro no registrado' }}</p><span class="status-chip">{{ control.estado|capitalize }}</span><a class="text-link" href="{{ url_for('main.editar_control', control_id=control.id) }}"><span class="material-symbols-outlined" aria-hidden="true">edit</span> Editar control</a></article>{% endfor %}</div>{% else %}<div class="empty compact-empty"><h3>Sin controles anteriores</h3><p>Los controles completados aparecerán aquí.</p></div>{% endif %}</section>
-  <a class="controls-fab" href="{{ url_for('main.nuevo_control') }}"><span class="material-symbols-outlined" aria-hidden="true">add</span> Registrar nuevo control</a>
+    <section class="controls-hero">
+      <div class="controls-hero__header">
+        <div>
+          <h2 class="controls-hero__title">Mis citas y controles</h2>
+          <p class="controls-hero__subtitle">Lleva el seguimiento ordenado de tus consultas y exámenes.</p>
+        </div>
+        <a class="button button--primary controls-hero__add-btn" href="{{ url_for('main.nuevo_control') }}">
+          <span class="material-symbols-outlined" aria-hidden="true">add</span>
+          <span>Registrar nuevo control</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="controls-section" aria-labelledby="proximo-control-heading">
+      <h2 id="proximo-control-heading">Próximo control</h2>
+
+      {% if proximo %}
+        {% set meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'] %}
+        {% set fecha_cita = proximo.fecha_control %}
+        <article class="card-surface aurora-card next-appointment-card">
+          <div class="next-appointment__main">
+            <div class="card-icon-box aurora-icon-box" aria-hidden="true">
+              <span class="material-symbols-outlined">calendar_month</span>
+            </div>
+            <div class="next-appointment__info">
+              {% if dias_para_proximo is not none or proximo.numero_control %}
+                <div class="next-appointment__top-row next-appointment__top-row--badge-only">
+                  {% if dias_para_proximo is not none %}
+                    <span class="next-appointment__badge aurora-badge aurora-badge-lavanda">
+                      {% if dias_para_proximo == 0 %}Es hoy{% elif dias_para_proximo == 1 %}En 1 día{% elif dias_para_proximo > 1 %}En {{ dias_para_proximo }} días{% endif %}
+                    </span>
+                  {% elif proximo.numero_control %}
+                    <span class="next-appointment__badge">Control N.º {{ proximo.numero_control }}</span>
+                  {% endif %}
+                </div>
+              {% endif %}
+              <div class="next-appointment__date aurora-card-title">
+                {{ '%02d'|format(fecha_cita.day) }} de {{ meses[fecha_cita.month - 1]|capitalize }} de {{ fecha_cita.year }}
+              </div>
+              {% if proximo.numero_control %}
+                <p class="next-appointment__subtitle">Control N.º {{ proximo.numero_control }} de tu embarazo</p>
+              {% endif %}
+              <div class="next-appointment__meta-list">
+                <div class="next-appointment__meta-item">
+                  <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+                  <span>{{ proximo.hora_control.strftime('%H:%M') if proximo.hora_control else 'Hora por confirmar' }}</span>
+                </div>
+                <div class="next-appointment__meta-item">
+                  <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                  <span>{{ proximo.centro_nombre if (proximo.centro_nombre is defined and proximo.centro_nombre) else 'Centro por confirmar' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions card-footer-links next-appointment__actions aurora-card-actions">
+            <a class="btn-card-action btn-ghost-sm card-link aurora-card-link" href="{{ url_for('main.editar_control', control_id=proximo.id) }}">
+              <span>Modificar cita</span>
+            </a>
+            <a class="link-calendar card-link aurora-card-link aurora-card-link-muted" href="{{ url_for('main.calendario') }}">
+              <span>Calendario</span>
+              <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+            </a>
+          </div>
+        </article>
+      {% else %}
+        <div class="card-surface aurora-card empty-next-card">
+          <span class="material-symbols-outlined empty-next-card__icon" aria-hidden="true">event_busy</span>
+          <h3>No hay un próximo control agendado</h3>
+          <p>Registra tu siguiente cita médica para que Aurora te recuerde tus preparativos.</p>
+        </div>
+      {% endif %}
+    </section>
+
+    <section class="controls-section history-section" aria-labelledby="anteriores-heading">
+      <h2 id="anteriores-heading">Controles anteriores</h2>
+      {% if anteriores %}
+        <div class="history-list">
+          {% for control in anteriores %}
+            {% set tipo_nombre = 'Control regular' %}
+            {% if control.indicaciones and ('[Ultrasonido' in control.indicaciones or 'Ecografía' in control.indicaciones) %}
+              {% set tipo_nombre = 'Ultrasonido' %}
+            {% elif control.indicaciones and ('[Exámenes de laboratorio]' in control.indicaciones or 'laboratorio' in control.indicaciones|lower) %}
+              {% set tipo_nombre = 'Laboratorio' %}
+            {% elif control.tipo_control is defined and control.tipo_control %}
+              {% set tipo_nombre = control.tipo_control %}
+            {% endif %}
+
+            <article class="card-surface aurora-card history-card">
+              <div class="history-card__header">
+                <div class="history-card__type">
+                  <span class="history-card__type-badge history-card__type-badge--{{ tipo_nombre|lower|replace(' ', '-') }}">
+                    {{ tipo_nombre }}
+                  </span>
+                  {% if control.numero_control %}
+                    <span class="history-card__num">Control #{{ control.numero_control }}</span>
+                  {% endif %}
+                </div>
+                <span class="status-chip status-chip--realizado">
+                  {{ control.estado|capitalize if control.estado else 'Realizado' }}
+                </span>
+              </div>
+
+              <div class="history-card__body">
+                <div class="history-card__detail">
+                  <span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>
+                  <time datetime="{{ control.fecha_control.isoformat() }}">
+                    {{ control.fecha_control.strftime('%d/%m/%Y') }}
+                  </time>
+                  {% if control.hora_control %}
+                    <span class="history-card__time">· {{ control.hora_control.strftime('%H:%M') }}</span>
+                  {% endif %}
+                </div>
+
+                <div class="history-card__detail">
+                  <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                  <span>{{ control.centro_nombre if (control.centro_nombre is defined and control.centro_nombre and control.centro_nombre != 'Centro por confirmar') else 'Centro no registrado' }}</span>
+                </div>
+              </div>
+
+              <div class="history-card__footer">
+                <a class="history-card__link" href="{{ url_for('main.editar_control', control_id=control.id) }}">
+                  <span>Ver detalles o editar</span>
+                  <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                </a>
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="card-surface aurora-card empty-history-card">
+          <span class="material-symbols-outlined empty-history-card__icon" aria-hidden="true">history</span>
+          <h3 class="empty-history-card__title">Sin controles anteriores completados</h3>
+          <p class="empty-history-card__text">Tus citas realizadas se archivarán aquí para tu control médico.</p>
+        </div>
+      {% endif %}
+    </section>
   {% else %}
-    {% set empty_title = 'Sin controles registrados' %}{% set empty_text = 'Necesitas un embarazo activo para registrar controles.' %}{% set empty_url = none %}{% set empty_action = none %}{% include 'partials/empty_state.html' %}
+    {% set empty_title = 'Sin controles registrados' %}
+    {% set empty_text = 'Necesitas un embarazo activo para registrar controles.' %}
+    {% set empty_url = url_for('main.embarazo') %}
+    {% set empty_action = 'Registrar mi embarazo' %}
+    {% set empty_icon = 'event_busy' %}
+    {% include 'partials/empty_state.html' %}
   {% endif %}
 </main>
 {% endblock %}

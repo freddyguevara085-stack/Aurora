@@ -6,7 +6,7 @@ from urllib.parse import urlsplit
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import func, or_, select
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import SQLAlchemyError
 
 from extensions import db
 from models.auditoria import HistorialAuditoria
@@ -947,24 +947,14 @@ def eliminar_centro(centro_id):
         abort(404)
 
     nombre = item.nombre
-    try:
-        db.session.delete(item)
-        registrar_auditoria(
-            usuario_id=current_user.id,
-            accion="eliminar",
-            entidad="centros_atencion",
-            registro_id=centro_id,
-            detalles={"nombre": nombre},
-            ip=request.remote_addr,
-        )
-        db.session.commit()
+    from models.seguimiento import ControlPrenatal
+    tiene_controles = db.session.scalar(
+        db.select(ControlPrenatal.id).where(ControlPrenatal.centro_atencion_id == centro_id).limit(1)
+    )
 
-        flash(f"Centro «{nombre}» eliminado del sistema.", "success")
-    except IntegrityError:
-        db.session.rollback()
-        # Si tiene controles asignados por integridad referencial, lo desactivamos de forma segura
-        item.activo = 0
-        try:
+    try:
+        if tiene_controles:
+            item.activo = 0
             registrar_auditoria(
                 usuario_id=current_user.id,
                 accion="desactivar_por_dependencias",
@@ -974,10 +964,22 @@ def eliminar_centro(centro_id):
                 ip=request.remote_addr,
             )
             db.session.commit()
-            flash(f"El centro «{nombre}» tiene controles registrados asociados, por lo que fue desactivado en lugar de eliminado para conservar el historial.", "warning")
-        except SQLAlchemyError:
-            db.session.rollback()
-            flash("No fue posible procesar la eliminación del centro.", "error")
+            flash(f"El centro «{nombre}» tiene controles asociados, por lo que fue desactivado en lugar de eliminado.", "warning")
+        else:
+            db.session.delete(item)
+            registrar_auditoria(
+                usuario_id=current_user.id,
+                accion="eliminar",
+                entidad="centros_atencion",
+                registro_id=centro_id,
+                detalles={"nombre": nombre},
+                ip=request.remote_addr,
+            )
+            db.session.commit()
+            flash(f"Centro «{nombre}» eliminado del sistema.", "success")
+    except SQLAlchemyError:
+        db.session.rollback()
+        flash("No fue posible procesar la eliminación del centro.", "error")
 
     return redirect(url_for("admin.centros"))
 

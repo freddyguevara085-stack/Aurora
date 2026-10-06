@@ -1,0 +1,85 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Mi red de apoyo | Aurora{% endblock %}
+
+{% block content %}
+<main id="main" tabindex="-1" class="app-shell section-shell community-page aurora-page-container">
+  {% set back_url = url_for('main.embarazo') %}
+  {% set back_label = 'Volver a Mi embarazo' %}
+  {% set page_title = 'Red de apoyo' %}
+  {% include 'partials/page_header.html' %}
+
+  {% include 'partials/flash.html' %}
+
+  <section class="community-header">
+    <div class="community-header__text">
+      <h2 class="community-header__title">Personas con quienes puedo contar</h2>
+      <p class="community-header__subtitle">Familiares, personas de confianza y transporte confirmados para el parto.</p>
+    </div>
+    <a class="add-contact-btn" href="{{ url_for('main.nuevo_contacto_comunitario') }}">
+      <span class="material-symbols-outlined" aria-hidden="true">add</span>
+      <span>Agregar contacto</span>
+    </a>
+  </section>
+
+  <section class="community-section" aria-label="Lista de contactos de apoyo">
+    {% if contactos %}
+      <div class="contact-list">
+        {% for contacto in contactos %}
+          <article class="card-surface aurora-card contact-card">
+            <header class="contact-card__header">
+              <h3 class="contact-card__name">{{ contacto.nombre }}</h3>
+              <span class="role-badge">{{ roles.get(contacto.rol, contacto.rol) }}</span>
+            </header>
+
+            {% if contacto.comunidad_barrio %}
+              <p class="contact-location">
+                <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                <span>{{ contacto.comunidad_barrio }}</span>
+              </p>
+            {% endif %}
+
+            {% if contacto.notas %}
+              <p class="contact-notes">{{ contacto.notas }}</p>
+            {% endif %}
+
+            {% if contacto.telefono %}
+              <div class="contact-card__call-wrap">
+                <a class="btn-aurora-chip-action" href="tel:{{ contacto.telefono }}">
+                  <span class="material-symbols-outlined" aria-hidden="true">call</span>
+                  <span>Llamar al {{ contacto.telefono }}</span>
+                </a>
+              </div>
+            {% else %}
+              <p class="contact-meta">Sin teléfono registrado</p>
+            {% endif %}
+
+            <div class="contact-card__actions aurora-card-actions">
+              <a class="contact-action-link contact-action-link--edit aurora-card-link" href="{{ url_for('main.editar_contacto_comunitario', contacto_id=contacto.id) }}">
+                <span>Editar datos</span>
+                <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+              </a>
+              <form method="post" action="{{ url_for('main.eliminar_contacto_comunitario', contacto_id=contacto.id) }}" data-confirm="¿Eliminar este contacto de tu red de apoyo?">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="contact-action-link contact-action-link--delete aurora-card-link aurora-card-link-muted" type="submit">
+                  <span>Eliminar</span>
+                </button>
+              </form>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty compact-empty community-empty card-surface">
+        <span class="material-symbols-outlined empty-icon" aria-hidden="true">groups</span>
+        <h3>Aún no registras tu red de apoyo</h3>
+        <p>Anota a una persona cercana o un transporte de confianza para tener su teléfono a mano cuando necesites compañía o coordinar un traslado.</p>
+        <a class="button button--primary add-contact-btn--empty" href="{{ url_for('main.nuevo_contacto_comunitario') }}">
+          <span class="material-symbols-outlined" aria-hidden="true">add</span>
+          <span>Agregar mi primer contacto</span>
+        </a>
+      </div>
+    {% endif %}
+  </section>
+
+</main>
+{% endblock %}

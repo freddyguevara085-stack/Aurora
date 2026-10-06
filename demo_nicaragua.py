@@ -5,7 +5,7 @@ IMPORTANTE: la fecha de consulta NO es una fecha de revisión clínica. Aurora
 todavía no ha sido revisada por profesionales de salud, por lo que todo el
 material clínico permanece como borrador y fuera de las páginas públicas.
 
-Fuentes consultadas el 2026-09-24:
+Fuentes consultadas el 2026-09-25:
 - OPS/OMS - Salud materna: https://www.paho.org/es/temas/salud-materna
 - OPS/OMS - Nicaragua: https://www.paho.org/es/nicaragua
 - MINSA Nicaragua - Inicio: https://www.minsa.gob.ni/
@@ -13,7 +13,11 @@ Fuentes consultadas el 2026-09-24:
 - MINSA Nicaragua - Red de Salud, Casa Materna: https://www.minsa.gob.ni/red-de-salud/casa-materna
 """
 
-FECHA_CONSULTA = "2026-09-24"
+# Cuenta ficticia que recibe los datos de demostración. Solo se usa cuando
+# DEMO_MODE está activo; nunca identifica datos reales.
+CUENTA_DEMO_EMAIL = "maria.demo@aurora.ni"
+
+FECHA_CONSULTA = "2026-09-25"
 
 FUENTES = {
     "ops_salud_materna": {
@@ -125,7 +129,7 @@ CENTROS = [
         "fuente": "minsa_hospitales",
     },
     {
-        "nombre": "Luz Divina",
+        "nombre": "Casa materna Luz Divina",
         "tipo_establecimiento": "casa_materna",
         "silais": "RACCN BILWI",
         "departamento": "RACCN",
@@ -143,7 +147,7 @@ CENTROS = [
         "fuente": "minsa_casas_maternas",
     },
     {
-        "nombre": "Cleta Nubia Jarquín",
+        "nombre": "Casa materna Cleta Nubia Jarquín",
         "tipo_establecimiento": "casa_materna",
         "silais": "BOACO",
         "departamento": "Boaco",
@@ -221,8 +225,9 @@ BORRADORES = [
 CONTEXTO = [
     {
         "dato": (
-            "Red de servicios de salud pública del MINSA: 79 hospitales, 153 centros de "
-            "salud, 1470 puestos de salud y 179 casas maternas con 2,403 camas."
+            "Red de servicios de salud pública del MINSA: la cifra de hospitales, centros de "
+            "salud, puestos y casas maternas NO se pudo confirmar en el sitio oficial en esta "
+            "consulta; queda por confirmar."
         ),
         "fuente": "minsa_inicio",
     },

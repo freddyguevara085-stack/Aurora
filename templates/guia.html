@@ -1,15 +1,104 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Guía prenatal | Aurora{% endblock %}
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell guide-page">
-  <header class="guide-topbar"><span class="material-symbols-outlined" aria-hidden="true">cloud_off</span><strong>Aurora</strong><span></span></header>
-  <section class="section-intro"><h1>Guía prenatal</h1><p>Información clara para cada etapa de tu embarazo</p></section>
-  <form class="guide-search" method="get"><span class="material-symbols-outlined" aria-hidden="true">search</span><input name="categoria" value="{{ categoria }}" placeholder="¿Qué quieres consultar?" aria-label="Buscar por categoría"><input type="hidden" name="trimestre" value="{{ trimestre or '' }}"></form>
-  <nav class="trimester-tabs" aria-label="Filtrar por trimestre"><a class="{% if trimestre == 1 %}is-active{% endif %}" href="{{ url_for('main.guia', trimestre=1, categoria=categoria) }}"{% if trimestre == 1 %} aria-current="page"{% endif %}>1.er trimestre</a><a class="{% if trimestre == 2 or (not trimestre and semana and semana >= 14 and semana <= 27) %}is-active{% endif %}" href="{{ url_for('main.guia', trimestre=2, categoria=categoria) }}"{% if trimestre == 2 or (not trimestre and semana and semana >= 14 and semana <= 27) %} aria-current="page"{% endif %}>2.º trimestre</a><a class="{% if trimestre == 3 %}is-active{% endif %}" href="{{ url_for('main.guia', trimestre=3, categoria=categoria) }}"{% if trimestre == 3 %} aria-current="page"{% endif %}>3.er trimestre</a></nav>
-  <section class="current-stage card-surface"><span class="current-stage__icon"><span class="material-symbols-outlined" aria-hidden="true">pregnant_woman</span></span><div><h2>Tu etapa actual</h2><p><span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>{% if semana is not none %}Semana {{ semana }} · {{ 'Primer' if semana <= 13 else ('Segundo' if semana <= 27 else 'Tercer') }} trimestre{% else %}Etapa aún no registrada{% endif %}</p></div></section>
-  <section class="guide-topics"><h2>Explora por tema</h2><div><a href="{{ url_for('main.guia', trimestre=trimestre, categoria='Controles prenatales') }}"><span class="material-symbols-outlined" aria-hidden="true">medical_services</span><span>Controles<br>prenatales</span></a><a href="{{ url_for('main.guia', trimestre=trimestre, categoria='Cuidados') }}"><span class="material-symbols-outlined" aria-hidden="true">favorite</span><span>Cuidados</span></a><a href="{{ url_for('main.guia', trimestre=trimestre, categoria='Cambios') }}"><span class="material-symbols-outlined" aria-hidden="true">sync</span><span>Cambios</span></a><a href="{{ url_for('main.guia', trimestre=trimestre, categoria='Preparación') }}"><span class="material-symbols-outlined" aria-hidden="true">crib</span><span>Preparación</span></a></div></section>
-  <section class="guide-recommended"><h2>Recomendado para tu trimestre</h2>{% if contenidos %}<div class="guide-list">{% for contenido in contenidos %}<a class="guide-row card-surface" href="{{ url_for('main.detalle_guia', contenido_id=contenido.id) }}"><img src="{{ url_for('static', filename='assets/stitch/guide-controls.jpg' if loop.index is odd else 'assets/stitch/guide-nutrition.jpg') }}" alt=""><span><strong>{{ contenido.titulo }}</strong><small><span class="material-symbols-outlined" aria-hidden="true">schedule</span>{{ 4 + (loop.index % 2) }} min de lectura</small></span></a>{% endfor %}</div>{% else %}<div class="empty compact-empty"><h3>Sin contenidos disponibles</h3><p>No encontramos artículos publicados para los filtros seleccionados.</p></div>{% endif %}</section>
-  <footer class="guide-footer"><p>Revisa la fuente y fecha registradas en cada orientación.</p><p>La disponibilidad sin conexión es parcial; los datos de tu cuenta requieren conexión.</p></footer>
+<main id="main" tabindex="-1" class="app-shell orient-page aurora-page-container">
+
+  {% set back_url = url_for('main.index') %}
+  {% set back_label = 'Inicio' %}
+  {% set page_title = 'Guía prenatal' %}
+  {% include 'partials/page_header.html' %}
+  <p class="orient-intro">Acompañamiento y orientación clara para cada etapa de tu embarazo.</p>
+
+  {% if orientaciones %}
+  {# ── Buscador ── #}
+  <div class="orient-search">
+    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+    <input id="orient-q" type="search" placeholder="Buscar síntoma, cuidado o duda…" aria-label="Buscar orientación">
+  </div>
+
+  {# ── Chips de categoría ── #}
+  <nav class="orient-chips" aria-label="Filtrar por categoría">
+    <button class="orient-chip is-active" data-filter="todas" type="button" aria-pressed="true">Todas</button>
+    {% if semana is not none %}
+    {% set user_trimestre = 1 if semana <= 13 else (2 if semana <= 27 else 3) %}
+    <button class="orient-chip orient-chip--stage" data-filter="mi-trimestre" type="button" aria-pressed="false">
+      <span class="material-symbols-outlined" aria-hidden="true">kid_star</span>Mi trimestre ({{ user_trimestre }}.º)
+    </button>
+    {% endif %}
+    <button class="orient-chip" data-filter="alimentacion" type="button" aria-pressed="false">Alimentación y Cuidados</button>
+    <button class="orient-chip orient-chip--warn" data-filter="senales" type="button" aria-pressed="false">Señales de alarma</button>
+    <button class="orient-chip" data-filter="controles" type="button" aria-pressed="false">Trámites y Consultas</button>
+    <button class="orient-chip" data-filter="preparacion" type="button" aria-pressed="false">Preparación y Parto</button>
+  </nav>
+
+  {# ── Anuncio en vivo para lectores de pantalla ── #}
+  <div id="orient-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  {# ── Etapa actual ── #}
+  {% if semana is not none %}
+  <div class="orient-stage">
+    <span class="material-symbols-outlined" aria-hidden="true">pregnant_woman</span>
+    <span>Tu etapa: <strong>Semana {{ semana }}</strong> · {{ 'Primer' if semana <= 13 else ('Segundo' if semana <= 27 else 'Tercer') }} trimestre</span>
+  </div>
+  {% endif %}
+
+  {# ── Lista de contenidos unificada ── #}
+  <section class="orient-list" aria-label="Orientaciones prenatales" id="orient-list" data-user-trimestre="{{ (1 if semana <= 13 else (2 if semana <= 27 else 3)) if semana is not none else '' }}">
+
+    {% for item in orientaciones %}
+    <article class="orient-card card-surface{% if item.es_borrador %} orient-card--draft{% endif %}"
+             data-cat="{{ item.categoria|lower|replace(' ', '-')|replace('ñ','n')|replace('á','a')|replace('é','e')|replace('í','i')|replace('ó','o')|replace('ú','u') }}"
+             data-trimestre="{{ item.trimestre or '' }}"
+             data-search="{{ item.titulo|lower }} {{ item.resumen|lower }} {{ item.cuerpo|lower }} {{ item.categoria|lower }}">
+      <button class="orient-card__toggle" type="button" aria-expanded="false" id="orient-btn-{{ loop.index }}">
+        <span class="orient-card__head">
+          <span class="orient-chip orient-chip--cat">{{ item.categoria }}</span>
+          <strong>{{ item.titulo }}</strong>
+          {% if item.resumen %}
+          <span class="orient-card__preview">{{ item.resumen }}</span>
+          {% endif %}
+          <span class="orient-card__source">{{ item.fuente_nombre }}{% if item.fecha_revision %} · {{ item.fecha_revision }}{% endif %}</span>
+        </span>
+        <span class="material-symbols-outlined orient-card__arrow" aria-hidden="true">expand_more</span>
+      </button>
+      <div class="orient-card__body" id="orient-body-{{ loop.index }}" hidden>
+        <div class="orient-card__content">{{ item.cuerpo }}</div>
+        {% if item.es_borrador %}
+        <span class="status-badge status-badge--warning orient-card__draft-badge">Borrador de demostración — pendiente de revisión clínica</span>
+        {% endif %}
+        {% if item.fuente_url and item.fuente_url != '#' %}
+        <a class="orient-card__link" href="{{ item.fuente_url }}" target="_blank" rel="noopener noreferrer">
+          <span class="material-symbols-outlined" aria-hidden="true">open_in_new</span>Ver fuente oficial
+        </a>
+        {% endif %}
+      </div>
+    </article>
+    {% endfor %}
+
+    {# ── Sin resultados de búsqueda ── #}
+    <div class="empty compact-empty orient-no-results" id="orient-no-results" hidden>
+      <span class="material-symbols-outlined orient-no-results__icon" aria-hidden="true">search_off</span>
+      <h3>Sin resultados</h3>
+      <p>No encontramos orientaciones que coincidan con tu búsqueda.</p>
+      <button type="button" class="button button--secondary orient-reset-btn" id="orient-reset-btn">
+        <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>Ver todas las orientaciones
+      </button>
+    </div>
+  </section>
+
+  {% else %}
+  {# ── Estado vacío: Contenido en revisión clínica (Fail-Closed) ── #}
+  <div class="empty compact-empty" id="orient-empty">
+    <h3>Contenido en revisión clínica</h3>
+    <p>Aurora todavía no publica orientaciones prenatales: el material debe ser revisado por profesionales de salud antes de mostrarse.</p>
+    <a class="button button--secondary" href="{{ url_for('main.fuentes') }}">Ver fuentes de información</a>
+  </div>
+  {% endif %}
+
+  {# ── Disclaimer clínico ── #}
+  <footer class="orient-footer">
+    <p>Aurora orienta y organiza; no sustituye la consulta médica con el personal de salud.</p>
+  </footer>
 
 </main>
 {% endblock %}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=26">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=26">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=26">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}?v=26">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}?v=26">
+  <title>Ficha de traslado y apoyo | Aurora</title>
+</head>
+<body class="print-page">
+  <main id="main" tabindex="-1" class="print-sheet plan-emergency-card">
+    <h1 class="print-sheet__title">Traslado y apoyo para mi atención</h1>
+    <dl class="print-sheet__details">
+      <dt>Gestante</dt>
+      <dd>{{ current_user.nombres }} {{ current_user.apellidos }}</dd>
+      <dt>Semana</dt>
+      <dd>{{ semana if semana is not none else 'Por calcular' }}</dd>
+      <dt>Fecha probable de parto</dt>
+      <dd>{{ embarazo.fpp.strftime('%d/%m/%Y') if embarazo.fpp else 'No registrada' }}</dd>
+      <dt>Centro de atención</dt>
+      <dd>{{ plan.centro_atencion.nombre if plan.centro_atencion else 'Centro por confirmar' }}{% if plan.requiere_casa_materna %} · Casa Materna{% endif %}</dd>
+      <dt>Acompañante</dt>
+      <dd>{{ plan.acompanante_nombre or 'Por definir' }}{% if plan.acompanante_telefono %} · {{ plan.acompanante_telefono }}{% endif %}</dd>
+      <dt>Transporte</dt>
+      <dd>{{ transportes.get(plan.transporte_tipo, plan.transporte_tipo) }}{% if plan.transporte_contacto %} · {{ plan.transporte_contacto }}{% endif %}</dd>
+      <dt>Cuidado de hijos/hogar</dt>
+      <dd>{{ plan.cuidador_hijos or 'Por definir' }}</dd>
+    </dl>
+    <section class="print-sheet__note" aria-labelledby="print-docs-title">
+      <h2 id="print-docs-title">Documentos y bulto a llevar</h2>
+      <ul class="print-sheet__questions">
+        <li>Cédula de identidad.</li>
+        <li>Tarjeta o documentos de control prenatal.</li>
+        <li>Ropa limpia para el recién nacido y artículos de higiene.</li>
+        <li>{{ 'Bulto/mochila listo.' if plan.bulto_listo else 'Preparar el bulto/mochila.' }}</li>
+        <li>{{ 'Recursos para el traslado disponibles.' if plan.recursos_traslado_listos else 'Reunir recursos para el traslado.' }}</li>
+      </ul>
+      {% if plan.notas %}<p class="print-sheet__note-text">{{ plan.notas }}</p>{% endif %}
+    </section>
+    {% if perfil and perfil.contactos_comunitarios %}
+    <section class="print-sheet__note" aria-labelledby="print-red-title">
+      <h2 id="print-red-title">Contactos de apoyo</h2>
+      <ul class="print-sheet__questions">
+        {% for contacto in perfil.contactos_comunitarios %}
+        <li><strong>{{ contacto.nombre }}</strong> · {{ roles.get(contacto.rol, contacto.rol) }}{% if contacto.telefono %} · {{ contacto.telefono }}{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+  </main>
+  <div class="print-page__actions no-print">
+    <p class="print-page__warning" id="print-warning">Ficha familiar con el lugar, transporte y contactos que registraste. Revisa el resultado antes de imprimir.</p>
+    <button class="button button--primary" type="button" data-print-action aria-describedby="print-warning">
+      <span class="material-symbols-outlined" aria-hidden="true">print</span>Imprimir ficha
+    </button>
+    <a class="text-link" href="{{ url_for('main.plan_parto') }}">Volver a traslado y apoyo</a>
+  </div>
+  <script src="{{ url_for('static', filename='js/app.js') }}?v=18"></script>
+</body>
+</html>

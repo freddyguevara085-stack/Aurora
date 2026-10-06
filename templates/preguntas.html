@@ -1,0 +1,104 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Mis preguntas | Aurora{% endblock %}
+{% block content %}
+<main id="main" tabindex="-1" class="app-shell section-shell questions-page aurora-page-container">
+  {% set back_url = url_for('main.index') %}
+  {% set back_label = 'Volver a Inicio' %}
+  {% set page_title = 'Mis preguntas' %}
+  {% include 'partials/page_header.html' %}
+  {% include 'partials/flash.html' %}
+  <section class="questions-lead" aria-label="Cómo funcionan tus preguntas">
+    <span class="material-symbols-outlined" aria-hidden="true">lightbulb</span>
+    <p>Guarda lo que quieres conversar. Tus preguntas siguen pendientes entre controles hasta que tú las marques como conversadas.</p>
+  </section>
+
+  <form class="question-form aurora-card" method="post" action="{{ url_for('main.preguntas_consulta') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="new-question">¿Qué quieres recordar preguntar o comentar?</label>
+    <textarea id="new-question" name="pregunta" maxlength="{{ max_caracteres }}" rows="3" required placeholder="Ej. ¿Puedo tomar té de manzanilla? o ¿Qué exámenes me tocan?" aria-describedby="new-question-help{% if pregunta_error and not editar_id %} new-question-error{% endif %}">{{ pregunta_borrador if not editar_id else '' }}</textarea>
+    <p class="form-help" id="new-question-help">Solo se guarda en tu cuenta. Hasta {{ max_caracteres }} caracteres.</p>
+    {% if pregunta_error and not editar_id %}<p class="form-error" id="new-question-error" role="alert">{{ pregunta_error }}</p>{% endif %}
+    <button class="button btn-aurora-primary button--wide" type="submit">Guardar pregunta</button>
+  </form>
+
+  {% set pendientes = preguntas|selectattr('estado', 'equalto', 'pendiente')|list %}
+  {% set conversadas = preguntas|selectattr('estado', 'equalto', 'conversada')|list %}
+  <section class="question-list" aria-labelledby="pending-title">
+    <div class="preguntas-section-header">
+      <h2 id="pending-title" class="preguntas-section-title">Preguntas pendientes</h2>
+      <span class="aurora-badge aurora-badge-lavanda">{{ pendientes|length }}</span>
+    </div>
+    {% if pendientes %}
+      {% for pregunta in pendientes %}
+      <article class="question-item aurora-card">
+        {% if editar_id == pregunta.id %}
+          <form method="post" action="{{ url_for('main.actualizar_pregunta', pregunta_id=pregunta.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="accion" value="editar">
+            <label for="edit-question-{{ pregunta.id }}">Editar pregunta</label>
+            <textarea id="edit-question-{{ pregunta.id }}" name="pregunta" maxlength="{{ max_caracteres }}" rows="3" required placeholder="Ej. ¿Puedo tomar té de manzanilla? o ¿Qué exámenes me tocan?" aria-describedby="edit-question-help-{{ pregunta.id }}{% if pregunta_error %} edit-question-error-{{ pregunta.id }}{% endif %}">{{ pregunta_borrador }}</textarea>
+            <p class="form-help" id="edit-question-help-{{ pregunta.id }}">Hasta {{ max_caracteres }} caracteres.</p>
+            {% if pregunta_error %}<p class="form-error" id="edit-question-error-{{ pregunta.id }}" role="alert">{{ pregunta_error }}</p>{% endif %}
+            <div class="card-footer-actions">
+              <button class="btn-aurora-primary question-edit-submit" type="submit">Guardar cambios</button>
+              <a class="link-action-edit" href="{{ url_for('main.preguntas_consulta') }}">Cancelar edición</a>
+            </div>
+          </form>
+        {% else %}
+          <p class="question-item__text">{{ pregunta.pregunta }}</p>
+          <div class="card-footer-actions">
+            <form method="post" action="{{ url_for('main.actualizar_pregunta', pregunta_id=pregunta.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="accion" value="estado">
+              <input type="hidden" name="estado" value="conversada">
+              <button class="btn-mark-done" type="submit">✓ Marcar como conversada</button>
+            </form>
+            <div class="card-footer-actions__secondary">
+              <a href="{{ url_for('main.preguntas_consulta', editar=pregunta.id) }}" class="link-action-edit">Editar ›</a>
+              <form method="post" action="{{ url_for('main.actualizar_pregunta', pregunta_id=pregunta.id) }}" data-confirm="¿Eliminar esta pregunta de tu lista?">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="accion" value="eliminar">
+                <button class="btn-action-delete" type="submit">Eliminar</button>
+              </form>
+            </div>
+          </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    {% else %}
+      {% if conversadas %}
+        <div class="empty compact-empty"><h3>Estás al día</h3><p>No te quedan preguntas pendientes. Si quieres retomar alguna, puedes volver a marcarla como pendiente.</p></div>
+      {% else %}
+        <div class="empty compact-empty"><h3>Aún no tienes preguntas</h3><p>Añade algo que quieras recordar conversar en una próxima consulta.</p></div>
+      {% endif %}
+    {% endif %}
+  </section>
+
+  {% if conversadas %}
+  <section class="question-list" aria-labelledby="discussed-title">
+    <div class="preguntas-section-header">
+      <h2 id="discussed-title" class="preguntas-section-title">Conversadas</h2>
+      <span class="aurora-badge aurora-badge-lavanda">{{ conversadas|length }}</span>
+    </div>
+    {% for pregunta in conversadas %}
+    <article class="question-item question-item--done aurora-card">
+      <p class="question-item__text">{{ pregunta.pregunta }}</p>
+      <div class="card-footer-actions">
+        <form method="post" action="{{ url_for('main.actualizar_pregunta', pregunta_id=pregunta.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="accion" value="estado">
+          <input type="hidden" name="estado" value="pendiente">
+          <button class="btn-mark-done" type="submit">↶ Volver a pendientes</button>
+        </form>
+        <form method="post" action="{{ url_for('main.actualizar_pregunta', pregunta_id=pregunta.id) }}" data-confirm="¿Eliminar esta pregunta de tu lista?">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="accion" value="eliminar">
+          <button class="btn-action-delete" type="submit">Eliminar</button>
+        </form>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+  {% endif %}
+</main>
+{% endblock %}

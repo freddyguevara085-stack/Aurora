@@ -1,0 +1,219 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Traslado y apoyo | Aurora{% endblock %}
+
+{% block content %}
+<main id="main" tabindex="-1" class="app-shell section-shell birth-plan aurora-page-container">
+  {% set back_url = url_for('main.embarazo') %}
+  {% set back_label = 'Volver a Mi embarazo' %}
+  {% set page_title = 'Traslado y apoyo' %}
+  {% include 'partials/page_header.html' %}
+
+  {% include 'partials/flash.html' %}
+
+  <section class="section-intro">
+    <p>Organiza con tiempo el lugar, transporte y personas de confianza para el momento del parto.</p>
+  </section>
+
+  {% if plan and not editar %}
+    <section class="plan-summary">
+      <!-- Tarjeta 1: Lugar previsto -->
+      <article class="card-surface aurora-card plan-summary-card">
+        <div class="card-item-row">
+          <div class="card-icon-box aurora-icon-box" aria-hidden="true">
+            <span class="material-symbols-outlined">location_on</span>
+          </div>
+          <div class="card-item-content">
+            <h3 class="card-main-title">{{ plan.centro_atencion.nombre if plan.centro_atencion else 'Centro por confirmar' }}</h3>
+            <p class="card-desc">{% if plan.requiere_casa_materna %}Prevé alojarse en Casa Materna{% else %}No prevé Casa Materna{% endif %}</p>
+          </div>
+        </div>
+      </article>
+
+      <!-- Tarjeta 2: Personas de apoyo -->
+      <article class="card-surface aurora-card plan-summary-card">
+        <div class="card-item-row">
+          <div class="card-icon-box aurora-icon-box" aria-hidden="true">
+            <span class="material-symbols-outlined">group</span>
+          </div>
+          <div class="card-item-content">
+            <h3 class="card-main-title">{{ plan.acompanante_nombre or 'Acompañante por definir' }}</h3>
+            <p class="card-desc">Cuidado de hijos/hogar: {{ plan.cuidador_hijos or 'por definir' }}</p>
+          </div>
+          <span class="badge-tag aurora-badge aurora-badge-rosa badge-familiar">Familiar</span>
+        </div>
+        {% if plan.acompanante_telefono %}
+        <div class="card-actions-wrapper">
+          <a href="tel:{{ plan.acompanante_telefono }}" class="btn-call-action btn-aurora-chip-action phone-link">
+            <span class="material-symbols-outlined btn-call-icon" aria-hidden="true">call</span>
+            <span>Llamar: {{ plan.acompanante_telefono }}</span>
+          </a>
+        </div>
+        {% else %}
+        <p class="card-empty-meta">Sin teléfono registrado</p>
+        {% endif %}
+      </article>
+
+      <!-- Tarjeta 3: Transporte -->
+      <article class="card-surface aurora-card plan-summary-card">
+        <div class="card-item-row">
+          <div class="card-icon-box aurora-icon-box" aria-hidden="true">
+            <span class="material-symbols-outlined">directions_car</span>
+          </div>
+          <div class="card-item-content">
+            <h3 class="card-main-title">{{ transportes.get(plan.transporte_tipo, plan.transporte_tipo) }}</h3>
+            {% if plan.transporte_contacto %}
+              {% set contacto_partes = plan.transporte_contacto.split(' - ') if ' - ' in plan.transporte_contacto else [plan.transporte_contacto] %}
+              {% set tel_transporte = contacto_partes[-1].strip() %}
+              {% if contacto_partes|length > 1 %}
+                <p class="card-desc">{{ contacto_partes[0].strip() }}</p>
+              {% endif %}
+            {% else %}
+              <p class="card-desc">Sin contacto registrado</p>
+            {% endif %}
+          </div>
+          <span class="badge-tag aurora-badge aurora-badge-lavanda badge-transporte">Transporte</span>
+        </div>
+        {% if plan.transporte_contacto %}
+        <div class="card-actions-wrapper">
+          <a href="tel:{{ tel_transporte }}" class="btn-call-action btn-aurora-chip-action phone-link">
+            <span class="material-symbols-outlined btn-call-icon" aria-hidden="true">call</span>
+            <span>Llamar: {{ tel_transporte }}</span>
+          </a>
+        </div>
+        {% endif %}
+      </article>
+
+      <!-- Tarjeta 4: Preparativos -->
+      <article class="card-surface aurora-card plan-summary-card">
+        <div class="card-item-row">
+          <div class="card-icon-box aurora-icon-box" aria-hidden="true">
+            <span class="material-symbols-outlined">checklist</span>
+          </div>
+          <div class="card-item-content">
+            <h3 class="card-main-title">Preparativos esenciales</h3>
+          </div>
+        </div>
+        <ul class="plan-checklist">
+          <li class="plan-checklist__item {{ 'is-done' if plan.bulto_listo else 'is-pending' }}">
+            <span class="material-symbols-outlined check-icon" aria-hidden="true">check_circle</span>
+            <span>Bulto o mochila listo</span>
+          </li>
+          <li class="plan-checklist__item {{ 'is-done' if plan.recursos_traslado_listos else 'is-pending' }}">
+            <span class="material-symbols-outlined check-icon" aria-hidden="true">check_circle</span>
+            <span>Recursos para el traslado disponibles</span>
+          </li>
+          <li class="plan-checklist__item is-done">
+            <span class="material-symbols-outlined check-icon" aria-hidden="true">check_circle</span>
+            <span>Tarjeta de control prenatal del MINSA y ropa de recién nacido limpia</span>
+          </li>
+        </ul>
+        {% if plan.notas %}
+        <div class="plan-card-notes">
+          <span class="plan-card-notes__label">Nota adicional:</span>
+          <p class="plan-card-notes__text">{{ plan.notas }}</p>
+        </div>
+        {% endif %}
+      </article>
+    </section>
+    <div class="plan-actions">
+      <a class="button btn-aurora-primary button--wide" href="{{ url_for('main.plan_parto', editar=1) }}"><span class="material-symbols-outlined" aria-hidden="true">edit</span> Editar plan</a>
+      <a class="button btn-aurora-secondary button--wide" href="{{ url_for('main.imprimir_plan_parto') }}"><span class="material-symbols-outlined" aria-hidden="true">print</span> Ver ficha para el hogar / Imprimir</a>
+    </div>
+  {% else %}
+    {% set v = form_data if form_data else plan %}
+    {% set transporte_guardado = v.transporte_contacto if v and v.transporte_contacto else '' %}
+    {% set transporte_partes = transporte_guardado.split(' - ', 1) if ' - ' in transporte_guardado else [transporte_guardado] %}
+    {% set transporte_nombre = transporte_partes[0] %}
+    {% set transporte_telefono = v.get('transporte_telefono', '') if form_data else (transporte_partes[1] if transporte_partes|length > 1 else '') %}
+    <form method="post" action="{{ url_for('main.plan_parto') }}" class="stack-form card-surface plan-form plan-form--editor">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <fieldset class="plan-form__section">
+        <legend><span class="plan-form__icon material-symbols-outlined" aria-hidden="true">location_on</span><span>Lugar previsto</span></legend>
+        <label>Centro de atención o Casa Materna de referencia
+          <select name="centro_atencion_id">
+            <option value="">Por definir</option>
+            {% for centro in centros %}
+            <option value="{{ centro.id }}" {% if v and v.centro_atencion_id|string == centro.id|string %}selected{% endif %}>{{ centro.nombre }} · {{ centro.municipio }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="checkbox-row"><input type="checkbox" name="requiere_casa_materna" value="1" {% if v and v.requiere_casa_materna %}checked{% endif %}> Necesito alojarme en una Casa Materna antes del parto</label>
+      </fieldset>
+      <fieldset class="plan-form__section">
+        <legend><span class="plan-form__icon material-symbols-outlined" aria-hidden="true">groups</span><span>Red de apoyo</span></legend>
+        {% if contactos %}
+        <div class="helper-select-wrap">
+          <label for="helper_acompanante" class="form-hint-label">Importar desde mi Red de apoyo (opcional)</label>
+          <select id="helper_acompanante" class="select-helper-contacto" onchange="autocompletarContacto(this, 'acompanante')">
+            <option value="">Seleccionar contacto guardado</option>
+            {% for contacto in contactos %}
+            <option value="{{ contacto.nombre }}" data-tel="{{ contacto.telefono or '' }}" data-notas="{{ contacto.notas or '' }}">{{ contacto.nombre }}{% if roles %} ({{ roles.get(contacto.rol, contacto.rol) }}){% endif %}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        <label>Persona de acompañamiento<input id="acompanante_nombre" name="acompanante_nombre" maxlength="150" value="{{ v.acompanante_nombre if v and v.acompanante_nombre else '' }}"></label>
+        <label>Teléfono de la persona de acompañamiento<input id="acompanante_telefono" name="acompanante_telefono" type="tel" maxlength="30" value="{{ v.acompanante_telefono if v and v.acompanante_telefono else '' }}"></label>
+        <label>Persona a cargo de los hijos o del hogar<input name="cuidador_hijos" maxlength="150" value="{{ v.cuidador_hijos if v and v.cuidador_hijos else '' }}"></label>
+      </fieldset>
+      <fieldset class="plan-form__section">
+        <legend><span class="plan-form__icon material-symbols-outlined" aria-hidden="true">directions_car</span><span>Transporte</span></legend>
+        <label>Medio previsto para el traslado
+          <select name="transporte_tipo">
+            {% set transporte_actual = v.transporte_tipo if v and v.transporte_tipo else 'familiar_vecino' %}
+            {% for valor, texto in transportes.items() %}
+            <option value="{{ valor }}" {% if transporte_actual == valor %}selected{% endif %}>{{ texto }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        {% if contactos %}
+        <div class="helper-select-wrap">
+          <label for="helper_transporte" class="form-hint-label">Importar contacto de transporte (opcional)</label>
+          <select id="helper_transporte" class="select-helper-contacto" onchange="autocompletarContacto(this, 'transporte')">
+            <option value="">Seleccionar contacto guardado</option>
+            {% for contacto in contactos %}
+            <option value="{{ contacto.nombre }}" data-tel="{{ contacto.telefono or '' }}">{{ contacto.nombre }}{% if roles %} ({{ roles.get(contacto.rol, contacto.rol) }}){% endif %}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        <label>Chofer o referencia local<input id="transporte_contacto" name="transporte_contacto" maxlength="150" value="{{ transporte_nombre }}"></label>
+        <label>Teléfono del transporte<input id="transporte_telefono" name="transporte_telefono" type="tel" maxlength="30" value="{{ transporte_telefono }}"></label>
+      </fieldset>
+      <fieldset class="plan-form__section">
+        <legend><span class="plan-form__icon material-symbols-outlined" aria-hidden="true">checklist</span><span>Preparativos esenciales</span></legend>
+        <label class="checkbox-row"><input type="checkbox" name="bulto_listo" value="1" {% if v and v.bulto_listo %}checked{% endif %}> Tengo listo el bulto/mochila (cédula, tarjeta de control prenatal, ropa del recién nacido, higiene)</label>
+        <label class="checkbox-row"><input type="checkbox" name="recursos_traslado_listos" value="1" {% if v and v.recursos_traslado_listos %}checked{% endif %}> Cuento con los recursos para el traslado</label>
+        <label>Notas<textarea name="notas" maxlength="500">{{ v.notas if v and v.notas else '' }}</textarea></label>
+      </fieldset>
+      <div class="plan-form__actions">
+        <button class="button button--primary button--wide" type="submit">Guardar plan</button>
+        {% if plan %}<a class="button button--secondary button--wide" href="{{ url_for('main.plan_parto') }}">Cancelar</a>{% endif %}
+      </div>
+    </form>
+  {% endif %}
+</main>
+{% if contactos %}
+<script>
+function autocompletarContacto(selectElement, tipo) {
+  const selectedOption = selectElement.options[selectElement.selectedIndex];
+  if (!selectedOption || !selectedOption.value) return;
+
+  const nombre = selectedOption.value;
+  const telefono = selectedOption.getAttribute('data-tel') || '';
+
+  if (tipo === 'acompanante') {
+    const inputNombre = document.getElementById('acompanante_nombre');
+    const inputTel = document.getElementById('acompanante_telefono');
+    if (inputNombre) inputNombre.value = nombre;
+    if (inputTel) inputTel.value = telefono;
+  } else if (tipo === 'transporte') {
+    const inputNombre = document.getElementById('transporte_contacto');
+    const inputTel = document.getElementById('transporte_telefono');
+    if (inputNombre) inputNombre.value = nombre;
+    if (inputTel) inputTel.value = telefono;
+  }
+}
+</script>
+{% endif %}
+{% endblock %}

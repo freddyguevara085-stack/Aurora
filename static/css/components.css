@@ -1,0 +1,893 @@
+.card-surface,.card,.empty,.notice{background:var(--white);border-radius:var(--radius-card);box-shadow:var(--shadow)}
+.flash{margin:12px 0;padding:12px 14px;border-radius:12px;background:var(--pink);color:var(--aurora-on-pink)}
+.flash--error{background:var(--aurora-error-bg);color:#93000a}
+.empty{margin:24px 0;padding:24px;text-align:center}
+.empty svg{width:38px;fill:none;stroke:var(--primary);stroke-width:1.8}
+.empty h2,.empty h3{margin:8px 0}
+.empty p{margin:0;color:var(--muted)}
+.compact-empty{margin:0;padding:20px}
+.corner-glow{position:absolute;top:-16px;right:-16px;width:128px;height:128px;border-radius:0 0 0 100%;background:var(--pink);opacity:.45}
+.progress-labels,.range-labels{display:flex;justify-content:space-between;margin-top:8px;color:var(--muted);font-size:14px}
+.text-link{display:flex;align-items:center;gap:2px;margin-top:14px;color:var(--primary);font-size:13px;font-weight:500;letter-spacing:.04em}
+.text-link .material-symbols-outlined{font-size:16px}
+.alert-banner__icon{display:grid;width:38px;height:38px;place-items:center;border-radius:var(--radius-icon-box);background:#fff}
+.alert-banner__icon .material-symbols-outlined{font-variation-settings:'FILL' 1}
+.alert-banner>span:nth-child(2){display:flex;flex-direction:column}
+.alert-banner strong{font-size:18px;font-weight:500}
+.alert-banner small{margin-top:3px;font-size:14px;line-height:19px}
+.alert-banner>b .material-symbols-outlined{font-size:18px}
+.edit-panel{margin-top:16px;padding:16px}
+.setup-card{padding:20px}
+.trimester-tabs{display:flex;gap:8px;margin:30px 0 38px;overflow-x:auto;scrollbar-width:none}
+.trimester-tabs a{flex:0 0 auto;padding:8px 15px;border-radius:var(--radius-badge);background:var(--aurora-surface-soft);color:var(--muted);font-size:13px}
+.trimester-tabs a.is-active{background:var(--color-primary);color:#fff}
+.current-stage{display:flex;align-items:center;gap:16px;padding:24px}
+.current-stage__icon{display:grid;width:48px;height:48px;flex:0 0 48px;place-items:center;border-radius:var(--radius-icon-box);background:var(--aurora-surface-lilac);color:var(--color-primary)}
+.current-stage h2{margin:0;font-size:18px;font-weight:500}
+.current-stage p{display:flex;align-items:center;gap:3px;margin:4px 0 0;padding:5px 8px;border-radius:var(--radius-badge);background:var(--peach);color:var(--color-text-main);font-size:13px}
+.current-stage p .material-symbols-outlined{font-size:14px}
+.logout-form{margin:24px 0 0}
+.logout-form button{width:100%;padding:12px;border:0;background:transparent;color:var(--secondary);font-weight:500}
+.article{line-height:1.7}
+.article footer{color:var(--muted)}
+.card{margin:16px 0;padding:20px}
+.inline-form{margin:0;display:inline}
+.muted-text{color:var(--muted);font-size:13px;margin:0}
+.filter-group{display:flex;flex-direction:column;gap:4px}
+.filter-group label{font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase}
+.filter-actions{display:flex;gap:8px}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-actions-bar{display:flex;gap:12px;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+.services-checkbox-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px}
+
+.verification-notice{display:flex;align-items:flex-start;gap:12px;margin:0 0 16px;padding:14px 16px;border:1px solid #f2d185;border-radius:16px;background:#fff8e7;color:#654b13}
+.verification-notice>.material-symbols-outlined{flex:0 0 auto;margin-top:1px;color:#8a6515;font-size:22px}
+.verification-notice strong{display:block;font-size:14px}
+.verification-notice p{margin:3px 0 0;font-size:13px;line-height:1.5}
+.verification-notice--verified{border-color:#b9ddc2;background:#effaf1;color:var(--aurora-success-text)}
+.verification-notice--verified>.material-symbols-outlined{color:#23753a}
+.verification-state{display:block;margin-top:6px;color:#856404;font-size:13px;line-height:1.35}
+.verification-state--verified{color:var(--aurora-success-text)}
+
+
+
+.aurora-page-container { padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important; }
+
+
+.aurora-card {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+  padding: 18px;
+  border: var(--aurora-border-card);
+  border-radius: 16px;
+  background: var(--aurora-card-bg);
+  box-shadow: var(--aurora-shadow-card);
+}
+
+
+.aurora-icon-box {
+  display: flex;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: var(--aurora-surface-lilac);
+  color: var(--aurora-purple);
+}
+
+
+.aurora-card-title { margin: 0; color: #2D1F3F; font-size: 16px; font-weight: 600; line-height: 1.35; }
+
+.aurora-card-desc { margin: 4px 0 0; color: #5C5364; font-size: 14px; line-height: 1.45; }
+
+
+.btn-aurora-primary,
+.btn-aurora-secondary {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn-aurora-primary { border: 0; background: var(--aurora-purple); box-shadow: var(--aurora-shadow-primary); color: #FFFFFF !important; }
+
+.btn-aurora-secondary { margin-top: 10px; border: 1px solid var(--aurora-divider); background: var(--aurora-card-bg); color: var(--aurora-purple) !important; }
+
+
+.aurora-card-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--aurora-surface-tint); }
+
+.aurora-card-link { display: inline-flex; min-height: 44px; align-items: center; gap: 4px; color: var(--aurora-purple); font-size: 14px; font-weight: 500; text-decoration: none; white-space: nowrap; }
+
+.aurora-card-link-muted { color: #5C5364; }
+
+
+.preguntas-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 0 14px;
+}
+
+
+.preguntas-section-title {
+  margin: 0;
+  color: #2D1F3F;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+
+.card-footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--aurora-surface-tint);
+}
+
+
+.card-footer-actions > form:first-child { min-width: 0; }
+
+.card-footer-actions__secondary { display: flex; align-items: center; gap: 12px; }
+
+.btn-mark-done {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid rgba(108, 75, 163, 0.2);
+  border-radius: 8px;
+  background: var(--aurora-surface-lilac);
+  color: #6C4BA3;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.btn-mark-done:hover { background: var(--aurora-lavender); }
+
+.link-action-edit,
+.btn-action-delete {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  white-space: nowrap;
+}
+
+
+.link-action-edit { color: var(--aurora-purple, #6C4BA3); font-weight: 500; }
+
+.btn-action-delete {
+  color: var(--aurora-text-light, #6F6678);
+  font-weight: 400;
+}
+
+.btn-action-delete:hover,
+.btn-action-delete:active { color: #D32F2F; }
+
+
+@media (max-width: 350px) {
+  .card-footer-actions { align-items: flex-start; flex-wrap: wrap; }
+  .card-footer-actions__secondary { margin-left: auto; }
+  .btn-mark-done { max-width: 100%; }
+}
+
+
+@media (max-width: 350px) {
+  .aurora-card-actions { gap: 6px; }
+  .aurora-card-link { font-size: 13px; }
+}
+
+
+/* Patrón canónico de tarjeta con icono a la izquierda */
+.card-item-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+
+.card-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 12px;
+  background: var(--aurora-surface-lilac);
+  color: #6C4BA3;
+  flex-shrink: 0;
+}
+
+
+.card-icon-box .material-symbols-outlined {
+  font-size: 22px;
+  color: #6C4BA3;
+}
+
+
+.card-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+
+.card-main-title {
+  margin: 0 0 4px;
+  color: #2D1F3F;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+
+.card-desc {
+  margin: 0;
+  color: #5C5364;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+
+.card-actions-wrapper {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(108, 75, 163, 0.08);
+}
+
+
+.card-empty-meta {
+  margin: 10px 0 0;
+  color: #6F6678;
+  font-size: 13px;
+  font-style: italic;
+}
+
+
+/* Botón de llamada táctil con presencia (compacto, no bloque completo) */
+.btn-call-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: #6C4BA3;
+  color: #FFFFFF !important;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  margin-top: 12px;
+  box-shadow: 0 2px 8px rgba(108, 75, 163, 0.25);
+  transition: background 0.15s ease;
+  box-sizing: border-box;
+}
+
+
+.btn-call-action:hover,
+.btn-call-action:active {
+  background: #583A88;
+}
+
+
+.btn-call-action .btn-call-icon {
+  font-size: 18px;
+  color: #FFFFFF;
+}
+
+
+.helper-select-wrap { margin: 0 0 14px; }
+
+.form-hint-label {
+  display: block;
+  margin-bottom: 4px;
+  color: #6C4BA3;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+
+.btn-call-emergency {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: #6C4BA3;
+  color: #FFF8F5 !important;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.18s ease, transform 0.15s ease;
+}
+
+
+.btn-call-emergency .material-symbols-outlined {
+  font-size: 20px;
+}
+
+
+.btn-call-emergency:hover,
+.btn-call-emergency:active {
+  background: #5A3E8A;
+  color: #FFF8F5 !important;
+}
+
+
+.btn-call-emergency:active {
+  transform: scale(0.98);
+}
+
+
+/* Fila horizontal limpia al pie (.card-actions) */
+.card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(108, 75, 163, 0.08);
+}
+
+
+.btn-ghost-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--aurora-divider);
+  background: #FFFFFF;
+  color: #6C4BA3;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+
+.btn-ghost-sm:hover {
+  background: var(--aurora-surface-soft);
+  border-color: rgba(108, 75, 163, 0.35);
+  color: #553A86;
+}
+
+
+.btn-ghost-sm:active {
+  transform: scale(0.98);
+}
+
+
+/* Empty State Próximo Control */
+.empty-next-card {
+  text-align: center;
+  padding: 18px 16px;
+  background: #FFFFFF;
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  border-radius: 20px;
+}
+
+
+.empty-next-card__icon {
+  font-size: 32px;
+  color: #A78BD6;
+  margin-bottom: 6px;
+}
+
+
+.empty-next-card h3 {
+  margin: 0 0 4px;
+  color: #2D1F3F;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+.empty-next-card p {
+  margin: 0;
+  color: #5C5364;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+
+.source-list { margin: 0; padding-left: 18px; }
+
+.source-list li { margin-bottom: 10px; }
+
+.source-list--compact li { margin-bottom: 6px; }
+
+.source-list small { color: var(--muted); }
+
+
+/* FASE 3.1: Tarjeta: Tu embarazo esta semana */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+
+.card-header-stacked {
+  margin-bottom: 12px;
+}
+
+
+.card-header__title {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #2D1F3F;
+}
+
+
+.card-header__title .material-symbols-outlined {
+  color: #8b496c;
+  font-size: 20px;
+}
+
+
+.card-header__meta {
+  margin: 4px 0 0;
+  color: #5c5364;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+
+.card-desc {
+  margin: 0 0 14px;
+  color: #5c5364;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+.card-header__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 4px;
+  color: #6C4BA3;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s, transform 0.15s;
+}
+
+
+.card-header__link:hover {
+  color: #553a86;
+  transform: translateX(2px);
+}
+
+
+.card-header__link:focus-visible {
+  outline: 2px solid #6C4BA3;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+
+/* FASE 3.2 & 3.3: Acciones Secundarias con Separador Tenue (#E5DCE8) y Chevrons */
+.card-action-links {
+  border-top: 1px solid var(--aurora-divider);
+  margin-top: 16px;
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+}
+
+
+.card-action-links--horizontal {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+
+.card-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 6px 4px;
+  color: #6C4BA3;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+
+.card-text-link:hover {
+  color: #553a86;
+}
+
+
+.card-text-link .material-symbols-outlined {
+  font-size: 18px;
+  color: #A78BD6;
+  flex-shrink: 0;
+}
+
+
+.card-text-link .chevron {
+  font-size: 16px;
+  color: #5c5364;
+  margin-left: auto;
+  transition: transform 0.15s, color 0.15s;
+}
+
+
+.card-text-link:hover .chevron {
+  transform: translateX(3px);
+  color: #6C4BA3;
+}
+
+
+.card-text-link:focus-visible {
+  outline: 2px solid #6C4BA3;
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+
+@media (max-width: 350px) {
+  .card-action-links--horizontal {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* 3. Filas de Ajustes Estándar (Grouped Lists) */
+.settings-group {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.settings-row__icon {
+  font-size: 22px;
+  color: #A78BD6;
+  flex-shrink: 0;
+}
+
+
+.settings-row__label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #2D1F3F;
+}
+
+
+.settings-row__chevron {
+  font-size: 18px;
+  color: #8B496C;
+  transition: transform 0.2s;
+}
+
+
+.settings-drawer-item {
+  border: 0;
+}
+
+
+.settings-drawer-item[open] .settings-row__chevron {
+  transform: rotate(90deg);
+}
+
+
+.settings-drawer-content {
+  padding: 16px 18px 20px;
+  background: var(--aurora-surface-soft);
+  border-top: 1px solid rgba(108, 75, 163, 0.06);
+}
+
+
+.settings-divider {
+  height: 1px;
+  background: var(--aurora-surface-tint);
+  margin: 0 18px;
+}
+
+
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+  min-height: 48px;
+  padding: 12px 24px;
+  border-radius: 12px;
+  background: #FFFFFF;
+  border: 1px solid rgba(108, 75, 163, 0.22);
+  color: #6C4BA3;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+
+.btn-logout:hover {
+  background: var(--aurora-surface-soft);
+  border-color: rgba(108, 75, 163, 0.38);
+  color: #553A86;
+}
+
+
+.btn-logout:active {
+  transform: scale(0.98);
+}
+
+
+/* 1. Cabecera y Navegación de Salida */
+.form-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  color: #6C4BA3;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  margin-bottom: 4px;
+  transition: color 0.15s;
+}
+
+
+.form-back-link:hover {
+  color: #553A86;
+}
+
+
+.form-back-link .material-symbols-outlined {
+  font-size: 20px;
+}
+
+
+/* 2. Cuadrícula de 2 columnas para Fecha y Hora */
+.form-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+
+.required-indicator {
+  color: var(--aurora-danger);
+  margin-left: 2px;
+}
+
+
+.optional-label {
+  font-weight: 400;
+  color: #5C5364;
+  font-size: 13px;
+}
+
+
+.form-sublink {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6C4BA3;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+
+.form-sublink:hover {
+  color: #553A86;
+  text-decoration: underline;
+}
+
+
+/* Selector estilizado */
+.form-select-wrap {
+  position: relative;
+  width: 100%;
+}
+
+
+.form-select-wrap .form-select {
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+
+.form-select-wrap .select-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #5C5364;
+  font-size: 20px;
+}
+
+
+.form-select-wrap .form-select optgroup {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-weight: 600;
+  color: #6C4BA3;
+  background: var(--aurora-surface-soft);
+}
+
+
+.form-select-wrap .form-select option {
+  font-weight: 400;
+  color: #2D1F3F;
+  background: #FFFFFF;
+}
+
+
+
+
+
+
+
+/* ==========================================================================
+   Próximo control: fila de enlaces limpia al pie (.card-footer-links).
+   Se coloca al final para anular la caja de .btn-ghost-sm sobre .card-link.
+   ========================================================================== */
+
+.card-footer-links {
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 12px;
+}
+
+
+.card-footer-links .card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 8px 6px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #5C5364;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+
+.card-footer-links .card-link .material-symbols-outlined {
+  font-size: 18px;
+  color: currentColor;
+  transition: transform 0.15s ease;
+}
+
+
+.card-footer-links .card-link:hover { color: #6C4BA3; }
+
+.card-footer-links .card-link:hover .material-symbols-outlined { transform: translateX(2px); }
+
+.card-footer-links .card-link:active { transform: scale(0.98); }
+
+
+/* Botón secundario táctil del pie de la tarjeta (nunca parte el texto) */
+.card-footer-links .btn-card-action {
+  border: 1px solid var(--aurora-divider);
+  background: #FFFFFF;
+  color: #6C4BA3;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+
+.card-footer-links .btn-card-action:hover {
+  background: var(--aurora-surface-soft);
+  color: #553A86;
+  border-color: rgba(108, 75, 163, 0.35);
+}
+
+
+/* ==========================================================================
+   Migración aditiva al Design System Aurora (pantallas de usuario).
+   Se coloca al final para que las clases .aurora-* añadidas en las plantillas
+   ganen a las reglas legacy equivalentes, sin eliminarlas ni reescribirlas.
+   Alcance: Inicio, Mi Embarazo, Centros, Perfil.
+   ========================================================================== */
+.aurora-page-container .aurora-card {
+  border: var(--aurora-border-card);
+  border-radius: var(--aurora-radius-lg);
+  background: var(--aurora-card-bg);
+  box-shadow: var(--aurora-shadow-card);
+}
+
+
+.aurora-page-container .aurora-card-title {
+  margin: 0;
+  color: var(--aurora-text-main);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+
+.aurora-page-container .aurora-card-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 4px;
+  color: var(--aurora-purple);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.empty__icon{font-size:40px;color:var(--primary)}
+
+/* Acceso fijo a Senales de alerta (base.html, visible en todas las pantallas de usuaria) */
+.alert-fab{position:fixed;z-index:35;bottom:calc(92px + env(safe-area-inset-bottom, 0px));right:calc(50vw - min(50vw,240px) + 12px);display:grid;width:48px;height:48px;place-items:center;padding:0;border:1px solid var(--color-coral);border-radius:50%;background:var(--color-care-pink);color:var(--color-text-main);text-decoration:none;box-shadow:var(--shadow);transition:transform .15s ease}
+.alert-fab:active{transform:scale(.96)}
+.alert-fab:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.alert-fab .material-symbols-outlined{font-size:22px}
+/* Si coincide el aviso de instalacion, el FAB sube por encima en lugar de solaparse */
+body:has(.install-banner:not([hidden])) .alert-fab{bottom:calc(218px + env(safe-area-inset-bottom, 0px))}
+@media (min-width:700px){.alert-fab{right:calc(50vw - min(50vw, 215px) + 12px)}}
+@media (prefers-reduced-motion:reduce){.alert-fab{transition:none}}
+@media print{.alert-fab{display:none}}
+
+/* Skeleton de navegacion (ver app.js: prepararSkeletonNavegacion) */
+.skeleton{position:absolute;inset:0;z-index:20;display:grid;gap:16px;align-content:start;padding:24px;background:var(--page)}
+.skeleton__bar,.skeleton__card{border-radius:var(--aurora-radius-md);background:linear-gradient(90deg,var(--soft) 25%,var(--line) 45%,var(--soft) 65%) no-repeat;background-size:400% 100%;animation:skeleton-shimmer 1.4s ease infinite}
+.skeleton__bar{width:55%;height:24px}
+.skeleton__card{height:96px}
+@keyframes skeleton-shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){.skeleton__bar,.skeleton__card{animation:none;background:var(--soft)}}

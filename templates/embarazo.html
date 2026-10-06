@@ -2,25 +2,21 @@
 {% block title %}{{ 'Editar embarazo' if editar else 'Mi embarazo' }} | Aurora{% endblock %}
 
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell section-shell pregnancy-page">
+<main id="main" tabindex="-1" class="app-shell section-shell pregnancy-page aurora-page-container">
   {% if editar %}
     {% set back_url = url_for('main.embarazo') %}
     {% set back_label = 'Cancelar edición y volver a Mi embarazo' %}
     {% set page_title = 'Editar embarazo' %}
-  {% else %}
-    {% set back_url = url_for('main.index') %}
-    {% set back_label = 'Volver a Inicio' %}
-    {% set page_title = 'Aurora' %}
-  {% endif %}
-  {% include 'partials/page_header.html' %}
-
-  {% if editar %}
+    {% include 'partials/page_header.html' %}
     <section class="section-intro">
       <h2>Editar embarazo</h2>
       <p>Actualiza tus fechas y el método de estimación.</p>
     </section>
   {% else %}
-    <section class="section-intro"><h2>Mi embarazo</h2><p>Acompaña tu progreso paso a paso</p></section>
+    <header class="pregnancy-header">
+      <h1 class="pregnancy-header__title">Mi embarazo</h1>
+      <p class="pregnancy-header__subtitle">Acompaña tu progreso paso a paso</p>
+    </header>
   {% endif %}
 
   {% include 'partials/flash.html' %}
@@ -32,14 +28,204 @@
     </section>
   {% elif embarazo %}
     {% set trimester = 1 if semana and semana <= 13 else (2 if semana and semana <= 27 else 3) %}
-    <section class="pregnancy-visual card-surface"><div class="pregnancy-photo"><img src="{{ url_for('static', filename='assets/stitch/pregnancy-week-24.jpg') }}" alt="Representación visual del embarazo"><div><strong>Semana {{ semana if semana is not none else '—' }}</strong><span>{% if semana is not none %}{{ 'Primer' if trimester == 1 else ('Segundo' if trimester == 2 else 'Tercer') }} trimestre{% else %}Etapa por calcular{% endif %}</span></div></div><div class="range-labels"><span>Semana 1</span><span>Semana 42</span></div><div class="progress-track" role="progressbar" aria-label="Semana gestacional" aria-valuemin="0" aria-valuemax="42" aria-valuenow="{{ semana if semana is not none else 0 }}"><span style="width:{{ ((semana or 0) / 42 * 100)|round|int }}%"></span></div><p class="range-current">Semana {{ semana if semana is not none else '—' }} de 42</p></section>
-    <section class="pregnancy-status card-surface"><h3><span class="material-symbols-outlined" aria-hidden="true">info</span> Tu embarazo esta semana</h3><div class="status-row"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span><p><small>Tu etapa</small><strong>{{ 'Primer' if trimester == 1 else ('Segundo' if trimester == 2 else 'Tercer') }} trimestre</strong></p></div><div class="status-row"><span class="material-symbols-outlined" aria-hidden="true">event</span><p><small>Próximo control</small><strong>{% if proximo %}{{ proximo.fecha_control.strftime('%d/%m/%Y') }}{% if proximo.hora_control %} · {{ proximo.hora_control.strftime('%H:%M') }}{% endif %}{% else %}Sin control programado{% endif %}</strong></p></div><div class="status-row"><span class="material-symbols-outlined" aria-hidden="true">child_care</span><p><small>Fecha probable de parto</small><strong>{{ embarazo.fpp.strftime('%d/%m/%Y') if embarazo.fpp else 'No registrada' }}</strong></p></div></section>
-    <a class="button button--secondary button--wide pregnancy-edit-link" href="{{ url_for('main.embarazo', editar=1) }}"><span class="material-symbols-outlined" aria-hidden="true">edit</span> Editar información</a>
-    <section class="prenatal-controls card-surface"><h3><span class="material-symbols-outlined" aria-hidden="true">medical_services</span> Mis controles prenatales</h3><div class="control-count"><strong>{{ controles|length }}</strong><span>controles registrados hasta ahora</span></div><a class="button button--primary button--wide" href="{{ url_for('main.controles') }}">Ver mis controles <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a><div class="split-actions"><a href="{{ url_for('main.nuevo_control') }}"><span class="material-symbols-outlined" aria-hidden="true">add</span> Registrar control</a><a href="{{ url_for('main.calendario') }}"><span class="material-symbols-outlined" aria-hidden="true">calendar_today</span> Ver calendario</a></div></section>
+    {% set safe_week = (semana or 0) %}
+    {% set clamped_week = 42 if safe_week > 42 else (0 if safe_week < 0 else safe_week) %}
+    {% set circumference = 427.26 %} {# 2 * PI * 68 = 427.256... #}
+    {% set stroke_offset = (circumference * (1 - (clamped_week / 42)))|round(2) %}
+    {% set analogias = {
+      1: 'una semilla de amapola 🌱',
+      2: 'una semilla de ajonjolí 🌱',
+      3: 'una semilla de chía 🌱',
+      4: 'una semilla de manzana 🍎',
+      5: 'una semilla de naranja 🍊',
+      6: 'un grano de café ☕',
+      7: 'un arándano 🫐',
+      8: 'una frambuesa 🍓',
+      9: 'una uva verde 🍇',
+      10: 'una ciruela pequeña 🍑',
+      11: 'un higo dulce 🫐',
+      12: 'un limón criollo 🍋',
+      13: 'un melocotón 🍑',
+      14: 'un limón grande 🍋',
+      15: 'una manzana criolla 🍎',
+      16: 'un aguacate 🥑',
+      17: 'una pera 🍐',
+      18: 'un camote pequeño 🍠',
+      19: 'un mango maduro 🥭',
+      20: 'un plátano maduro 🍌',
+      21: 'una granadilla 🍈',
+      22: 'una papaya pequeña 🍈',
+      23: 'una toronja 🍊',
+      24: 'un coco 🥥',
+      25: 'una coliflor tierna 🥦',
+      26: 'una jícama fresca 🥔',
+      27: 'un repollo tierno 🥬',
+      28: 'una berenjena 🍆',
+      29: 'una piña tierna 🍍',
+      30: 'un pepino grande 🥒',
+      31: 'un coco grande 🥥',
+      32: 'una jícama grande 🍈',
+      33: 'una piña dulce 🍍',
+      34: 'un melón cantalupo 🍈',
+      35: 'un melón verde 🍈',
+      36: 'una papaya 🍈',
+      37: 'un güisquil grande 🥬',
+      38: 'una calabaza tierna 🎃',
+      39: 'una sandía mediana 🍉',
+      40: 'una sandía dulce 🍉'
+    } %}
+
+    {# ── FASE 2: Tarjeta Gestacional Principal (Alineación con Inicio) ── #}
+    <section class="pregnancy-visual card-surface aurora-card" aria-label="Progreso gestacional">
+      <div class="gestational-ring-wrap">
+        <svg class="gestational-ring" viewBox="0 0 180 180" width="180" height="180" aria-hidden="true">
+          <defs>
+            <linearGradient id="aurora-ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6C4BA3" />
+              <stop offset="100%" stop-color="#A78BD6" />
+            </linearGradient>
+          </defs>
+          <!-- Doble trazo exterior sutil en Lavanda Serena -->
+          <circle class="gestational-ring__outer-trace" cx="90" cy="90" r="78" />
+          <!-- Pista principal en Lavanda Serena suave -->
+          <circle class="gestational-ring__track" cx="90" cy="90" r="68" />
+          <!-- Trazo de progreso activo en Morado Aurora -->
+          <circle
+            class="gestational-ring__progress"
+            cx="90"
+            cy="90"
+            r="68"
+            stroke-dasharray="427.26"
+            stroke-dashoffset="{{ stroke_offset if semana is not none else '427.26' }}"
+            transform="rotate(-90 90 90)"
+          />
+          <!-- Doble trazo interior decorativo en Lavanda Serena -->
+          <circle class="gestational-ring__inner-trace" cx="90" cy="90" r="58" />
+        </svg>
+        <div class="gestational-ring__center">
+          <strong class="gestational-ring__week">Semana {{ semana if semana is not none else '—' }}</strong>
+          <span class="gestational-ring__badge">
+            {% if semana is not none %}
+              {{ 'Primer' if trimester == 1 else ('Segundo' if trimester == 2 else 'Tercer') }} trimestre
+            {% else %}
+              Por calcular
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      {% if semana and semana in analogias %}
+      <p class="gestational-analogy">
+        <span>Tu bebé tiene el tamaño de {{ analogias[semana] }}</span>
+      </p>
+      {% endif %}
+
+      <div class="gestational-progress-container">
+        <div class="progress-track" role="progressbar" aria-label="Semana gestacional" aria-valuemin="1" aria-valuemax="42" aria-valuenow="{{ semana if semana is not none else 0 }}">
+          <span style="width:{{ [100, (((semana or 0) / 42) * 100)|round(1)]|min if semana is not none else 0 }}%"></span>
+        </div>
+        <div class="range-labels">
+          <span>Semana 1</span>
+          <span>Semana 42</span>
+        </div>
+      </div>
+    </section>
+
+    {# ── FASE 3.1: Tarjeta: Tu embarazo esta semana ── #}
+    <section class="pregnancy-status card-surface aurora-card">
+      <header class="card-header">
+        <h3 class="card-header__title aurora-card-title">
+          <span class="material-symbols-outlined" aria-hidden="true">info</span>
+          <span>Tu embarazo esta semana</span>
+        </h3>
+        <a href="{{ url_for('main.embarazo', editar=1) }}" class="card-header__link link-edit" aria-label="Editar datos del embarazo">Editar datos ›</a>
+      </header>
+      <div class="status-rows">
+        <div class="status-row">
+          <span class="material-symbols-outlined status-row__icon" aria-hidden="true">calendar_today</span>
+          <div class="status-row__text">
+            <small>Próximo control</small>
+            <strong>{% if proximo %}{{ proximo.fecha_control.strftime('%d/%m/%Y') }}{% if proximo.hora_control %} · {{ proximo.hora_control.strftime('%H:%M') }}{% endif %}{% else %}Sin control programado{% endif %}</strong>
+          </div>
+        </div>
+        <div class="status-row">
+          <span class="material-symbols-outlined status-row__icon" aria-hidden="true">child_care</span>
+          <div class="status-row__text">
+            <small>Fecha probable de parto</small>
+            <strong>{{ embarazo.fpp.strftime('%d/%m/%Y') if embarazo.fpp else 'No registrada' }}</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {# ── FASE 3.2: Tarjeta: Mis controles prenatales ── #}
+    <section class="prenatal-controls card-surface aurora-card">
+      <header class="card-header-stacked">
+        <h3 class="card-header__title aurora-card-title">
+          <span class="material-symbols-outlined" aria-hidden="true">medical_services</span>
+          <span>Mis controles prenatales</span>
+        </h3>
+        <p class="card-header__meta">{{ controles|length }} control{{ 'es' if controles|length != 1 else '' }} registrado{{ 's' if controles|length != 1 else '' }} hasta ahora</p>
+      </header>
+      <a class="button button--primary button--wide button--tactile" href="{{ url_for('main.nuevo_control') }}">
+        <span class="material-symbols-outlined" aria-hidden="true">add</span>
+        <span>Registrar control</span>
+      </a>
+      <div class="card-action-links">
+        <a href="{{ url_for('main.preguntas_consulta') }}" class="card-text-link action-ghost">
+          <span class="material-symbols-outlined" aria-hidden="true">help_outline</span>
+          <span>Mis preguntas médicas</span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </a>
+        <a href="{{ url_for('main.controles') }}" class="card-text-link action-ghost">
+          <span class="material-symbols-outlined" aria-hidden="true">history</span>
+          <span>Ver historial de controles</span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </a>
+      </div>
+    </section>
+
+    {# ── FASE 3.3: Tarjeta: Traslado y red de apoyo ── #}
+    <section class="birth-plan-entry card-surface aurora-card" aria-labelledby="birth-plan-title">
+      <header class="card-header-stacked">
+        <h3 id="birth-plan-title" class="card-header__title aurora-card-title">
+          <span class="material-symbols-outlined" aria-hidden="true">map</span>
+          <span>Traslado y red de apoyo</span>
+        </h3>
+        <p class="card-header__meta">{% if embarazo.plan_parto %}Tu plan familiar está guardado.{% else %}Aún no registras tu plan.{% endif %}</p>
+      </header>
+      <p class="card-desc aurora-card-desc">Organiza con tu familia el lugar, el traslado, la persona acompañante y tus contactos de confianza.</p>
+      <a class="btn-aurora-chip-action" href="{{ url_for('main.plan_parto') }}">
+        <span class="material-symbols-outlined" aria-hidden="true">route</span>
+        <span>Preparar traslado y apoyo</span>
+      </a>
+      <div class="card-action-links card-action-links--horizontal">
+        <a href="{{ url_for('main.red_comunitaria') }}" class="card-text-link action-ghost">
+          <span class="material-symbols-outlined" aria-hidden="true">groups</span>
+          <span>Mis contactos</span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </a>
+        <a href="{{ url_for('main.imprimir_plan_parto') }}" class="card-text-link action-ghost">
+          <span class="material-symbols-outlined" aria-hidden="true">print</span>
+          <span>Ficha para el hogar</span>
+          <span class="chevron" aria-hidden="true">›</span>
+        </a>
+      </div>
+    </section>
+
   {% elif perfil and current_user.rol.nombre == 'usuario' %}
-    <section class="card-surface setup-card"><h3>Registrar embarazo</h3><p>Indica al menos una fecha. Esta información es orientativa y no sustituye la atención profesional.</p>{% include 'partials/embarazo_form.html' %}</section>
+    <section class="card-surface setup-card">
+      <h3>Registrar embarazo</h3>
+      <p>Indica al menos una fecha. Esta información es orientativa y no sustituye la atención profesional.</p>
+      {% include 'partials/embarazo_form.html' %}
+    </section>
   {% else %}
-    {% set empty_title = 'Sin embarazo activo' %}{% set empty_text = 'No hay un perfil gestante asociado a esta cuenta.' %}{% set empty_url = none %}{% set empty_action = none %}{% include 'partials/empty_state.html' %}
+    {% set empty_title = 'Sin embarazo activo' %}
+    {% set empty_text = 'No hay un perfil gestante asociado a esta cuenta.' %}
+    {% set empty_url = none %}
+    {% set empty_action = none %}
+    {% set empty_icon = 'pregnant_woman' %}
+    {% include 'partials/empty_state.html' %}
   {% endif %}
 </main>
 {% endblock %}

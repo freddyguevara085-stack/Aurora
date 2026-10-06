@@ -5,11 +5,12 @@ import click
 from werkzeug.security import generate_password_hash
 
 from demo_nicaragua import CENTROS as CENTROS_VERIFICADOS
+from demo_nicaragua import CUENTA_DEMO_EMAIL
 from extensions import db
 from models.acceso import Rol
 from models.directorio import CentroAtencion
-from models.gestacion import Embarazo, PerfilGestante
-from models.seguimiento import ControlPrenatal, Recordatorio
+from models.gestacion import ContactoComunitario, Embarazo, PerfilGestante, PlanParto
+from models.seguimiento import ControlPrenatal, PreguntaConsulta, Recordatorio
 from models.usuario import Usuario
 
 
@@ -119,7 +120,7 @@ def register_commands(app) -> None:
             db.session.add(rol_usuario)
             db.session.flush()
 
-        email_demo = "maria.demo@aurora.ni"
+        email_demo = CUENTA_DEMO_EMAIL
         usuario_demo = db.session.scalar(db.select(Usuario).filter_by(email=email_demo))
         if not usuario_demo:
             usuario_demo = Usuario(
@@ -149,8 +150,8 @@ def register_commands(app) -> None:
         perfil.cedula = None
         perfil.fecha_nacimiento = None
         perfil.telefono = None
-        perfil.municipio = None
-        perfil.departamento = None
+        perfil.municipio = "Managua"
+        perfil.departamento = "Managua"
         perfil.direccion_residencia = None
         perfil.contacto_emergencia_nombre = None
         perfil.contacto_emergencia_telefono = None
@@ -182,52 +183,147 @@ def register_commands(app) -> None:
             embarazo.metodo_fpp = "fum"
             db.session.flush()
 
-        # Eliminar detalles de salud y citas ficticias anteriores de esta cuenta demo.
+        # 6b. Plan de parto demostrativo (logística, sin datos clínicos)
+        db.session.execute(
+            db.delete(PlanParto).where(PlanParto.embarazo_id == embarazo.id)
+        )
+        centro_referencia = db.session.scalar(
+            db.select(CentroAtencion)
+            .where(
+                CentroAtencion.activo == 1,
+                CentroAtencion.tipo_establecimiento.in_(("hospital", "centro_salud")),
+            )
+            .order_by(CentroAtencion.id)
+            .limit(1)
+        )
+        db.session.add(
+            PlanParto(
+                embarazo_id=embarazo.id,
+                centro_atencion_id=centro_referencia.id if centro_referencia else None,
+                requiere_casa_materna=0,
+                acompanante_nombre="Rosa Guevara (Hermana)",
+                acompanante_telefono="8888-0000",
+                cuidador_hijos="Abuela materna en casa",
+                transporte_tipo="caponera_taxi",
+                transporte_contacto="Don Carlos (Taxi barrio) - 8777-1111",
+                bulto_listo=1,
+                recursos_traslado_listos=1,
+                notas=None,
+            )
+        )
+        db.session.flush()
+
+        # 6c. Red comunitaria de apoyo demostrativa (brigadista y traslado local)
+        db.session.execute(
+            db.delete(ContactoComunitario).where(
+                ContactoComunitario.perfil_gestante_id == perfil.id
+            )
+        )
+        db.session.flush()
+        contactos_comunitarios_def = [
+            (
+                "Doña Silvia Martínez",
+                "brigadista",
+                "8888-2345",
+                "Barrio Jorge Smith",
+                "Enlace con el centro de salud municipal",
+            ),
+            (
+                "Don Pedro Fonseca",
+                "traslado_local",
+                "8765-4321",
+                "Sector San Antonio",
+                "Camioneta disponible para traslado hacia el centro de salud u hospital",
+            ),
+        ]
+        for nombre, rol, telefono, comunidad, notas in contactos_comunitarios_def:
+            db.session.add(
+                ContactoComunitario(
+                    perfil_gestante_id=perfil.id,
+                    nombre=nombre,
+                    rol=rol,
+                    telefono=telefono,
+                    comunidad_barrio=comunidad,
+                    notas=notas,
+                )
+            )
+        db.session.flush()
+
+        # 7. Controles ficticios coherentes (sin indicaciones clínicas)
         db.session.execute(
             db.delete(ControlPrenatal).where(ControlPrenatal.embarazo_id == embarazo.id)
         )
         db.session.flush()
 
-        # Cita ficticia solo para demostrar el calendario: no contiene indicaciones médicas.
-        control = ControlPrenatal(
-            embarazo_id=embarazo.id,
-            registrado_por_usuario_id=usuario_demo.id,
-            numero_control=1,
-            fecha_control=hoy + timedelta(days=4),
-            hora_control=None,
-            edad_gestacional_semanas=None,
-            estado="programado",
-            centro_atencion_id=None,
-            indicaciones=None,
-            notas=None,
-        )
-        db.session.add(control)
-        db.session.flush()
+        controles_def = [
+            (1, fum_calculada + timedelta(days=8 * 7), 8, "realizado"),
+            (2, fum_calculada + timedelta(days=16 * 7), 16, "realizado"),
+            (3, hoy - timedelta(days=5), 24, "realizado"),
+            (4, hoy + timedelta(days=7), 25, "programado"),
+        ]
+        controles = []
+        for numero, fecha, edad, estado in controles_def:
+            control = ControlPrenatal(
+                embarazo_id=embarazo.id,
+                registrado_por_usuario_id=usuario_demo.id,
+                numero_control=numero,
+                fecha_control=fecha,
+                hora_control=time(9, 0),
+                edad_gestacional_semanas=float(edad),
+                estado=estado,
+                centro_atencion_id=None,
+                indicaciones=None,
+            )
+            db.session.add(control)
+            db.session.flush()
+            controles.append(control)
+        proximo = controles[-1]
 
-        # 8. Recordatorios activos en calendario
-        # Limpiar recordatorios previos de la cuenta demo
+        # 8. Preguntas ficticias del hilo persistente (reemplazan la nota del control)
+        db.session.execute(
+            db.delete(PreguntaConsulta).where(PreguntaConsulta.usuario_id == usuario_demo.id)
+        )
+        db.session.flush()
+        preguntas_def = [
+            "¿Qué documentos necesito llevar a mi próxima consulta?",
+            "¿Cuándo será mi próximo control prenatal?",
+        ]
+        for texto in preguntas_def:
+            db.session.add(
+                PreguntaConsulta(usuario_id=usuario_demo.id, pregunta=texto, estado="pendiente")
+            )
+
+        # 9. Recordatorios ficticios coherentes (sin indicaciones clínicas)
         db.session.execute(
             db.delete(Recordatorio).where(Recordatorio.usuario_id == usuario_demo.id)
         )
         db.session.flush()
 
-        recordatorio = Recordatorio(
-            usuario_id=usuario_demo.id,
-            control_prenatal_id=control.id,
-            titulo="Preparar preguntas para mi cita",
-            descripcion="Ejemplo ficticio: anota dudas para conversarlas con el personal de salud.",
-            tipo="control",
-            fecha_hora=datetime.combine(hoy + timedelta(days=4), time(7, 30)),
-            estado="pendiente",
-        )
-        db.session.add(recordatorio)
+        recordatorios_def = [
+            ("Próximo control prenatal", "Recuerda asistir a tu cita de demostración.", "control", datetime.combine(hoy + timedelta(days=7), time(8, 0)), proximo.id),
+            ("Anotar dudas para la consulta", "Ejemplo ficticio: prepara tus preguntas.", "personal", datetime.combine(hoy + timedelta(days=2), time(19, 0)), None),
+            ("Preparar documentos para mi cita", "Ejemplo ficticio de recordatorio personal.", "personal", datetime.combine(hoy + timedelta(days=5), time(18, 0)), None),
+        ]
+        for titulo, descripcion, tipo, fecha_hora, control_id in recordatorios_def:
+            db.session.add(
+                Recordatorio(
+                    usuario_id=usuario_demo.id,
+                    control_prenatal_id=control_id,
+                    titulo=titulo,
+                    descripcion=descripcion,
+                    tipo=tipo,
+                    fecha_hora=fecha_hora,
+                    estado="pendiente",
+                )
+            )
         db.session.commit()
 
         click.echo(f"- Centros confirmados por el MINSA: {centros_nuevos} nuevos.")
         click.echo("- Gestante demo configurada con éxito:")
-        click.echo("  * Correo:      maria.demo@aurora.ni")
+        click.echo(f"  * Correo:      {email_demo}")
         click.echo("  * Contraseña:  Password123!")
-        click.echo("  * Datos ficticios, sin información clínica ni de contacto real.")
+        click.echo("  * Perfil, embarazo semana 24, 3 controles realizados + 1 programado, 2 preguntas, 3 recordatorios, plan de traslado y apoyo, y contactos personales listos.")
+        click.echo("  * Datos ficticios, sin cédula, teléfonos ni contacto de emergencia.")
         click.echo("  * Teléfonos y horarios de centros: no confirmados en la fuente.")
         click.echo("  * Contenido clínico: no se publica; permanece como borrador.")
         click.echo("¡Datos de demostración listos!")

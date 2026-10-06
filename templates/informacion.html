@@ -11,5 +11,26 @@
     <h2>{{ titulo }}</h2>
     {% for parrafo in contenido %}<p>{{ parrafo }}</p>{% endfor %}
   </article>
+  {% if contexto %}
+  <section class="card">
+    <h2>Contexto de Nicaragua (con fuente)</h2>
+    <ul class="source-list">
+      {% for item in contexto %}
+      <li>{{ item.dato }}<br><small>Fuente: {% if fuentes %}<a href="{{ fuentes.get(item.fuente, {}).get('url', '#') }}" rel="noopener noreferrer">{{ fuentes.get(item.fuente, {}).get('nombre', 'Fuente sin registrar') }}</a>{% else %}{{ item.fuente }}{% endif %}{% if fecha_consulta %} · consultada {{ fecha_consulta }}{% endif %}</small></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+  {% if fuentes %}
+  <section class="card">
+    <h2>Fuentes consultadas</h2>
+    <ul class="source-list source-list--compact">
+      {% for clave, fuente in fuentes.items() %}
+      <li><a href="{{ fuente.url }}" rel="noopener noreferrer">{{ fuente.nombre }}</a></li>
+      {% endfor %}
+    </ul>
+    <p class="form-help">Fecha de consulta: {{ fecha_consulta }}. Esta fecha no constituye una revisión clínica.</p>
+  </section>
+  {% endif %}
 </main>
 {% endblock %}

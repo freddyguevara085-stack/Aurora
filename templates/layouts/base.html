@@ -3,22 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#43215f">
-    <meta name="description" content="Acompañamiento prenatal Aurora">
+    <meta name="theme-color" content="#6C4BA3">
+    <meta name="description" content="Aurora ayuda a organizar controles, preguntas y apoyo para la atención prenatal.">
     <link rel="manifest" href="{{ url_for('main.manifest') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/app-icon-32.png') }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/app-icon-192.png') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/app-icon-180.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=27">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=29">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=31">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}?v=29">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}?v=27">
     <title>{% block title %}Aurora{% endblock %}</title>
 </head>
 <body>
     <a class="skip-link" href="#main">Saltar al contenido principal</a>
-    <p class="proto-banner" role="note">Demo experimental · Hackathon Nicaragua 2026 · Información orientativa que no sustituye atención médica profesional.</p>
+    <aside class="install-banner" data-install-banner hidden aria-labelledby="install-title">
+        <span class="material-symbols-outlined install-banner__icon" aria-hidden="true">install_mobile</span>
+        <div class="install-banner__copy">
+            <strong id="install-title">Aurora, siempre a mano</strong>
+            <p>Instala un acceso directo. Algunas páginas públicas estarán disponibles sin conexión.</p>
+        </div>
+        <div class="install-banner__actions">
+            <button class="button button--primary" type="button" data-install-action>Instalar Aurora</button>
+            <button class="button install-banner__dismiss" type="button" data-install-dismiss>Ahora no</button>
+        </div>
+        <p class="sr-only" role="status" aria-live="polite" data-install-status></p>
+    </aside>
     {% block content %}{% endblock %}
     {% if current_user.is_authenticated and current_user.rol and current_user.rol.nombre == 'usuario' %}
         {% include 'partials/bottom_nav.html' %}
+        {% if request.endpoint not in ['main.index', 'main.alertas', 'main.controles', 'main.nuevo_control', 'main.editar_control', 'main.plan_parto'] %}
+        <a class="alert-fab" href="{{ url_for('main.alertas') }}" aria-label="Señales de alerta: cuándo buscar atención" title="Señales de alerta"><span class="material-symbols-outlined" aria-hidden="true">warning</span></a>
+        {% endif %}
     {% endif %}
-    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <dialog id="aurora-confirm" class="confirm-dialog" aria-labelledby="aurora-confirm-title">
+        <h2 id="aurora-confirm-title">Confirmar acción</h2>
+        <p data-confirm-message></p>
+        <div class="confirm-dialog__actions">
+            <button type="button" class="button button--secondary" data-confirm-cancel>Cancelar</button>
+            <button type="button" class="button button--danger" data-confirm-ok>Eliminar</button>
+        </div>
+    </dialog>
+    <script src="{{ url_for('static', filename='js/app.js') }}?v=22"></script>
 </body>
 </html>

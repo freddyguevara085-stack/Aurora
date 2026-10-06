@@ -1,36 +1,248 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Inicio | Aurora{% endblock %}
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell home-shell">
-  <header class="home-header"><a href="{{ url_for('main.index') }}" aria-label="Aurora, inicio"><img src="{{ url_for('static', filename='icons/app-icon-192.png') }}" width="32" height="32" alt="Aurora"></a></header>
-  <section class="home-intro"><h1>Hola, {{ home.user_name }}</h1><p>Acompañando el comienzo de una nueva vida.</p></section>
-  {% if home.consentimiento_pendiente %}<a class="consent-notice" href="{{ url_for('main.perfil') }}">Revisa y acepta tu consentimiento informado en tu perfil.<span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></a>{% endif %}
-  {% if home.empty_message %}
-    {% set empty_title = 'Sin embarazo activo' %}{% set empty_text = home.empty_message %}{% set empty_url = url_for('main.embarazo') %}{% set empty_action = 'Registrar mi embarazo' %}{% include 'partials/empty_state.html' %}
-  {% else %}
-  <section class="pregnancy-overview" aria-label="Progreso del embarazo">
-    <span class="corner-glow" aria-hidden="true"></span>
-    <div class="week-ring">
-      <span>Semana</span>
-      <strong>{{ home.week }}</strong>
-    </div>
-    <span class="stage-pill">Trimestre {{ home.trimester }}</span>
-    <p>Estás avanzando en la semana {{ home.week }} de tu embarazo.</p>
-    <div class="progress-track" role="progressbar" aria-label="Progreso del embarazo" aria-valuemin="1" aria-valuemax="42" aria-valuenow="{{ home.week }}">
-      <span style="width:{{ home.progress }}%"></span>
-    </div>
-    <div class="progress-labels">
-      <span>Semana 1</span>
-      <span>Semana 42</span>
-    </div>
-  </section>
-  {% endif %}
-  <section class="next-control home-card"><div><p class="eyebrow">PRÓXIMO CONTROL</p>{% if home.control %}<h2>{{ home.control.fecha_control.strftime('%d/%m/%Y') }}{% if home.control.hora_control %}, {{ home.control.hora_control.strftime('%H:%M') }}{% endif %}</h2><p class="muted-row"><span class="material-symbols-outlined" aria-hidden="true">location_on</span>{{ home.control.centro_atencion.nombre if home.control.centro_atencion else 'Centro por confirmar' }}</p>{% else %}<h2>No hay controles próximos</h2><p class="muted-row">Registra una cita para verla aquí.</p>{% endif %}<a class="text-link" href="{{ url_for('main.calendario') }}">Ver calendario <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></a></div><span class="round-icon"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span></span></section>
-  {% if home.recordatorios %}<section class="home-card"><h2>Lo próximo en tu calendario</h2>{% for recordatorio in home.recordatorios %}<p>{{ recordatorio.fecha_hora.strftime('%d/%m/%Y %H:%M') }} · {{ recordatorio.titulo }}</p>{% endfor %}<a class="text-link" href="{{ url_for('main.calendario') }}">Ver todos los recordatorios</a></section>{% endif %}
-  <section class="home-actions" aria-label="Acciones rápidas"><a class="home-action home-action--primary" href="{{ url_for('main.nuevo_control') }}"><span class="material-symbols-outlined" aria-hidden="true">medical_services</span><span>Registrar Control</span></a><a class="home-action home-action--pink" href="{{ url_for('main.calendario') }}"><span class="material-symbols-outlined" aria-hidden="true">calendar_month</span><span>Ver Calendario</span></a></section>
-  <a class="alert-banner" href="{{ url_for('main.alertas') }}"><span class="alert-banner__icon"><span class="material-symbols-outlined" aria-hidden="true">warning</span></span><span><strong>Señales de alerta</strong><small>Conoce cuándo es importante buscar atención profesional.</small></span><b>Ver<br>señales <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span></b></a>
-  <section class="home-guide"><header><h2>Guía y orientación</h2><a href="{{ url_for('main.guia') }}">Ver guía</a></header>{% if home.contenidos %}{% set contenido = home.contenidos[0] %}<article class="feature-article"><div><h3>{{ contenido.titulo }}</h3><p>{{ contenido.resumen or 'Orientación para organizar tu atención y preparar preguntas.' }}</p><a href="{{ url_for('main.detalle_guia', contenido_id=contenido.id) }}">Leer orientación</a></div></article>{% else %}<p>No hay orientación publicada por el momento. Puedes preparar preguntas para conversar con el personal de salud.</p>{% endif %}</section>
-  <p class="offline-note">Algunas páginas pueden consultarse sin conexión. Tus datos y el resto de Aurora requieren conexión.</p>
+<main id="main" tabindex="-1" class="app-shell home-shell aurora-page-container">
+  <header class="home-header">
+    <a href="{{ url_for('main.index') }}" aria-label="Aurora, inicio">
+      <img src="{{ url_for('static', filename='icons/app-icon-192.png') }}" width="32" height="32" alt="Aurora">
+    </a>
+  </header>
 
+  <section class="home-intro">
+    <h1>Hola, {{ home.user_name }}</h1>
+    <p>Tu próximo paso, claro y a mano.</p>
+  </section>
+
+  {# ── 5. Banner de Consentimiento Informado ── #}
+  {% if home.consentimiento_pendiente %}
+  <a class="consent-notice" href="{{ url_for('main.perfil') }}">
+    <span class="material-symbols-outlined consent-notice__icon" aria-hidden="true">verified_user</span>
+    <span class="consent-notice__text">Revisa y acepta tu consentimiento informado en tu perfil.</span>
+    <span class="material-symbols-outlined consent-notice__chevron" aria-hidden="true">chevron_right</span>
+  </a>
+  {% endif %}
+
+  {% if home.empty_message %}
+    {% set empty_title = 'Sin embarazo activo' %}
+    {% set empty_text = home.empty_message %}
+    {% set empty_url = url_for('main.embarazo') %}
+    {% set empty_action = 'Registrar mi embarazo' %}
+    {% set empty_icon = 'pregnant_woman' %}
+    {% include 'partials/empty_state.html' %}
+  {% else %}
+    {% set trimester_name = 'Primer trimestre' if home.trimester == 1 else ('Segundo trimestre' if home.trimester == 2 else 'Tercer trimestre') %}
+    {% set safe_week = (home.week or 0) %}
+    {% set clamped_week = 42 if safe_week > 42 else (0 if safe_week < 0 else safe_week) %}
+    {% set circumference = 427.26 %}
+    {% set stroke_offset = (circumference * (1 - (clamped_week / 42)))|round(2) %}
+    {% set analogias = {
+      1: 'una semilla de amapola 🌱',
+      2: 'una semilla de ajonjolí 🌱',
+      3: 'una semilla de chía 🌱',
+      4: 'una semilla de manzana 🍎',
+      5: 'una semilla de naranja 🍊',
+      6: 'un grano de café ☕',
+      7: 'un arándano 🫐',
+      8: 'una frambuesa 🍓',
+      9: 'una uva verde 🍇',
+      10: 'una ciruela pequeña 🍑',
+      11: 'un higo dulce 🫐',
+      12: 'un limón criollo 🍋',
+      13: 'un melocotón 🍑',
+      14: 'un limón grande 🍋',
+      15: 'una manzana criolla 🍎',
+      16: 'un aguacate 🥑',
+      17: 'una pera 🍐',
+      18: 'un camote pequeño 🍠',
+      19: 'un mango maduro 🥭',
+      20: 'un plátano maduro 🍌',
+      21: 'una granadilla 🍈',
+      22: 'una papaya pequeña 🍈',
+      23: 'una toronja 🍊',
+      24: 'un coco 🥥',
+      25: 'una coliflor tierna 🥦',
+      26: 'una jícama fresca 🥔',
+      27: 'un repollo tierno 🥬',
+      28: 'una berenjena 🍆',
+      29: 'una piña tierna 🍍',
+      30: 'un pepino grande 🥒',
+      31: 'un coco grande 🥥',
+      32: 'una jícama grande 🍈',
+      33: 'una piña dulce 🍍',
+      34: 'un melón cantalupo 🍈',
+      35: 'un melón verde 🍈',
+      36: 'una papaya 🍈',
+      37: 'un güisquil grande 🥬',
+      38: 'una calabaza tierna 🎃',
+      39: 'una sandía mediana 🍉',
+      40: 'una sandía dulce 🍉'
+    } %}
+
+    {# ── 1. Widget Gestacional Canónico ── #}
+    <section class="pregnancy-overview card-surface aurora-card" aria-label="Progreso del embarazo">
+      <div class="gestational-ring-wrap">
+        <svg class="gestational-ring" viewBox="0 0 180 180" width="180" height="180" aria-hidden="true">
+          <defs>
+            <linearGradient id="aurora-ring-grad-home" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#6C4BA3" />
+              <stop offset="100%" stop-color="#A78BD6" />
+            </linearGradient>
+          </defs>
+          <circle class="gestational-ring__outer-trace" cx="90" cy="90" r="78" />
+          <circle class="gestational-ring__track" cx="90" cy="90" r="68" />
+          <circle
+            class="gestational-ring__progress"
+            cx="90"
+            cy="90"
+            r="68"
+            stroke-dasharray="427.26"
+            stroke-dashoffset="{{ stroke_offset if home.week is not none else '427.26' }}"
+            transform="rotate(-90 90 90)"
+          />
+          <circle class="gestational-ring__inner-trace" cx="90" cy="90" r="58" />
+        </svg>
+        <div class="gestational-ring__center">
+          <strong class="gestational-ring__week">Semana {{ home.week if home.week is not none else '—' }}</strong>
+          <span class="gestational-ring__badge">{{ trimester_name if home.trimester else 'Por calcular' }}</span>
+        </div>
+      </div>
+
+      {% if home.week and home.week in analogias %}
+      <p class="gestational-analogy">
+        <span>Tu bebé tiene el tamaño de {{ analogias[home.week] }}</span>
+      </p>
+      {% endif %}
+
+      <div class="gestational-progress-container">
+        <div class="progress-track" role="progressbar" aria-label="Progreso del embarazo" aria-valuemin="1" aria-valuemax="42" aria-valuenow="{{ home.week if home.week is not none else 0 }}">
+          <span style="width:{{ [100, (((home.week or 0) / 42) * 100)|round]|min if home.week is not none else 0 }}%"></span>
+        </div>
+        <div class="range-labels">
+          <span>Semana 1</span>
+          <span>Semana 42</span>
+        </div>
+      </div>
+    </section>
+
+    {# ── 2. Tarjeta: Tu próximo paso (Control Prenatal) ── #}
+    <section class="visit-card{% if home.dias_para_control in (0, 1) %} visit-card--soon{% endif %} card-surface aurora-card" aria-labelledby="visit-title">
+      <header class="visit-card__header">
+        <div>
+          <p class="eyebrow">TU PRÓXIMO PASO</p>
+          <h2 id="visit-title" class="aurora-card-title">{% if home.control %}Prepara tu próxima consulta{% else %}Agenda tu próximo control{% endif %}</h2>
+        </div>
+        <span class="round-icon"><span class="material-symbols-outlined" aria-hidden="true">event_available</span></span>
+      </header>
+      {% if home.control %}
+        <div class="visit-date">
+          <strong>{% if home.dias_para_control == 0 %}Es hoy{% elif home.dias_para_control == 1 %}Mañana{% else %}En {{ home.dias_para_control }} días{% endif %}</strong>
+          <span>{{ home.control.fecha_control.strftime('%d/%m/%Y') }}{% if home.control.hora_control %} · {{ home.control.hora_control.strftime('%H:%M') }}{% endif %}</span>
+        </div>
+        <p class="muted-row visit-location">
+          <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+          <span>{{ home.control.centro_nombre if home.control.centro_nombre else (home.control.centro_atencion.nombre if home.control.centro_atencion else 'Centro por confirmar') }}</span>
+        </p>
+        <a class="button button--primary button--wide button--tactile visit-details-link" href="{{ url_for('main.detalle_consulta') }}">
+          Ver detalles y preparar consulta
+        </a>
+      {% else %}
+        <p class="visit-empty">Todavía no hay una cita en tu calendario. Cuando la agendes, Aurora te ayudará a tener a mano lo que quieras conversar.</p>
+        <a class="button button--primary button--wide button--tactile" href="{{ url_for('main.nuevo_control') }}">Agendar un control</a>
+      {% endif %}
+    </section>
+
+    {% if home.trimester == 3 %}
+    <a class="birth-plan-reminder card-surface" href="{{ url_for('main.plan_parto') }}">
+      <div class="shortcut-icon shortcut-icon--support">
+        <span class="material-symbols-outlined" aria-hidden="true">route</span>
+      </div>
+      <div class="birth-plan-reminder__text">
+        <strong>Prepara tu traslado y apoyo</strong>
+        <small>Acuerda con tiempo el lugar, el transporte y tu acompañante.</small>
+      </div>
+      <span class="chevron" aria-hidden="true">›</span>
+    </a>
+    {% endif %}
+
+    {# ── 3. Reorganización de Accesos Directos (Grid Compacto de 2 Columnas) ── #}
+    <section class="home-shortcuts" aria-label="Accesos directos">
+      <div class="home-shortcuts-grid">
+        <!-- Señales de alerta (fondo blanco, icono rosa suave) -->
+        <a class="shortcut-card shortcut-card--alert card-surface aurora-card" href="{{ url_for('main.alertas') }}">
+          <div class="shortcut-card__header">
+            <span class="shortcut-icon shortcut-icon--warn">
+              <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+            </span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </div>
+          <div class="shortcut-card__body">
+            <strong>Señales de alerta</strong>
+            <span>Cuándo buscar atención</span>
+          </div>
+        </a>
+
+        <!-- Mi red de apoyo -->
+        <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.red_comunitaria') }}">
+          <div class="shortcut-card__header">
+            <span class="shortcut-icon shortcut-icon--support">
+              <span class="material-symbols-outlined" aria-hidden="true">groups</span>
+            </span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </div>
+          <div class="shortcut-card__body">
+            <strong>Mi red de apoyo</strong>
+            <span>Contactos y traslado</span>
+          </div>
+        </a>
+
+        <!-- Mis preguntas -->
+        <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.preguntas_consulta') }}">
+          <div class="shortcut-card__header">
+            <span class="shortcut-icon shortcut-icon--questions">
+              <span class="material-symbols-outlined" aria-hidden="true">help_outline</span>
+            </span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </div>
+          <div class="shortcut-card__body">
+            <strong>Mis preguntas</strong>
+            <span>Para tu consulta médica</span>
+          </div>
+        </a>
+
+        <!-- Guía prenatal -->
+        <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.guia') }}">
+          <div class="shortcut-card__header">
+            <span class="shortcut-icon shortcut-icon--guide">
+              <span class="material-symbols-outlined" aria-hidden="true">menu_book</span>
+            </span>
+            <span class="chevron" aria-hidden="true">›</span>
+          </div>
+          <div class="shortcut-card__body">
+            <strong>Guía prenatal</strong>
+            <span>Cuidados y orientación</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    {# ── 4. Guía con artículo destacado si existe contenido publicado ── #}
+    {% if home.contenidos %}
+      {% set contenido = home.contenidos[0] %}
+      <section class="home-guide card-surface aurora-card">
+        <header class="home-guide__header">
+          <h2 class="aurora-card-title">Guía y orientación</h2>
+          <a href="{{ url_for('main.guia') }}" class="home-guide__link aurora-card-link">Ver guía ›</a>
+        </header>
+        <article class="feature-article">
+          <div>
+            <h3>{{ contenido.titulo }}</h3>
+            <p>{{ contenido.resumen or 'Orientación para organizar tu atención y preparar preguntas.' }}</p>
+            <a href="{{ url_for('main.detalle_guia', contenido_id=contenido.id) }}" class="feature-article__link">Leer orientación ›</a>
+          </div>
+        </article>
+      </section>
+    {% endif %}
+
+  {% endif %}
 </main>
 {% endblock %}

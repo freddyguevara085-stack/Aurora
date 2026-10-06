@@ -1,17 +1,18 @@
 from datetime import date, datetime, time, timedelta
+import re
 
-from flask import Blueprint, abort, flash, redirect, render_template, request, send_from_directory, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, send_from_directory, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 
 from controllers.admin import admin_required
-from demo_nicaragua import BORRADORES, CONTEXTO, FECHA_CONSULTA, FUENTES
+from demo_nicaragua import BORRADORES, CONTEXTO, CUENTA_DEMO_EMAIL, FECHA_CONSULTA, FUENTES
 from services.home import calcular_semana_gestacional, construir_inicio
 from services.mvp import centros_activos, centro_activo, contenidos_publicados, controles_activos, perfil_y_embarazo, recordatorios_pendientes, servicios_disponibles
 from extensions import db
-from models.gestacion import Embarazo, PerfilGestante
-from models.seguimiento import ControlPrenatal, Recordatorio
+from models.gestacion import ContactoComunitario, Embarazo, PerfilGestante, PlanParto
+from models.seguimiento import ControlPrenatal, PreguntaConsulta, Recordatorio
 
 main_bp = Blueprint('main', __name__)
 
@@ -28,6 +29,15 @@ def _usuario_gestante():
     return current_user.rol and current_user.rol.nombre == "usuario"
 
 
+def _es_cuenta_demo():
+    """True solo para la cuenta ficticia de demostración con DEMO_MODE activo."""
+    return (
+        current_user.is_authenticated
+        and current_app.config.get("DEMO_MODE")
+        and getattr(current_user, "email", None) == CUENTA_DEMO_EMAIL
+    )
+
+
 def validar_fechas_embarazo(fum_raw, fpp_raw, metodo):
     """Normaliza fechas del embarazo sin aceptar estimaciones contradictorias."""
     try:
@@ -39,6 +49,8 @@ def validar_fechas_embarazo(fum_raw, fpp_raw, metodo):
         return None, None, "Indica la fecha de última menstruación o la fecha probable de parto."
     if fum and fum > date.today():
         return None, None, "La fecha de última menstruación no puede estar en el futuro."
+    if not fum and fpp and fpp <= date.today():
+        return None, None, "La fecha probable de parto debe ser futura."
     if metodo == "fum" and fum:
         return fum, fum + timedelta(days=280), None
     if fum and fpp:
@@ -79,7 +91,7 @@ def embarazo():
                     db.session.rollback()
                     flash('No fue posible guardar la información del embarazo.', 'error')
     controles = controles_activos(activo)
-    semana = calcular_semana_gestacional(activo.fum, activo.fpp) if activo else None
+    semana = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
     proximo = next((control for control in controles if control.fecha_control >= date.today() and control.estado in {'programado', 'reprogramado'}), None)
     return render_template(
         'embarazo.html',
@@ -97,49 +109,174 @@ def embarazo():
 @main_bp.route('/controles')
 @login_required
 def controles():
-    _, activo = perfil_y_embarazo(current_user.id)
+    perfil, activo = perfil_y_embarazo(current_user.id)
     controles = controles_activos(activo)
     hoy = date.today()
     proximos = [control for control in controles if control.fecha_control >= hoy and control.estado in {'programado', 'reprogramado'}]
     proximo = min(proximos, key=lambda control: (control.fecha_control, control.hora_control or datetime.min.time()), default=None)
-    anteriores = [control for control in reversed(controles) if control is not proximo]
-    return render_template('controles.html', embarazo=activo, controles=controles, proximo=proximo, anteriores=anteriores)
+    anteriores = [c for c in reversed(controles) if c.fecha_control < hoy or c.estado in ('realizado', 'cancelado')]
+    dias_para_proximo = (proximo.fecha_control - hoy).days if proximo else None
+    return render_template('controles.html', embarazo=activo, controles=controles, proximo=proximo, anteriores=anteriores, dias_para_proximo=dias_para_proximo)
+
+
+def _resolver_centro_input(texto, centros):
+    """Resuelve un centro a partir del texto ingresado con datalist o texto libre.
+
+    Retorna (centro_id, nombre_personalizado):
+    - Coincide con centro registrado: (centro.id, None)
+    - Puesto libre o comunitario: (None, texto_limpio)
+    - Vacío: (None, None)
+    """
+    if not texto:
+        return None, None
+    raw = texto.strip()
+    if not raw:
+        return None, None
+
+    # Compatibilidad con envíos directos de id numérico
+    if raw.isdigit():
+        cid = int(raw)
+        for c in centros:
+            if getattr(c, 'id', None) == cid:
+                return cid, None
+        if centro_activo(cid):
+            return cid, None
+
+    raw_lower = raw.lower()
+    for c in centros:
+        c_nom = (getattr(c, 'nombre', None) or '').strip()
+        c_mun = (getattr(c, 'municipio', None) or '').strip()
+        c_completo = f"{c_nom} ({c_mun})".lower() if c_mun else c_nom.lower()
+        if raw_lower == c_nom.lower() or raw_lower == c_completo:
+            return getattr(c, 'id', None), None
+
+    return None, raw[:150]
+
+
+def _ordenar_centros_por_zona(centros, perfil):
+    """Ordena los centros priorizando el municipio y departamento de la gestante."""
+    if not perfil or (not perfil.departamento and not perfil.municipio):
+        return list(centros)
+    dep_u = (perfil.departamento or '').strip().lower()
+    mun_u = (perfil.municipio or '').strip().lower()
+    return sorted(
+        centros,
+        key=lambda c: (
+            0 if mun_u and (getattr(c, 'municipio', None) or '').strip().lower() == mun_u else (
+                1 if dep_u and (getattr(c, 'departamento', None) or '').strip().lower() == dep_u else 2
+            ),
+            getattr(c, 'nombre', ''),
+        ),
+    )
 
 
 @main_bp.route('/controles/nuevo', methods=['GET', 'POST'])
 @login_required
 def nuevo_control():
-    _, activo = perfil_y_embarazo(current_user.id)
+    perfil, activo = perfil_y_embarazo(current_user.id)
+    if not perfil and activo and hasattr(activo, 'perfil_gestante'):
+        perfil = activo.perfil_gestante
     if not activo:
         flash('Necesitas un embarazo activo para registrar un control.', 'error')
         return redirect(url_for('main.controles'))
-    centros = centros_activos()
+    centros = _ordenar_centros_por_zona(centros_activos(), perfil)
+
+    ultimo_numero = db.session.scalar(
+        db.select(db.func.max(ControlPrenatal.numero_control)).where(ControlPrenatal.embarazo_id == activo.id)
+    ) or 0
+    siguiente_numero = ultimo_numero + 1
+
+    semana_actual = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
+
+    inicio_gestacion = None
+    if activo:
+        if activo.metodo_fpp in ("ecografia", "profesional") and activo.fpp:
+            inicio_gestacion = activo.fpp - timedelta(days=280)
+        else:
+            inicio_gestacion = activo.fum or (activo.fpp - timedelta(days=280) if activo.fpp else None)
+    inicio_gestacion_iso = inicio_gestacion.isoformat() if inicio_gestacion else ''
+
     if request.method == 'POST':
         try:
-            numero = int(request.form.get('numero_control', ''))
-            edad = request.form.get('edad_gestacional') or None
-            edad = float(edad) if edad else None
+            numero_raw = (request.form.get('numero_control') or '').strip()
+            numero = int(numero_raw) if numero_raw else siguiente_numero
             fecha_control = date.fromisoformat(request.form.get('fecha_control', ''))
             hora_raw = request.form.get('hora_control') or None
             hora_control = time.fromisoformat(hora_raw) if hora_raw else None
-            centro_id = int(request.form.get('centro_atencion_id')) if request.form.get('centro_atencion_id') else None
+
+            centro_input_raw = (request.form.get('centro_nombre_input') or request.form.get('centro_atencion_id') or '').strip()
+            if centro_input_raw == 'otro':
+                centro_input_raw = (request.form.get('centro_otro_nombre') or '').strip() or 'Puesto de salud comunitario'
+
+            centro_id, centro_personalizado = _resolver_centro_input(centro_input_raw, centros)
             estado = request.form.get('estado', 'programado')
-            if numero < 1 or (edad is not None and not 0 <= edad <= 45) or estado not in {'programado', 'realizado', 'reprogramado', 'cancelado'} or (centro_id and not centro_activo(centro_id)):
+
+            edad_raw = request.form.get('edad_gestacional') or None
+            if edad_raw:
+                edad = float(edad_raw)
+            else:
+                edad_calc = calcular_semana_gestacional(activo.fum, activo.fpp, hoy=fecha_control, metodo_fpp=activo.metodo_fpp) if activo else None
+                edad = float(edad_calc) if edad_calc is not None else None
+
+            tipo_control = (request.form.get('tipo_control') or '').strip()
+            indicaciones_texto = (request.form.get('indicaciones') or '').strip()
+
+            partes_indicaciones = []
+            if tipo_control and tipo_control != 'Control prenatal regular':
+                partes_indicaciones.append(f"[{tipo_control}]")
+            if centro_personalizado:
+                partes_indicaciones.append(f"[Centro: {centro_personalizado}]")
+            if indicaciones_texto:
+                partes_indicaciones.append(indicaciones_texto)
+
+            indicaciones_final = " ".join(partes_indicaciones).strip() or None
+            notas_final = (request.form.get('notas') or '').strip() or None
+
+            if numero < 1 or (edad is not None and not 0 <= edad <= 45) or estado not in {'programado', 'realizado', 'reprogramado', 'cancelado'}:
                 raise ValueError
-            db.session.add(ControlPrenatal(embarazo_id=activo.id, registrado_por_usuario_id=current_user.id, numero_control=numero, fecha_control=fecha_control, hora_control=hora_control, edad_gestacional_semanas=edad, centro_atencion_id=centro_id, estado=estado, indicaciones=request.form.get('indicaciones') or None, notas=request.form.get('notas') or None))
+
+            db.session.add(ControlPrenatal(
+                embarazo_id=activo.id,
+                registrado_por_usuario_id=current_user.id,
+                numero_control=numero,
+                fecha_control=fecha_control,
+                hora_control=hora_control,
+                edad_gestacional_semanas=edad,
+                centro_atencion_id=centro_id,
+                estado=estado,
+                indicaciones=indicaciones_final,
+                notas=notas_final
+            ))
             db.session.commit()
+            flash('Control agendado con éxito.', 'success')
             return redirect(url_for('main.controles'))
         except (ValueError, TypeError):
             flash('Revisa los datos del control.', 'error')
         except SQLAlchemyError:
-            db.session.rollback(); flash('Ya existe ese número de control.', 'error')
-    return render_template('control_form.html', centros=centros, control=None, form_data=request.form if request.method == 'POST' else None)
+            db.session.rollback()
+            flash('Ya existe ese número de control.', 'error')
+
+    centro_nombre_valor = request.form.get('centro_nombre_input', '') if request.method == 'POST' else ''
+
+    return render_template(
+        'control_form.html',
+        centros=centros,
+        centro_nombre_valor=centro_nombre_valor,
+        control=None,
+        siguiente_numero=siguiente_numero,
+        semana_actual=semana_actual,
+        inicio_gestacion_iso=inicio_gestacion_iso,
+        tipo_control_actual='Control prenatal regular',
+        form_data=request.form if request.method == 'POST' else None
+    )
 
 
 @main_bp.route('/controles/<int:control_id>/editar', methods=['GET', 'POST'])
 @login_required
 def editar_control(control_id):
-    _, activo = perfil_y_embarazo(current_user.id)
+    perfil, activo = perfil_y_embarazo(current_user.id)
+    if not perfil and activo and hasattr(activo, 'perfil_gestante'):
+        perfil = activo.perfil_gestante
     control = db.session.scalar(
         db.select(ControlPrenatal).where(
             ControlPrenatal.id == control_id,
@@ -149,23 +286,72 @@ def editar_control(control_id):
     if not control:
         abort(404)
 
-    centros = centros_activos()
+    centros = _ordenar_centros_por_zona(centros_activos(), perfil)
+    semana_actual = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
+
+    inicio_gestacion = None
+    if activo:
+        if activo.metodo_fpp in ("ecografia", "profesional") and activo.fpp:
+            inicio_gestacion = activo.fpp - timedelta(days=280)
+        else:
+            inicio_gestacion = activo.fum or (activo.fpp - timedelta(days=280) if activo.fpp else None)
+    inicio_gestacion_iso = inicio_gestacion.isoformat() if inicio_gestacion else ''
+
+    tipo_control_actual = 'Control prenatal regular'
+    indicaciones_limpias = control.indicaciones or ''
+    for opcion in ['Ultrasonido / Ecografía', 'Exámenes de laboratorio', 'Control prenatal regular']:
+        prefijo = f"[{opcion}]"
+        if indicaciones_limpias.startswith(prefijo):
+            tipo_control_actual = opcion
+            indicaciones_limpias = indicaciones_limpias[len(prefijo):].strip()
+            break
+
+    centro_otro_actual = ''
+    if '[Centro:' in indicaciones_limpias or '[Centro: ' in indicaciones_limpias:
+        m = re.search(r'\[Centro:\s*([^\]]+)\]', indicaciones_limpias)
+        if m:
+            centro_otro_actual = m.group(1).strip()
+            indicaciones_limpias = re.sub(r'\[Centro:\s*[^\]]+\]', '', indicaciones_limpias).strip()
+
     if request.method == 'POST':
         try:
             fecha_control = date.fromisoformat(request.form.get('fecha_control', ''))
             hora_raw = request.form.get('hora_control') or None
             estado = request.form.get('estado', '')
-            centro_raw = request.form.get('centro_atencion_id') or None
+
+            centro_input_raw = (request.form.get('centro_nombre_input') or request.form.get('centro_atencion_id') or '').strip()
+            if centro_input_raw == 'otro':
+                centro_input_raw = (request.form.get('centro_otro_nombre') or '').strip() or 'Puesto de salud comunitario'
+
+            centro_id, centro_personalizado = _resolver_centro_input(centro_input_raw, centros)
             if estado not in {'programado', 'realizado', 'reprogramado', 'cancelado'}:
                 raise ValueError
-            if centro_raw and not centro_activo(int(centro_raw)):
-                raise ValueError
+
+            tipo_control = (request.form.get('tipo_control') or '').strip()
+            indicaciones_texto = (request.form.get('indicaciones') or '').strip()
+
+            partes_indicaciones = []
+            if tipo_control and tipo_control != 'Control prenatal regular':
+                partes_indicaciones.append(f"[{tipo_control}]")
+            if centro_personalizado:
+                partes_indicaciones.append(f"[Centro: {centro_personalizado}]")
+            if indicaciones_texto:
+                partes_indicaciones.append(indicaciones_texto)
+
+            indicaciones_final = " ".join(partes_indicaciones).strip() or None
+
             control.fecha_control = fecha_control
             control.hora_control = time.fromisoformat(hora_raw) if hora_raw else None
             control.estado = estado
-            control.centro_atencion_id = int(centro_raw) if centro_raw else None
-            control.indicaciones = request.form.get('indicaciones') or None
-            control.notas = request.form.get('notas') or None
+            control.centro_atencion_id = centro_id
+            control.indicaciones = indicaciones_final
+            control.notas = (request.form.get('notas') or '').strip() or None
+
+            if activo and (activo.fum or activo.fpp):
+                edad_calc = calcular_semana_gestacional(activo.fum, activo.fpp, hoy=fecha_control, metodo_fpp=activo.metodo_fpp)
+                if edad_calc is not None:
+                    control.edad_gestacional_semanas = float(edad_calc)
+
             db.session.commit()
             flash('Control actualizado.', 'success')
             return redirect(url_for('main.controles'))
@@ -175,9 +361,438 @@ def editar_control(control_id):
         except SQLAlchemyError:
             db.session.rollback()
             flash('No fue posible actualizar el control.', 'error')
-        return render_template('control_form.html', centros=centros, control=control, form_data=request.form)
 
-    return render_template('control_form.html', centros=centros, control=control, form_data=None)
+    semana_estimada_control = int(control.edad_gestacional_semanas) if control.edad_gestacional_semanas is not None else None
+
+    if request.method == 'POST':
+        centro_nombre_valor = request.form.get('centro_nombre_input', '')
+    else:
+        c_atencion = getattr(control, 'centro_atencion', None)
+        if c_atencion:
+            c_mun = (getattr(c_atencion, 'municipio', None) or '').strip()
+            centro_nombre_valor = f"{c_atencion.nombre} ({c_mun})" if c_mun else c_atencion.nombre
+        elif getattr(control, 'centro_atencion_id', None):
+            c_obj = centro_activo(control.centro_atencion_id)
+            if c_obj:
+                c_mun = (getattr(c_obj, 'municipio', None) or '').strip()
+                centro_nombre_valor = f"{c_obj.nombre} ({c_mun})" if c_mun else c_obj.nombre
+            else:
+                centro_nombre_valor = ''
+        elif centro_otro_actual:
+            centro_nombre_valor = centro_otro_actual
+        else:
+            centro_nombre_valor = ''
+
+    return render_template(
+        'control_form.html',
+        centros=centros,
+        centro_nombre_valor=centro_nombre_valor,
+        control=control,
+        siguiente_numero=control.numero_control,
+        semana_actual=semana_actual,
+        semana_estimada=semana_estimada_control,
+        inicio_gestacion_iso=inicio_gestacion_iso,
+        tipo_control_actual=tipo_control_actual,
+        indicaciones_limpias=indicaciones_limpias,
+        form_data=request.form if request.method == 'POST' else None
+    )
+
+
+@main_bp.get('/consulta/imprimir')
+@login_required
+def imprimir_consulta():
+    """Hoja imprimible con logística y preguntas pendientes de la cuenta."""
+    if not _usuario_gestante():
+        abort(403)
+    control = construir_inicio(current_user.id)["control"]
+    if not control:
+        flash('No tienes una próxima consulta para preparar.', 'error')
+        return redirect(url_for('main.index'))
+    preguntas = db.session.scalars(
+        db.select(PreguntaConsulta)
+        .where(
+            PreguntaConsulta.usuario_id == current_user.id,
+            PreguntaConsulta.estado == 'pendiente',
+        )
+        .order_by(PreguntaConsulta.id)
+    ).all()
+    return render_template('consulta_impresa.html', control=control, preguntas=preguntas)
+
+
+@main_bp.get('/consulta/preparar')
+@login_required
+def detalle_consulta():
+    if not _usuario_gestante():
+        abort(403)
+    control = construir_inicio(current_user.id)["control"]
+    if not control:
+        flash('No tienes una próxima consulta para preparar.', 'error')
+        return redirect(url_for('main.index'))
+    return render_template('consulta_detalle.html', control=control)
+
+
+PLAN_PARTO_TRANSPORTES = {
+    'propio': 'Vehículo propio',
+    'familiar_vecino': 'Apoyo de familiar o vecino',
+    'publico_colectivo': 'Transporte público / bus / panga',
+    'caponera_taxi': 'Taxi o caponera local',
+    'ambulancia_minsa': 'Coordinación con ambulancia del MINSA',
+    'otro': 'Otro medio acordado',
+}
+
+
+@main_bp.route('/plan-parto', methods=['GET', 'POST'])
+@login_required
+def plan_parto():
+    """Visualización y edición de la logística familiar para acudir a la atención."""
+    if not _usuario_gestante():
+        abort(403)
+
+    perfil, activo = perfil_y_embarazo(current_user.id)
+    if not activo:
+        flash('Necesitas un embarazo registrado para organizar tu traslado y apoyo.', 'error')
+        return redirect(url_for('main.embarazo'))
+
+    plan = activo.plan_parto
+    centros = centros_activos()
+    modo_editar = request.args.get('editar') == '1' or not plan or request.method == 'POST'
+
+    if request.method == 'POST':
+        centro_raw = (request.form.get('centro_atencion_id') or '').strip()
+        centro_id = request.form.get('centro_atencion_id', type=int)
+        casa_materna = 1 if request.form.get('requiere_casa_materna') in ('1', 'on', 'true') else 0
+        acompanante_nombre = (request.form.get('acompanante_nombre') or '').strip()[:150] or None
+        acompanante_tel = (request.form.get('acompanante_telefono') or '').strip()[:30] or None
+        cuidador = (request.form.get('cuidador_hijos') or '').strip()[:150] or None
+        transporte = request.form.get('transporte_tipo') or 'familiar_vecino'
+        transporte_contacto = (request.form.get('transporte_contacto') or '').strip()[:150] or None
+        transporte_telefono = (request.form.get('transporte_telefono') or '').strip()[:30] or None
+        if transporte_contacto and transporte_telefono:
+            transporte_contacto = f'{transporte_contacto} - {transporte_telefono}'[:150]
+        bulto = 1 if request.form.get('bulto_listo') in ('1', 'on', 'true') else 0
+        recursos = 1 if request.form.get('recursos_traslado_listos') in ('1', 'on', 'true') else 0
+        notas = (request.form.get('notas') or '').strip()[:500] or None
+
+        if transporte not in PLAN_PARTO_TRANSPORTES:
+            flash('Selecciona un medio de transporte válido.', 'error')
+            return render_template('plan_parto.html', plan=plan, embarazo=activo, centros=centros, contactos=perfil.contactos_comunitarios if perfil else [], roles=ROLES_COMUNITARIOS, transportes=PLAN_PARTO_TRANSPORTES, editar=True, form_data=request.form)
+
+        if (centro_raw and centro_id is None) or (centro_id and not centro_activo(centro_id)):
+            flash('El centro de atención seleccionado no es válido.', 'error')
+            return render_template('plan_parto.html', plan=plan, embarazo=activo, centros=centros, contactos=perfil.contactos_comunitarios if perfil else [], roles=ROLES_COMUNITARIOS, transportes=PLAN_PARTO_TRANSPORTES, editar=True, form_data=request.form)
+
+        try:
+            if not plan:
+                plan = PlanParto(embarazo_id=activo.id)
+                db.session.add(plan)
+
+            plan.centro_atencion_id = centro_id
+            plan.requiere_casa_materna = casa_materna
+            plan.acompanante_nombre = acompanante_nombre
+            plan.acompanante_telefono = acompanante_tel
+            plan.cuidador_hijos = cuidador
+            plan.transporte_tipo = transporte
+            plan.transporte_contacto = transporte_contacto
+            plan.bulto_listo = bulto
+            plan.recursos_traslado_listos = recursos
+            plan.notas = notas
+
+            db.session.commit()
+            flash('Plan de traslado y apoyo guardado.', 'success')
+            return redirect(url_for('main.plan_parto'))
+        except SQLAlchemyError:
+            db.session.rollback()
+            flash('No fue posible guardar el plan de traslado y apoyo.', 'error')
+            return render_template('plan_parto.html', plan=plan, embarazo=activo, centros=centros, contactos=perfil.contactos_comunitarios if perfil else [], roles=ROLES_COMUNITARIOS, transportes=PLAN_PARTO_TRANSPORTES, editar=True, form_data=request.form)
+
+    return render_template(
+        'plan_parto.html',
+        plan=plan,
+        embarazo=activo,
+        centros=centros,
+        contactos=perfil.contactos_comunitarios if perfil else [],
+        roles=ROLES_COMUNITARIOS,
+        transportes=PLAN_PARTO_TRANSPORTES,
+        editar=modo_editar and (not plan or request.args.get('editar') == '1'),
+    )
+
+
+@main_bp.get('/plan-parto/imprimir')
+@login_required
+def imprimir_plan_parto():
+    """Ficha imprimible con la logística y contactos elegidos por la usuaria."""
+    if not _usuario_gestante():
+        abort(403)
+
+    perfil, activo = perfil_y_embarazo(current_user.id)
+    if not activo or not activo.plan_parto:
+        flash('Registra primero tu plan de traslado y apoyo para poder imprimirlo.', 'error')
+        return redirect(url_for('main.plan_parto'))
+
+    semana = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp)
+    return render_template(
+        'plan_parto_impreso.html',
+        plan=activo.plan_parto,
+        embarazo=activo,
+        perfil=perfil,
+        semana=semana,
+        transportes=PLAN_PARTO_TRANSPORTES,
+        roles=ROLES_COMUNITARIOS,
+    )
+
+
+ROLES_COMUNITARIOS = {
+    'brigadista': 'Contacto comunitario',
+    'partera': 'Acompañante de confianza',
+    'promotor_salud': 'Persona de apoyo',
+    'traslado_local': 'Transporte',
+    'lider_comunitario': 'Referente comunitario',
+    'vecino_apoyo': 'Familiar, vecina o vecino',
+    'otro': 'Otro contacto',
+}
+
+
+def _validar_contacto_comunitario(form):
+    """Normaliza y valida los campos de un contacto de la red de apoyo."""
+    datos = {
+        'nombre': (form.get('nombre') or '').strip(),
+        'rol': (form.get('rol') or '').strip(),
+        'telefono': (form.get('telefono') or '').strip(),
+        'comunidad_barrio': (form.get('comunidad_barrio') or '').strip(),
+        'notas': (form.get('notas') or '').strip(),
+    }
+    if (
+        not datos['nombre']
+        or len(datos['nombre']) > 150
+        or datos['rol'] not in ROLES_COMUNITARIOS
+        or len(datos['telefono']) > 30
+        or len(datos['comunidad_barrio']) > 150
+        or len(datos['notas']) > 255
+    ):
+        return None, 'Revisa el nombre, el rol y la longitud de los campos del contacto.'
+    for campo in ('telefono', 'comunidad_barrio', 'notas'):
+        datos[campo] = datos[campo] or None
+    return datos, None
+
+
+def _contacto_propio(contacto_id, perfil):
+    """Busca un contacto verificando que pertenezca al perfil autenticado."""
+    return db.session.scalar(
+        db.select(ContactoComunitario).where(
+            ContactoComunitario.id == contacto_id,
+            ContactoComunitario.perfil_gestante_id == (perfil.id if perfil else None),
+        )
+    )
+
+
+@main_bp.get('/red-comunitaria')
+@login_required
+def red_comunitaria():
+    """Contactos personales elegidos por la usuaria para acompañamiento y traslado."""
+    if not _usuario_gestante():
+        abort(403)
+    perfil, activo = perfil_y_embarazo(current_user.id)
+    contactos = perfil.contactos_comunitarios if perfil else []
+    return render_template(
+        'red_comunitaria.html',
+        perfil=perfil,
+        embarazo=activo,
+        contactos=contactos,
+        roles=ROLES_COMUNITARIOS,
+    )
+
+
+@main_bp.route('/red-comunitaria/nuevo', methods=['GET', 'POST'])
+@login_required
+def nuevo_contacto_comunitario():
+    if not _usuario_gestante():
+        abort(403)
+    perfil, _ = perfil_y_embarazo(current_user.id)
+    if not perfil:
+        flash('Necesitas un perfil gestante para registrar tu red de apoyo.', 'error')
+        return redirect(url_for('main.embarazo'))
+    if request.method == 'POST':
+        datos, error = _validar_contacto_comunitario(request.form)
+        if error:
+            flash(error, 'error')
+        else:
+            try:
+                db.session.add(ContactoComunitario(perfil_gestante_id=perfil.id, **datos))
+                db.session.commit()
+                flash('Contacto de apoyo agregado.', 'success')
+                return redirect(url_for('main.red_comunitaria'))
+            except SQLAlchemyError:
+                db.session.rollback()
+                flash('No fue posible guardar el contacto.', 'error')
+    return render_template(
+        'contacto_comunitario_form.html',
+        contacto=None,
+        roles=ROLES_COMUNITARIOS,
+        form_data=request.form if request.method == 'POST' else None,
+    )
+
+
+@main_bp.route('/red-comunitaria/<int:contacto_id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_contacto_comunitario(contacto_id):
+    if not _usuario_gestante():
+        abort(403)
+    perfil, _ = perfil_y_embarazo(current_user.id)
+    contacto = _contacto_propio(contacto_id, perfil)
+    if not contacto:
+        abort(404)
+    if request.method == 'POST':
+        datos, error = _validar_contacto_comunitario(request.form)
+        if error:
+            flash(error, 'error')
+        else:
+            contacto.nombre = datos['nombre']
+            contacto.rol = datos['rol']
+            contacto.telefono = datos['telefono']
+            contacto.comunidad_barrio = datos['comunidad_barrio']
+            contacto.notas = datos['notas']
+            try:
+                db.session.commit()
+                flash('Contacto actualizado.', 'success')
+                return redirect(url_for('main.red_comunitaria'))
+            except SQLAlchemyError:
+                db.session.rollback()
+                flash('No fue posible actualizar el contacto.', 'error')
+    return render_template(
+        'contacto_comunitario_form.html',
+        contacto=contacto,
+        roles=ROLES_COMUNITARIOS,
+        form_data=request.form if request.method == 'POST' else None,
+    )
+
+
+@main_bp.post('/red-comunitaria/<int:contacto_id>/eliminar')
+@login_required
+def eliminar_contacto_comunitario(contacto_id):
+    if not _usuario_gestante():
+        abort(403)
+    perfil, _ = perfil_y_embarazo(current_user.id)
+    contacto = _contacto_propio(contacto_id, perfil)
+    if not contacto:
+        abort(404)
+    try:
+        db.session.delete(contacto)
+        db.session.commit()
+        flash('Contacto eliminado.', 'success')
+    except SQLAlchemyError:
+        db.session.rollback()
+        flash('No fue posible eliminar el contacto.', 'error')
+    return redirect(url_for('main.red_comunitaria'))
+
+
+PREGUNTA_MAX_CARACTERES = 500
+
+
+def _renderizar_preguntas(pregunta_borrador="", editar_id=None, error=None, status=200, preguntas=None):
+    if preguntas is None:
+        preguntas = db.session.scalars(
+            db.select(PreguntaConsulta)
+            .where(PreguntaConsulta.usuario_id == current_user.id)
+            .order_by(PreguntaConsulta.estado, PreguntaConsulta.id)
+        ).all()
+    return render_template(
+        'preguntas.html',
+        preguntas=preguntas,
+        pregunta_borrador=pregunta_borrador,
+        editar_id=editar_id,
+        pregunta_error=error,
+        max_caracteres=PREGUNTA_MAX_CARACTERES,
+    ), status
+
+
+@main_bp.route('/preguntas', methods=['GET', 'POST'])
+@login_required
+def preguntas_consulta():
+    if not _usuario_gestante():
+        abort(403)
+    if request.method == 'GET':
+        editar_id = request.args.get('editar', type=int)
+        if editar_id is not None:
+            pregunta = db.session.scalar(
+                db.select(PreguntaConsulta).where(
+                    PreguntaConsulta.id == editar_id,
+                    PreguntaConsulta.usuario_id == current_user.id,
+                    PreguntaConsulta.estado == 'pendiente',
+                )
+            )
+            if pregunta is None:
+                abort(404)
+        return _renderizar_preguntas(editar_id=editar_id)
+
+    pregunta = (request.form.get('pregunta') or '').strip()
+    if not pregunta or len(pregunta) > PREGUNTA_MAX_CARACTERES:
+        return _renderizar_preguntas(
+            pregunta,
+            error=f'Escribe una pregunta de hasta {PREGUNTA_MAX_CARACTERES} caracteres.',
+            status=400,
+        )
+    try:
+        db.session.add(PreguntaConsulta(usuario_id=current_user.id, pregunta=pregunta, estado='pendiente'))
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        return _renderizar_preguntas(
+            pregunta,
+            error='No fue posible guardar. Conservamos el texto para que puedas intentarlo de nuevo.',
+            status=503,
+        )
+    flash('Pregunta guardada para una próxima consulta.', 'success')
+    return redirect(url_for('main.preguntas_consulta'))
+
+
+@main_bp.post('/preguntas/<int:pregunta_id>')
+@login_required
+def actualizar_pregunta(pregunta_id):
+    if not _usuario_gestante():
+        abort(403)
+    pregunta_guardada = db.session.scalar(
+        db.select(PreguntaConsulta).where(
+            PreguntaConsulta.id == pregunta_id,
+            PreguntaConsulta.usuario_id == current_user.id,
+        )
+    )
+    if not pregunta_guardada:
+        abort(404)
+
+    accion = request.form.get('accion')
+    if accion == 'editar':
+        pregunta = (request.form.get('pregunta') or '').strip()
+        if not pregunta or len(pregunta) > PREGUNTA_MAX_CARACTERES:
+            return _renderizar_preguntas(
+                pregunta,
+                editar_id=pregunta_id,
+                error=f'Escribe una pregunta de hasta {PREGUNTA_MAX_CARACTERES} caracteres.',
+                status=400,
+            )
+        pregunta_guardada.pregunta = pregunta
+    elif accion == 'estado':
+        estado = request.form.get('estado')
+        if estado not in {'pendiente', 'conversada'}:
+            abort(400)
+        pregunta_guardada.estado = estado
+    elif accion == 'eliminar':
+        db.session.delete(pregunta_guardada)
+    else:
+        abort(400)
+
+    try:
+        db.session.commit()
+    except SQLAlchemyError:
+        db.session.rollback()
+        draft = request.form.get('pregunta', '') if accion == 'editar' else ''
+        return _renderizar_preguntas(
+            draft,
+            editar_id=pregunta_id if accion == 'editar' else None,
+            error='No fue posible guardar el cambio. Inténtalo de nuevo.',
+            status=503,
+        )
+    flash('Pregunta eliminada.' if accion == 'eliminar' else 'Pregunta actualizada.', 'success')
+    return redirect(url_for('main.preguntas_consulta'))
 
 
 @main_bp.route('/calendario')
@@ -253,13 +868,60 @@ def nuevo_recordatorio():
 
 @main_bp.route('/guia')
 def guia():
-    trimestre = request.args.get('trimestre', type=int)
-    categoria = (request.args.get('categoria') or '').strip()[:80]
     activo = None
     if current_user.is_authenticated:
         _, activo = perfil_y_embarazo(current_user.id)
-    semana = calcular_semana_gestacional(activo.fum, activo.fpp) if activo else None
-    return render_template('guia.html', contenidos=contenidos_publicados(trimestre, categoria), trimestre=trimestre, categoria=categoria, semana=semana)
+    semana = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
+
+    publicados = contenidos_publicados()
+    orientaciones = [
+        {
+            "id": f"pub-{c.id}",
+            "titulo": c.titulo,
+            "resumen": c.resumen or "",
+            "cuerpo": c.contenido,
+            "categoria": c.categoria,
+            "trimestre": c.trimestre,
+            "fuente_nombre": c.fuente_nombre,
+            "fuente_url": c.fuente_url,
+            "fecha_revision": c.fecha_revision.strftime('%d/%m/%Y') if c.fecha_revision else None,
+            "es_borrador": False,
+        }
+        for c in publicados
+    ]
+
+    borradores = []
+    if _es_cuenta_demo():
+        borradores = [
+            {
+                **item,
+                "fuente_nombre": FUENTES.get(item["fuente"], {}).get("nombre", "Fuente sin registrar"),
+                "fuente_url": FUENTES.get(item["fuente"], {}).get("url", "#"),
+            }
+            for item in BORRADORES
+        ]
+        for item in borradores:
+            orientaciones.append({
+                "id": f"demo-{item['id']}",
+                "titulo": item["titulo"],
+                "resumen": item["texto"][:120] + ("…" if len(item["texto"]) > 120 else ""),
+                "cuerpo": item["texto"],
+                "categoria": item["categoria"].capitalize(),
+                "trimestre": None,
+                "fuente_nombre": item["fuente_nombre"],
+                "fuente_url": item["fuente_url"],
+                "fecha_revision": f"consultada {FECHA_CONSULTA}",
+                "es_borrador": True,
+            })
+
+    return render_template(
+        'guia.html',
+        orientaciones=orientaciones,
+        contenidos=publicados,
+        borradores=borradores,
+        fecha_consulta=FECHA_CONSULTA,
+        semana=semana,
+    )
 
 
 @main_bp.route('/guia/<int:contenido_id>')
@@ -274,7 +936,25 @@ def alertas():
 
 @main_bp.route('/centros')
 def centros():
-    return render_template('centros.html', centros=centros_activos((request.args.get('q') or '').strip(), (request.args.get('tipo') or '').strip()), q=(request.args.get('q') or '').strip()[:80], tipo=(request.args.get('tipo') or '').strip())
+    centros = centros_activos()
+    departamentos = sorted(list(set(c.departamento for c in centros if getattr(c, "departamento", None))))
+
+    departamento_usuario = None
+    if current_user.is_authenticated:
+        perfil, _ = perfil_y_embarazo(current_user.id)
+        if perfil and perfil.departamento:
+            departamento_usuario = perfil.departamento
+
+    return render_template(
+        'centros.html',
+        centros=centros,
+        departamentos=departamentos,
+        departamento_usuario=departamento_usuario,
+        es_demo=_es_cuenta_demo(),
+        q=(request.args.get('q') or '').strip()[:80],
+        tipo=(request.args.get('tipo') or '').strip(),
+        departamento=(request.args.get('departamento') or '').strip()[:100],
+    )
 
 
 @main_bp.route('/centros/<int:centro_id>')
@@ -307,7 +987,7 @@ def perfil():
             nacimiento = None
             fecha_invalida = True
         if fecha_invalida:
-            semana = calcular_semana_gestacional(embarazo_actual.fum, embarazo_actual.fpp) if embarazo_actual else None
+            semana = calcular_semana_gestacional(embarazo_actual.fum, embarazo_actual.fpp, metodo_fpp=embarazo_actual.metodo_fpp) if embarazo_actual else None
             return render_template(
                 'perfil.html',
                 perfil=perfil_actual,
@@ -319,7 +999,9 @@ def perfil():
                 date=date.today(),
             )
         perfil_actual = perfil_actual or PerfilGestante(usuario_id=current_user.id)
-        perfil_actual.cedula = (request.form.get('cedula') or '').strip()[:20] or None
+        nueva_cedula = (request.form.get('cedula') or '').strip()[:20] or None
+        if nueva_cedula is not None or not perfil_actual.cedula:
+            perfil_actual.cedula = nueva_cedula
         perfil_actual.fecha_nacimiento = nacimiento
         perfil_actual.telefono = (request.form.get('telefono') or '').strip()[:30] or None
         perfil_actual.direccion_residencia = (request.form.get('direccion_residencia') or '').strip() or None
@@ -327,8 +1009,12 @@ def perfil():
         perfil_actual.departamento = (request.form.get('departamento') or '').strip()[:100] or None
         perfil_actual.contacto_emergencia_nombre = (request.form.get('contacto_emergencia_nombre') or '').strip()[:150] or None
         perfil_actual.contacto_emergencia_telefono = (request.form.get('contacto_emergencia_telefono') or '').strip()[:30] or None
-        perfil_actual.consentimiento_datos = int(consentimiento)
-        perfil_actual.fecha_consentimiento = datetime.now() if consentimiento == '1' else None
+        nuevo_consentimiento = int(consentimiento)
+        if nuevo_consentimiento == 1 and not perfil_actual.consentimiento_datos:
+            perfil_actual.fecha_consentimiento = datetime.now()
+        elif nuevo_consentimiento == 0:
+            perfil_actual.fecha_consentimiento = None
+        perfil_actual.consentimiento_datos = nuevo_consentimiento
         if not perfil_actual.id: db.session.add(perfil_actual)
         try:
             db.session.commit()
@@ -341,7 +1027,7 @@ def perfil():
     cedula = None
     if perfil_actual and perfil_actual.cedula:
         cedula = '*' * max(0, len(perfil_actual.cedula) - 4) + perfil_actual.cedula[-4:]
-    semana = calcular_semana_gestacional(embarazo_actual.fum, embarazo_actual.fpp) if embarazo_actual else None
+    semana = calcular_semana_gestacional(embarazo_actual.fum, embarazo_actual.fpp, metodo_fpp=embarazo_actual.metodo_fpp) if embarazo_actual else None
     return render_template(
         'perfil.html',
         perfil=perfil_actual,
@@ -356,8 +1042,6 @@ def perfil():
 @main_bp.post('/perfil/cambiar-password')
 @login_required
 def cambiar_password():
-    if not _usuario_gestante():
-        abort(403)
     actual = request.form.get('password_actual', '')
     nueva = request.form.get('password_nueva', '')
     confirmacion = request.form.get('password_confirm', '')
@@ -403,6 +1087,9 @@ def fuentes():
             'Las señales de alerta y recomendaciones deben revisarse con profesionales de la salud antes de usarse en un contexto real.',
             'El contenido publicado incluye la fuente y la fecha de revisión registrada por el equipo administrador.',
         ],
+        contexto=CONTEXTO,
+        fuentes=FUENTES,
+        fecha_consulta=FECHA_CONSULTA,
     )
 
 
@@ -427,9 +1114,10 @@ def acerca():
         titulo='Acerca de Aurora',
         icono='help',
         contenido=[
-            'Aurora es un prototipo de acompañamiento prenatal desarrollado para organizar información, controles y recordatorios.',
-            'No diagnostica, no prescribe y no sustituye la atención de profesionales de la salud.',
-            'Versión de demostración para recibir comentarios de gestantes y profesionales.',
+            'Aurora es un puente organizativo entre la vida diaria de una gestante y su atención prenatal.',
+            'Ayuda a recordar controles, preparar preguntas y coordinar el traslado y las personas de apoyo elegidas por la usuaria.',
+            'No interpreta síntomas, diagnostica, prescribe, recomienda tratamientos ni reemplaza al personal o a los servicios de salud.',
+            'Es una demostración para validar si estas tareas simples ayudan a llegar mejor preparada y acompañada a la atención profesional.',
         ],
     )
 

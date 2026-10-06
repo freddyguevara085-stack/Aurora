@@ -7,5 +7,6 @@
   <h1>{{ titulo }}</h1>
   <p>{{ mensaje }}</p>
   <a class="button button--primary button--wide" href="{{ url_for('main.index') if current_user.is_authenticated else url_for('auth.login') }}">Volver a Aurora</a>
+  {% if reintentar %}<a class="button button--secondary button--wide" href="{{ request.path }}" style="margin-top:8px;">Reintentar</a>{% endif %}
 </main>
 {% endblock %}

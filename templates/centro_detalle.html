@@ -2,7 +2,7 @@
 {% block title %}{{ centro.nombre }} | Aurora{% endblock %}
 
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell">
+<main id="main" tabindex="-1" class="app-shell aurora-page-container">
     {% set back_url = url_for('main.centros') %}
     {% set back_label = 'Centros de salud' %}
     {% set page_title = 'Detalles del Centro' %}
@@ -26,7 +26,7 @@
     </section>
     {% endif %}
 
-    <article class="card" style="margin-bottom: 24px;">
+    <article class="card aurora-card" style="margin-bottom: 24px;">
         <div style="margin-bottom: 16px;">
             <span class="status-badge status-badge--success" style="text-transform: capitalize;">
                 {{ centro.tipo_establecimiento|replace('_', ' ') }}
@@ -76,7 +76,7 @@
     </article>
 
     <h2 class="eyebrow" style="margin-bottom: 12px;">SERVICIOS DISPONIBLES</h2>
-    <div class="card" style="padding: 20px;">
+    <div class="card aurora-card" style="padding: 20px;">
         {% if servicios %}
             <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                 {% for servicio in servicios %}

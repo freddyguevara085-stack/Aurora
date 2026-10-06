@@ -1,0 +1,49 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ 'Editar contacto' if contacto else 'Nuevo contacto' }} | Aurora{% endblock %}
+{% block content %}
+<main id="main" tabindex="-1" class="app-shell section-shell community-page aurora-page-container">
+  {% set back_url = url_for('main.red_comunitaria') %}
+  {% set back_label = 'Volver a mi red de apoyo' %}
+  {% set page_title = 'Red de apoyo' %}
+  {% include 'partials/page_header.html' %}
+
+  {% include 'partials/flash.html' %}
+
+  <section class="section-intro">
+    <h2>{{ 'Editar contacto de apoyo' if contacto else 'Agregar contacto de apoyo' }}</h2>
+    <p>Registra a una persona o transporte de confianza cuyo teléfono hayas confirmado.</p>
+  </section>
+
+  {% set values = form_data or contacto %}
+  <form class="card-surface plan-form plan-form--editor" method="post" action="{{ url_for('main.editar_contacto_comunitario', contacto_id=contacto.id) if contacto else url_for('main.nuevo_contacto_comunitario') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <fieldset class="plan-form__section">
+      <legend><span class="plan-form__icon material-symbols-outlined" aria-hidden="true">person</span><span>Datos del contacto</span></legend>
+      <label>Nombre completo
+        <input name="nombre" maxlength="150" required value="{{ values.nombre if values and values.nombre else '' }}">
+      </label>
+      <label>Tipo de apoyo
+        <select name="rol" required>
+          {% set rol_actual = values.rol if values and values.rol else 'vecino_apoyo' %}
+          {% for valor, etiqueta in roles.items() %}
+          <option value="{{ valor }}" {% if rol_actual == valor %}selected{% endif %}>{{ etiqueta }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Teléfono
+        <input name="telefono" type="tel" maxlength="30" value="{{ values.telefono if values and values.telefono else '' }}" placeholder="8888-0000">
+      </label>
+      <label>Comunidad o barrio
+        <input name="comunidad_barrio" maxlength="150" value="{{ values.comunidad_barrio if values and values.comunidad_barrio else '' }}">
+      </label>
+      <label>Notas de apoyo
+        <textarea name="notas" maxlength="255">{{ values.notas if values and values.notas else '' }}</textarea>
+      </label>
+    </fieldset>
+    <div class="plan-form__actions">
+      <button class="button button--primary button--wide" type="submit">{{ 'Guardar cambios' if contacto else 'Guardar contacto' }}</button>
+      <a class="button button--secondary button--wide" href="{{ url_for('main.red_comunitaria') }}">Cancelar</a>
+    </div>
+  </form>
+</main>
+{% endblock %}

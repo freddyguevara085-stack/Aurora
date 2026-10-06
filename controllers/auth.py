@@ -107,6 +107,8 @@ def enviar_correo_recuperacion(destinatario: str, enlace: str) -> None:
     if not servidor:
         if current_app.config.get("DEBUG"):
             print(f"Enlace de recuperación para {destinatario}: {enlace}", file=sys.stdout)
+        else:
+            current_app.logger.warning("MAIL_SERVER no configurado. No se envió correo de recuperación a %s", destinatario)
         return
 
     puerto = int(os.getenv("MAIL_PORT", "587"))
@@ -141,6 +143,18 @@ def enviar_correo_recuperacion(destinatario: str, enlace: str) -> None:
         smtp.send_message(mensaje)
 
 
+def _enmascarar_email(email: str) -> str:
+    """Oculta la parte local de un correo, dejando el dominio visible para diagnóstico."""
+    if "@" not in email:
+        return "***"
+    local, domain = email.rsplit("@", 1)
+    if not local:
+        return f"***@{domain}"
+    if len(local) == 1:
+        return f"{local[0]}***@{domain}"
+    return f"{local[0]}***{local[-1]}@{domain}"
+
+
 @auth_bp.route("/recuperar-password", methods=["GET", "POST"])
 def recuperar_password():
     if current_user.is_authenticated:
@@ -154,11 +168,12 @@ def recuperar_password():
                 payload = {"email": usuario.email, "pwd_stamp": usuario.password_hash[-12:]}
                 token = _serializador_recuperacion().dumps(payload)
                 enlace = url_for("auth.restablecer_password", token=token, _external=True)
-                current_app.logger.info("Solicitud de recuperación para correo: %s", usuario.email)
+                email_mascarado = _enmascarar_email(usuario.email)
+                current_app.logger.info("Solicitud de recuperación para correo: %s", email_mascarado)
                 try:
                     enviar_correo_recuperacion(usuario.email, enlace)
                 except (OSError, RuntimeError, smtplib.SMTPException):
-                    current_app.logger.exception("No fue posible enviar la recuperación para correo: %s", usuario.email)
+                    current_app.logger.exception("No fue posible enviar la recuperación para correo: %s", email_mascarado)
         flash("Si el correo está registrado, se enviaron las instrucciones para restablecer tu contraseña.", "success")
         return redirect(url_for("auth.login"))
 

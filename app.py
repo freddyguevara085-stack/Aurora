@@ -62,6 +62,7 @@ def pagina_no_encontrada(error):
 
 @app.errorhandler(500)
 def error_servidor(error):
+    app.logger.exception(error)
     db.session.rollback()
     return render_template(
         "errors/error.html",
@@ -69,7 +70,8 @@ def error_servidor(error):
         eyebrow="Error 500",
         titulo="Algo no salió bien",
         mensaje="Estamos trabajando para recuperar el servicio. Intenta nuevamente en unos momentos.",
+        reintentar=True,
     ), 500
 
 if __name__ == '__main__':
-    app.run(debug=app.config["DEBUG"], host='0.0.0.0', port=5000)
+    app.run(debug=app.config["DEBUG"], host='127.0.0.1', port=5000)

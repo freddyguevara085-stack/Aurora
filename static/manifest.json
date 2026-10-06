@@ -4,8 +4,8 @@
   "description": "Acompañamiento prenatal con disponibilidad parcial sin conexión",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#faf9fc",
-  "theme_color": "#331956",
+  "background_color": "#FFF8F5",
+  "theme_color": "#6C4BA3",
   "orientation": "portrait",
   "icons": [
     {

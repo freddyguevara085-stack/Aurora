@@ -1,0 +1,90 @@
+@font-face{font-family:'Poppins';src:url('../fonts/poppins/poppins-400.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+
+@font-face{font-family:'Poppins';src:url('../fonts/poppins/poppins-500.woff2') format('woff2');font-style:normal;font-weight:500;font-display:swap}
+
+@font-face{font-family:'Poppins';src:url('../fonts/poppins/poppins-600.woff2') format('woff2');font-style:normal;font-weight:600;font-display:swap}
+
+@font-face{font-family:'Poppins';src:url('../fonts/poppins/poppins-700.woff2') format('woff2');font-style:normal;font-weight:700;font-display:swap}
+
+@font-face{font-family:'Material Symbols Outlined';src:url('../fonts/material-symbols/material-symbols-outlined.ttf') format('truetype');font-style:normal;font-weight:400;font-display:block}
+
+/* ========================================================================
+   AURORA DESIGN SYSTEM — Tokens oficiales
+   ======================================================================== */
+:root{
+  /* Paleta principal (60-30-10) */
+  --color-primary:#6C4BA3;      /* Morado Aurora */
+  --color-secondary:#A78BD6;    /* Lavanda Serena */
+  --color-care-pink:#F8A8C1;    /* Rosa Cuidado */
+  --color-coral:#FF8F9F;        /* Coral Aurora */
+  --color-sunrise:#FFD59E;      /* Amanecer */
+  --color-bg-app:#FFF8F5;       /* Fondo de pantalla (60%) */
+  --color-surface:#FFFFFF;      /* Tarjetas y campos */
+
+  /* Texto */
+  --color-text-main:#2D1F3F;
+  --color-text-muted:#5C5364;
+  --color-text-subtle:#8C8294;
+
+  /* Elevación */
+  --border-card:1px solid rgba(167,139,214,0.22);
+  --border-input:1px solid #E5DCE8;
+  --shadow-card:0 4px 18px rgba(108,75,163,0.08);
+  --shadow-btn-primary:0 4px 12px rgba(108,75,163,0.25);
+
+  /* Radios */
+  --radius-badge:8px;
+  --radius-btn:12px;
+  --radius-card:16px;
+  --radius-icon-box:12px;
+
+  /* Alias legacy (compatibilidad con clases existentes) */
+  --aurora-purple:var(--color-primary);
+  --serene-lavender:var(--color-secondary);
+  --care-pink:var(--color-care-pink);
+  --sunrise:var(--color-sunrise);
+  --warm-white:var(--color-bg-app);
+  --aurora-coral:var(--color-coral);
+  --primary:var(--color-primary);
+  --primary-light:var(--color-secondary);
+  --page:var(--color-bg-app);
+  --white:var(--color-surface);
+  --ink:var(--color-text-main);
+  --muted:var(--color-text-muted);
+  --outline:var(--color-text-subtle);
+
+  /* Alias semánticos adicionales usados en el resto de la hoja de estilos */
+  --aurora-surface-soft:#faf7fb;
+  --aurora-divider:#e5dce8;
+  --aurora-lavender:#ede7f6;
+  --aurora-surface-tint:#f0ebf4;
+  --aurora-surface-lilac:#f3edf9;
+  --aurora-surface-mist:#f4eefa;
+  --aurora-gradient-lilac:#f5eaff;
+  --aurora-text-faint:#8C8294;
+  --aurora-danger:#d93865;
+  --aurora-error-bg:#ffdad6;
+  --aurora-error-text:#ba1a1a;
+  --aurora-success-text:#155724;
+  --aurora-on-pink:#6f3253;
+  --aurora-on-pink-strong:#7a3b5e;
+  --pink:#FBD3DF;
+  --pink-strong:var(--color-care-pink);
+  --peach:var(--color-sunrise);
+  --line:#e5dce8;
+  --soft:#f3edf9;
+  --shadow:var(--shadow-card);
+
+  /* Variables canónicas de componentes */
+  --aurora-card-bg:var(--color-surface);
+  --aurora-text-main:var(--color-text-main);
+  --aurora-text-muted:var(--color-text-muted);
+  --aurora-text-subtle:var(--color-text-subtle);
+  --aurora-border-card:var(--border-card);
+  --aurora-shadow-card:var(--shadow-card);
+  --aurora-shadow-primary:var(--shadow-btn-primary);
+  --aurora-shadow-chip:0 2px 6px rgba(108,75,163,0.15);
+  --aurora-radius-sm:var(--radius-badge);
+  --aurora-radius-md:var(--radius-btn);
+  --aurora-radius-lg:var(--radius-card);
+}

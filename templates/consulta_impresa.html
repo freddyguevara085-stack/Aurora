@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=26">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=26">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=26">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}?v=26">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}?v=26">
+  <title>Hoja de preparación | Aurora</title>
+</head>
+<body class="print-page">
+  <main id="main" tabindex="-1" class="print-sheet">
+    <h1 class="print-sheet__title">Hoja de preparación para tu próxima consulta</h1>
+    <dl class="print-sheet__details">
+      <dt>Fecha</dt>
+      <dd>{{ control.fecha_control.strftime('%d/%m/%Y') }}</dd>
+      <dt>Hora</dt>
+      <dd>{{ control.hora_control.strftime('%H:%M') if control.hora_control else 'Hora por confirmar' }}</dd>
+      <dt>Centro de atención</dt>
+      <dd>{{ control.centro_nombre if control.centro_nombre else (control.centro_atencion.nombre if control.centro_atencion else 'Centro por confirmar') }}</dd>
+    </dl>
+    <section class="print-sheet__note" aria-labelledby="print-questions-title">
+      <h2 id="print-questions-title">Preguntas pendientes</h2>
+      {% if preguntas %}
+        <ul class="print-sheet__questions">
+          {% for pregunta in preguntas %}<li>{{ pregunta.pregunta }}</li>{% endfor %}
+        </ul>
+      {% else %}
+        <p class="print-sheet__note-text print-sheet__note-text--empty">No tienes preguntas pendientes guardadas.</p>
+      {% endif %}
+    </section>
+  </main>
+  <div class="print-page__actions no-print">
+    <p class="print-page__warning" id="print-warning">La hoja incluye tus preguntas pendientes. El diálogo del navegador puede imprimirlas o guardarlas en este dispositivo; revisa el resultado y guárdalo con cuidado.</p>
+    <button class="button button--primary" type="button" data-print-action aria-describedby="print-warning">
+      <span class="material-symbols-outlined" aria-hidden="true">print</span>Imprimir hoja
+    </button>
+    <a class="text-link" href="{{ url_for('main.index') }}">Volver a Inicio</a>
+  </div>
+  <script src="{{ url_for('static', filename='js/app.js') }}?v=18"></script>
+</body>
+</html>

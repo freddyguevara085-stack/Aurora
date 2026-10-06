@@ -321,6 +321,84 @@ create table if not exists recordatorios (
     on update cascade
 ) engine = innodb;
 
+-- Preguntas personales que pueden continuar pendientes entre controles.
+create table if not exists preguntas_consulta (
+  id int unsigned not null auto_increment,
+  usuario_id int unsigned not null,
+  pregunta varchar(500) not null,
+  estado enum('pendiente', 'conversada') not null default 'pendiente',
+  created_at timestamp not null default current_timestamp,
+  updated_at timestamp not null default current_timestamp
+    on update current_timestamp,
+  primary key (id),
+  key idx_preguntas_usuario_estado (usuario_id, estado, id),
+  constraint fk_preguntas_consulta_usuario
+    foreign key (usuario_id)
+    references usuarios (id)
+    on delete cascade
+    on update cascade,
+  constraint chk_preguntas_texto check (char_length(trim(pregunta)) > 0)
+) engine = innodb;
+
+-- Plan de parto y emergencia comunitaria: organización logística de la gestante
+-- con su familia (lugar, red de apoyo, transporte y preparativos). No clínico.
+create table if not exists planes_parto (
+  id int unsigned not null auto_increment,
+  embarazo_id int unsigned not null,
+  centro_atencion_id int unsigned null,
+  requiere_casa_materna tinyint(1) not null default 0,
+  acompanante_nombre varchar(150) null,
+  acompanante_telefono varchar(30) null,
+  cuidador_hijos varchar(150) null,
+  transporte_tipo enum('propio', 'familiar_vecino', 'publico_colectivo', 'caponera_taxi', 'ambulancia_minsa', 'otro') not null default 'familiar_vecino',
+  transporte_contacto varchar(150) null,
+  bulto_listo tinyint(1) not null default 0,
+  recursos_traslado_listos tinyint(1) not null default 0,
+  notas varchar(500) null,
+  created_at timestamp not null default current_timestamp,
+  updated_at timestamp not null default current_timestamp
+    on update current_timestamp,
+  primary key (id),
+  unique key uk_planes_parto_embarazo (embarazo_id),
+  key idx_planes_parto_centro (centro_atencion_id),
+  constraint fk_planes_parto_embarazo
+    foreign key (embarazo_id)
+    references embarazos (id)
+    on delete cascade
+    on update cascade,
+  constraint fk_planes_parto_centro
+    foreign key (centro_atencion_id)
+    references centros_atencion (id)
+    on delete set null
+    on update cascade,
+  constraint chk_planes_parto_casa check (requiere_casa_materna in (0, 1)),
+  constraint chk_planes_parto_bulto check (bulto_listo in (0, 1)),
+  constraint chk_planes_parto_recursos check (recursos_traslado_listos in (0, 1))
+) engine = innodb;
+
+-- Red de apoyo comunitario: brigadistas, parteras capacitadas, promotores y
+-- transporte local que la gestante registra para su acompañamiento. No clínico.
+create table if not exists contactos_comunitarios (
+  id int unsigned not null auto_increment,
+  perfil_gestante_id int unsigned not null,
+  nombre varchar(150) not null,
+  rol enum('brigadista', 'partera', 'promotor_salud', 'traslado_local', 'lider_comunitario', 'vecino_apoyo', 'otro') not null default 'brigadista',
+  telefono varchar(30) null,
+  comunidad_barrio varchar(150) null,
+  notas varchar(255) null,
+  created_at timestamp not null default current_timestamp,
+  updated_at timestamp not null default current_timestamp
+    on update current_timestamp,
+  primary key (id),
+  key idx_contactos_perfil (perfil_gestante_id),
+  key idx_contactos_rol (rol),
+  constraint fk_contactos_perfil
+    foreign key (perfil_gestante_id)
+    references perfiles_gestantes (id)
+    on delete cascade
+    on update cascade
+) engine = innodb;
+
 create table if not exists contenidos_prenatales (
   id int unsigned not null auto_increment,
   creado_por_usuario_id int unsigned null,

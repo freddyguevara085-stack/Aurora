@@ -1,22 +1,218 @@
 {% extends 'layouts/base.html' %}
-{% block title %}{{ 'Editar control' if control else 'Registrar control' }} | Aurora{% endblock %}
+{% block title %}{{ 'Editar control' if control else 'Agendar nuevo control' }} | Aurora{% endblock %}
+
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell">
-	<a class="back" href="{{ url_for('main.controles') }}">Mis controles</a>
-	<h1>{{ 'Editar control' if control else 'Registrar control' }}</h1>
-	{% include 'partials/flash.html' %}
-	{% set values = form_data or control %}
-	<form class="card" method="post">
-		<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-		<label>Número de control <input name="numero_control" type="number" min="1" value="{{ values.numero_control if values else '' }}" {% if control %}readonly{% else %}required{% endif %}></label>
-		<label>Fecha <input name="fecha_control" type="date" value="{{ values.fecha_control if values and form_data else (values.fecha_control.isoformat() if values else '') }}" required></label>
-		<label>Hora <input name="hora_control" type="time" value="{{ values.hora_control if values and form_data else (values.hora_control.strftime('%H:%M') if values and values.hora_control else '') }}"></label>
-		<label>Centro <select name="centro_atencion_id"><option value="">Sin especificar</option>{% for centro in centros %}<option value="{{ centro.id }}" {% if values and values.centro_atencion_id|string == centro.id|string %}selected{% endif %}>{{ centro.nombre }}</option>{% endfor %}</select></label>
-		{% if not control %}<label>Edad gestacional <input name="edad_gestacional" type="number" min="0" max="45" step="0.1"></label>{% endif %}
-		<label>Estado <select name="estado">{% for estado, etiqueta in [('programado', 'Programado'), ('realizado', 'Realizado'), ('reprogramado', 'Reprogramado'), ('cancelado', 'Cancelado')] %}<option value="{{ estado }}" {% if values and values.estado == estado %}selected{% endif %}>{{ etiqueta }}</option>{% endfor %}</select></label>
-		<label>Indicaciones <textarea name="indicaciones">{{ values.indicaciones if values else '' }}</textarea></label>
-		<label>Notas post-consulta <textarea name="notas">{{ values.notas if values else '' }}</textarea></label>
-		<button class="button button--primary button--wide" type="submit">{{ 'Guardar cambios' if control else 'Guardar control' }}</button>
-	</form>
+<main id="main" tabindex="-1" class="app-shell section-shell control-form-page">
+  <!-- 1. Cabecera y Navegación de Salida -->
+  <a class="form-back-link" href="{{ url_for('main.controles') }}">
+    <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+    <span>Volver a mis controles</span>
+  </a>
+
+  <header class="control-form-header">
+    <h1 class="control-form-title">{{ 'Editar control' if control else 'Agendar nuevo control' }}</h1>
+    <p class="control-form-subtitle">
+      {% if control %}
+        Actualiza los datos o notas de esta cita médica.
+      {% else %}
+        Organiza tu próxima cita para llevar tus dudas y recibir atención a tiempo.
+      {% endif %}
+    </p>
+  </header>
+
+  {% include 'partials/flash.html' %}
+
+  {% set values = form_data or control %}
+  <form class="card-surface control-card-form" method="post" novalidate>
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <!-- 3.1 Número correlativo de control (Automatizado y amigable) -->
+    <div class="control-badge-card">
+      <span class="material-symbols-outlined control-badge-icon" aria-hidden="true">event_available</span>
+      <div class="control-badge-text">
+        <strong>Control N.º {{ siguiente_numero if siguiente_numero else (control.numero_control if control else 1) }}</strong>
+        <small>Seguimiento continuo de tu embarazo</small>
+      </div>
+    </div>
+    <input type="hidden" name="numero_control" value="{{ siguiente_numero if siguiente_numero else (control.numero_control if control else 1) }}">
+
+    <!-- 3.3 Selector visual del motivo/tipo de control -->
+    <fieldset class="form-group form-control-types">
+      <legend class="form-label">Tipo o motivo de la cita</legend>
+      <div class="control-type-grid">
+        <label class="control-type-option">
+          <input type="radio" name="tipo_control" value="Control prenatal regular" {% if tipo_control_actual == 'Control prenatal regular' %}checked{% endif %}>
+          <span class="control-type-card">
+            <span class="material-symbols-outlined control-type-icon" aria-hidden="true">clinical_notes</span>
+            <strong class="control-type-title">Control regular</strong>
+            <span class="control-type-desc">Revisión periódica de rutina</span>
+          </span>
+        </label>
+
+        <label class="control-type-option">
+          <input type="radio" name="tipo_control" value="Ultrasonido / Ecografía" {% if tipo_control_actual == 'Ultrasonido / Ecografía' %}checked{% endif %}>
+          <span class="control-type-card">
+            <span class="material-symbols-outlined control-type-icon" aria-hidden="true">radiology</span>
+            <strong class="control-type-title">Ultrasonido</strong>
+            <span class="control-type-desc">Ecografía o imagen fetal</span>
+          </span>
+        </label>
+
+        <label class="control-type-option">
+          <input type="radio" name="tipo_control" value="Exámenes de laboratorio" {% if tipo_control_actual == 'Exámenes de laboratorio' %}checked{% endif %}>
+          <span class="control-type-card">
+            <span class="material-symbols-outlined control-type-icon" aria-hidden="true">biotech</span>
+            <strong class="control-type-title">Laboratorio</strong>
+            <span class="control-type-desc">Análisis de sangre u orina</span>
+          </span>
+        </label>
+      </div>
+    </fieldset>
+
+    <!-- 2. Fecha y Hora en cuadrícula de 2 columnas -->
+    <div class="form-grid-2col">
+      <div class="form-group">
+        <label for="fecha_control" class="form-label">Fecha <span class="required-indicator" aria-hidden="true">*</span></label>
+        <input
+          id="fecha_control"
+          name="fecha_control"
+          type="date"
+          class="form-input"
+          value="{{ values.fecha_control if values and form_data else (values.fecha_control.isoformat() if values and values.fecha_control else '') }}"
+          required
+        >
+      </div>
+      <div class="form-group">
+        <label for="hora_control" class="form-label">Hora <span class="optional-label">(opcional)</span></label>
+        <input
+          id="hora_control"
+          name="hora_control"
+          type="time"
+          class="form-input"
+          value="{{ values.hora_control if values and form_data else (values.hora_control.strftime('%H:%M') if values and values.hora_control else '') }}"
+        >
+      </div>
+    </div>
+
+    <!-- 3.2 Nota reactiva de edad gestacional calculada -->
+    <div class="gestational-calc-note" id="calc-gestacional-note" data-inicio="{{ inicio_gestacion_iso or '' }}">
+      <span class="material-symbols-outlined" aria-hidden="true">pregnant_woman</span>
+      <span id="calc-gestacional-text">
+        {% if semana_estimada %}
+          Estarás cursando la <strong>semana {{ semana_estimada }}</strong> de gestación.
+        {% elif semana_actual %}
+          Estarás cursando aproximadamente la <strong>semana {{ semana_actual }}</strong> de gestación.
+        {% else %}
+          La semana de gestación se calculará según la fecha que elijas.
+        {% endif %}
+      </span>
+    </div>
+
+    <!-- Centro de atención con datalist asistido -->
+    <div class="form-group">
+      <label for="centro_atencion_input" class="form-label">Centro de atención <span class="optional-label">(opcional)</span></label>
+      <input
+        type="text"
+        id="centro_atencion_input"
+        name="centro_nombre_input"
+        class="form-input"
+        list="centros_sugeridos"
+        placeholder="Buscar centro o puesto local..."
+        value="{{ centro_nombre_valor or (values.centro_nombre_input if values and form_data else (control.centro_nombre if control and control.centro_nombre != 'Centro por confirmar' else '')) }}"
+        autocomplete="off"
+      >
+      <datalist id="centros_sugeridos">
+        {% for c in centros %}
+          <option value="{{ c.nombre }}{% if c.municipio %} ({{ c.municipio }}){% endif %}"></option>
+        {% endfor %}
+      </datalist>
+      <span class="form-hint">Escribe tu puesto local si no aparece en la lista.</span>
+    </div>
+
+    <!-- Estado (visible solo si se está editando) -->
+    {% if control %}
+    <div class="form-group">
+      <label for="estado" class="form-label">Estado de la cita</label>
+      <div class="form-select-wrap">
+        <select id="estado" name="estado" class="form-input form-select">
+          {% for estado_val, etiqueta in [('programado', 'Programado'), ('realizado', 'Realizado'), ('reprogramado', 'Reprogramado'), ('cancelado', 'Cancelado')] %}
+            <option value="{{ estado_val }}" {% if values and values.estado == estado_val %}selected{% endif %}>{{ etiqueta }}</option>
+          {% endfor %}
+        </select>
+        <span class="material-symbols-outlined select-chevron" aria-hidden="true">expand_more</span>
+      </div>
+    </div>
+    {% else %}
+    <input type="hidden" name="estado" value="programado">
+    {% endif %}
+
+    <!-- 4. Preguntas o notas para la consulta -->
+    <div class="form-group">
+      <div class="form-label-with-link">
+        <label for="indicaciones" class="form-label">Preguntas o notas para la consulta</label>
+        <a href="{{ url_for('main.preguntas_consulta') }}" class="form-sublink">Mis preguntas ›</a>
+      </div>
+      <textarea
+        id="indicaciones"
+        name="indicaciones"
+        class="form-input form-textarea"
+        maxlength="500"
+        rows="3"
+        placeholder="Anota aquí dudas sobre síntomas o alimentos para dialogar con el personal de salud"
+      >{{ indicaciones_limpias if control else (values.indicaciones if values and form_data else '') }}</textarea>
+      <small class="form-help">Escribe tus dudas previas para llevarlas preparadas a la consulta. Aurora no genera indicaciones médicas.</small>
+    </div>
+
+    {# Notas posteriores solo al editar un control ya marcado como realizado #}
+    {% if control and control.estado == 'realizado' %}
+    <div class="form-group">
+      <label for="notas" class="form-label">Notas post-consulta</label>
+      <textarea
+        id="notas"
+        name="notas"
+        class="form-input form-textarea"
+        maxlength="500"
+        rows="3"
+        placeholder="Recomendaciones o acuerdos recibidos en tu consulta"
+      >{{ values.notas if values else '' }}</textarea>
+      <small class="form-help">Anotaciones personales tras recibir la atención de salud.</small>
+    </div>
+    {% endif %}
+
+    <!-- 5. Jerarquía de Acciones al Pie -->
+    <div class="form-actions">
+      <button class="button button--primary button--wide button--tactile" type="submit">
+        {{ 'Guardar cambios' if control else 'Guardar control' }}
+      </button>
+      <a class="button button--ghost button--wide button--tactile" href="{{ url_for('main.controles') }}">
+        Cancelar
+      </a>
+    </div>
+  </form>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var fechaInput = document.getElementById('fecha_control');
+  var noteEl = document.getElementById('calc-gestacional-note');
+  var textEl = document.getElementById('calc-gestacional-text');
+  if (fechaInput && noteEl && textEl) {
+    var inicioStr = noteEl.getAttribute('data-inicio');
+    if (inicioStr) {
+      var inicioDate = new Date(inicioStr + 'T00:00:00');
+      function actualizarSemana() {
+        if (!fechaInput.value) return;
+        var citaDate = new Date(fechaInput.value + 'T00:00:00');
+        var diffDays = Math.floor((citaDate - inicioDate) / (1000 * 60 * 60 * 24));
+        var semana = Math.min(42, Math.max(0, Math.floor(diffDays / 7)));
+        if (!isNaN(semana) && semana >= 0) {
+          textEl.innerHTML = 'Estarás cursando la <strong>semana ' + semana + '</strong> de gestación.';
+        }
+      }
+      fechaInput.addEventListener('change', actualizarSemana);
+      fechaInput.addEventListener('input', actualizarSemana);
+    }
+  }
+});
+</script>
 {% endblock %}

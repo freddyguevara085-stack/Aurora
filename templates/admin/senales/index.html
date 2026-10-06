@@ -82,7 +82,7 @@
                     </button>
                   </form>
 
-                  <form action="{{ url_for('admin.eliminar_senal', senal_id=item.id) }}" method="post" class="inline-form" onsubmit="return confirm('¿Estás seguro de que deseas eliminar esta señal de alerta?');">
+                  <form action="{{ url_for('admin.eliminar_senal', senal_id=item.id) }}" method="post" class="inline-form" data-confirm="¿Eliminar esta señal de alerta? Esta acción no se puede deshacer.">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar" aria-label="Eliminar señal">
                       <span class="material-symbols-outlined" aria-hidden="true">delete</span>

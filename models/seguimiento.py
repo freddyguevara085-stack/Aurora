@@ -1,5 +1,7 @@
 """Modelos de controles prenatales y recordatorios."""
 
+import re
+
 from sqlalchemy.dialects.mysql import ENUM
 from sqlalchemy.dialects.mysql import INTEGER as UINT
 from sqlalchemy.dialects.mysql import SMALLINT
@@ -104,6 +106,29 @@ class ControlPrenatal(db.Model):
         ),
     )
 
+    @property
+    def centro_nombre(self) -> str:
+        """Nombre del centro de atención oficial o puesto comunitario indicado."""
+        if self.centro_atencion and getattr(self.centro_atencion, "nombre", None):
+            return self.centro_atencion.nombre
+        if self.indicaciones and "[Centro:" in self.indicaciones:
+            m = re.search(r"\[Centro:\s*([^\]]+)\]", self.indicaciones)
+            if m:
+                return m.group(1).strip()
+        return "Centro por confirmar"
+
+    @property
+    def tipo_control(self) -> str:
+        """Tipo o motivo del control prenatal (regular, ultrasonido, laboratorio)."""
+        if self.indicaciones:
+            if "[Ultrasonido" in self.indicaciones or "Ecografía" in self.indicaciones:
+                return "Ultrasonido"
+            if "[Exámenes de laboratorio]" in self.indicaciones or "laboratorio" in self.indicaciones.lower():
+                return "Laboratorio"
+            if "[Control prenatal regular]" in self.indicaciones:
+                return "Control regular"
+        return "Control regular"
+
     def __repr__(self) -> str:
         return f"<ControlPrenatal id={self.id} estado={self.estado!r}>"
 
@@ -177,3 +202,45 @@ class Recordatorio(db.Model):
 
     def __repr__(self) -> str:
         return f"<Recordatorio id={self.id} estado={self.estado!r}>"
+
+
+class PreguntaConsulta(db.Model):
+    """Pregunta privada que la usuaria puede llevar a futuras consultas."""
+
+    __tablename__ = "preguntas_consulta"
+
+    id = db.Column(UINT(unsigned=True), primary_key=True, autoincrement=True)
+    usuario_id = db.Column(
+        UINT(unsigned=True),
+        db.ForeignKey(
+            "usuarios.id",
+            name="fk_preguntas_consulta_usuario",
+            ondelete="CASCADE",
+            onupdate="CASCADE",
+        ),
+        nullable=False,
+    )
+    pregunta = db.Column(db.String(500), nullable=False)
+    estado = db.Column(
+        ENUM("pendiente", "conversada"),
+        nullable=False,
+        server_default=db.text("'pendiente'"),
+    )
+    created_at = db.Column(
+        db.TIMESTAMP,
+        nullable=False,
+        server_default=db.text("CURRENT_TIMESTAMP"),
+    )
+    updated_at = db.Column(
+        db.TIMESTAMP,
+        nullable=False,
+        server_default=db.text("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"),
+    )
+
+    __table_args__ = (
+        db.Index("idx_preguntas_usuario_estado", "usuario_id", "estado", "id"),
+        db.CheckConstraint("char_length(trim(pregunta)) > 0", name="chk_preguntas_texto"),
+    )
+
+    def __repr__(self) -> str:
+        return f"<PreguntaConsulta id={self.id} estado={self.estado!r}>"

@@ -4,6 +4,10 @@ env/
 .env
 __pycache__/
 *.pyc
+.pytest_cache/
 instance/
 *.db
 *.sqlite3
+presentacion/*.mp4
+presentacion/clips/
+presentacion/app-icon.png

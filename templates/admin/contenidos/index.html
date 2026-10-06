@@ -104,7 +104,7 @@
                     </button>
                   </form>
 
-                  <form action="{{ url_for('admin.eliminar_contenido', contenido_id=item.id) }}" method="post" class="inline-form" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este contenido?');">
+                  <form action="{{ url_for('admin.eliminar_contenido', contenido_id=item.id) }}" method="post" class="inline-form" data-confirm="¿Eliminar este contenido? Esta acción no se puede deshacer.">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button type="submit" class="admin-action-btn admin-action-btn--danger" title="Eliminar" aria-label="Eliminar contenido">
                       <span class="material-symbols-outlined" aria-hidden="true">delete</span>

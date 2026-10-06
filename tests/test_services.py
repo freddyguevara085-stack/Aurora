@@ -24,3 +24,18 @@ def test_validar_fechas_embarazo_rechaza_relacion_incoherente():
     fum, fpp, error = validar_fechas_embarazo("2026-01-01", "2027-01-01", "otro")
     assert fum is None and fpp is None
     assert error
+
+
+def test_validar_fechas_embarazo_rechaza_fpp_pasada_sin_fum():
+    fpp_pasada = (date.today() - timedelta(days=1)).isoformat()
+    fum, fpp, error = validar_fechas_embarazo(None, fpp_pasada, "otro")
+    assert fum is None and fpp is None
+    assert "fecha probable de parto" in error.lower()
+
+
+def test_validar_fechas_embarazo_acepta_fpp_futura_sin_fum():
+    fpp_futura = date.today() + timedelta(days=1)
+    fum, fpp, error = validar_fechas_embarazo(None, fpp_futura.isoformat(), "otro")
+    assert fum is None
+    assert fpp == fpp_futura
+    assert error is None

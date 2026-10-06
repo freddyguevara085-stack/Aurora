@@ -48,5 +48,15 @@
     {% include 'partials/flash.html' %}
     {% block admin_content %}{% endblock %}
   </main>
+
+  <dialog id="aurora-confirm" class="confirm-dialog" aria-labelledby="aurora-confirm-title">
+    <h2 id="aurora-confirm-title">Confirmar acción</h2>
+    <p data-confirm-message></p>
+    <div class="confirm-dialog__actions">
+      <button type="button" class="button button--secondary" data-confirm-cancel>Cancelar</button>
+      <button type="button" class="button button--danger" data-confirm-ok>Eliminar</button>
+    </div>
+  </dialog>
+  <script src="{{ url_for('static', filename='js/app.js') }}?v=18"></script>
 </div>
 {% endblock %}

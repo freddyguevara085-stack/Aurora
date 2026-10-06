@@ -1,8 +1,8 @@
 <div align="center">
   <img src="logo%20para%20el%20readme.png" alt="Logo de Aurora" width="260">
   <h1>Aurora</h1>
-  <p><strong>Acompañamiento prenatal claro, cercano y organizado.</strong></p>
-  <p>Una aplicación web para ayudar a las gestantes a comprender su etapa de embarazo, organizar sus controles y encontrar orientación para buscar atención.</p>
+  <p><strong>Un puente entre la vida diaria y la atención prenatal.</strong></p>
+  <p>Una aplicación web para organizar controles, preparar preguntas y coordinar el traslado y la red de apoyo de una gestante.</p>
 </div>
 
 <p align="center">
@@ -12,10 +12,11 @@
   <img src="https://img.shields.io/badge/Tests-pytest-2ea44f" alt="Pruebas con pytest">
 </p>
 
-> Aurora ofrece información y organización del seguimiento prenatal. No diagnostica, no prescribe y no sustituye la atención de profesionales de la salud.
+> Aurora organiza la preparación para la atención prenatal. No interpreta síntomas, diagnostica, prescribe ni sustituye al personal o a los servicios de salud.
 
 ## Contenido
 
+- [Alcance del producto](#alcance-del-producto)
 - [Qué incluye](#qué-incluye)
 - [Tecnologías](#tecnologías)
 - [Requisitos](#requisitos)
@@ -27,28 +28,36 @@
 - [Despliegue](#despliegue)
 - [Estructura](#estructura)
 - [Roles](#roles)
-- [PWA y modo offline](#pwa-y-modo-offline)
+- [PWA y disponibilidad sin conexión](#pwa-y-disponibilidad-sin-conexión)
 - [Seguridad](#seguridad)
 - [Limitaciones y próximos pasos](#limitaciones-y-próximos-pasos)
 
+## Alcance del producto
+
+- **Qué es:** un puente organizativo entre la vida diaria de una gestante y su atención prenatal.
+- **Qué ofrece:** etapa orientativa del embarazo, agenda de controles, preguntas para la consulta, plan de traslado y apoyo, contactos personales y fichas imprimibles.
+- **Qué no ofrece:** diagnóstico, interpretación de síntomas, tratamientos, protocolos clínicos ni sustitución de la atención profesional.
+
+Quedaron **fuera del producto** el seguimiento de preeclampsia y el de puerperio, lactancia y recién nacido: sus rutas devuelven 404 y no aparecen en la navegación. El contenido clínico (guía y señales) permanece cerrado al público hasta contar con revisión clínica documentada.
+
 ## Qué incluye
 
-### Para gestantes
+Aurora está diseñada como un **medio sencillo de organización** entre la gestante, su familia y la atención profesional. Su alcance se limita a tareas prácticas que la usuaria puede preparar sin convertir la aplicación en un servicio médico.
 
-- Registro público de cuenta con asignación automática del rol `usuario` y creación del perfil inicial.
-- Inicio y cierre de sesión, recuperación segura de contraseña y cambio de contraseña autenticado.
-- Perfil de embarazo y ubicación opcional; los datos personales y contactos adicionales son opcionales.
-- Registro y edición del embarazo activo, con cálculo orientativo de semana gestacional, trimestre y FPP.
-- Registro, consulta, edición y reprogramación de controles prenatales.
-- Estados de control: programado, realizado, reprogramado y cancelado.
-- Organización de citas y preguntas para conversar con personal de salud; Aurora no prescribe.
-- Calendario de controles y recordatorios personales, de control o informativos.
-- Guía prenatal, señales de alerta y directorio de centros de atención.
+### 1. Embarazo y controles
+- Registro y seguimiento del embarazo activo con cálculo orientativo de semana gestacional, trimestre y FPP.
+- Registro, reprogramación y consulta de controles prenatales (programados, realizados, reprogramados).
+- **Preguntas para la consulta:** dudas anotadas por la gestante para conversar con el personal de salud.
+- Hoja imprimible de preparación de la cita (`/consulta/imprimir`).
 
-### Para administración
+### 2. Traslado y apoyo familiar
+- **Plan de traslado y apoyo (`/plan-parto`):** lugar previsto, acompañante, persona a cargo del hogar, transporte y preparativos básicos.
+- **Contactos personales (`/red-comunitaria`):** familiares, personas de confianza y transporte confirmados por la usuaria, con enlace de llamada `tel:`.
+- **Ficha familiar (`/plan-parto/imprimir`):** hoja compacta con la logística y los contactos registrados.
 
+### 3. Para administración
 - Panel protegido para gestionar contenidos, señales de alerta, centros y servicios.
-- Publicación y desactivación de contenidos del MVP.
+- El contenido sanitario permanece cerrado al público hasta tener revisión clínica documentada.
 - Registro de actividad administrativa mediante auditoría.
 
 ## Tecnologías
@@ -95,16 +104,22 @@ Si PowerShell bloquea la activación del entorno, puedes ejecutar directamente `
 
 ## Base de datos
 
-Aurora usa MySQL y distribuye dos scripts:
+Aurora usa MySQL y distribuye su esquema maestro y scripts de migración:
 
-- [Aurora_BD.sql](Aurora_BD.sql): crea la base de datos, tablas, relaciones, roles, permisos e índices.
+- [Aurora_BD.sql](Aurora_BD.sql): crea la base de datos, tablas maestro, relaciones, roles, permisos e índices.
 - [database/Aurora_MVP_seed.sql](database/Aurora_MVP_seed.sql): carga contenidos, señales y servicios iniciales.
+- [database/migrations/20260925_preguntas_consulta.sql](database/migrations/20260925_preguntas_consulta.sql): agrega el hilo de preguntas a bases existentes.
+- [database/migrations/20260926_plan_parto.sql](database/migrations/20260926_plan_parto.sql): tabla `planes_parto` para la logística de traslado y apoyo.
+- [database/migrations/20260926_red_comunitaria.sql](database/migrations/20260926_red_comunitaria.sql): tabla `contactos_comunitarios` para los contactos personales de apoyo.
 
 Desde CMD:
 
 ```cmd
 mysql -u root -p < Aurora_BD.sql
 mysql -u root -p aurora < database\Aurora_MVP_seed.sql
+mysql -u root -p aurora < database\migrations\20260925_preguntas_consulta.sql
+mysql -u root -p aurora < database\migrations\20260926_plan_parto.sql
+mysql -u root -p aurora < database\migrations\20260926_red_comunitaria.sql
 ```
 
 Desde PowerShell:
@@ -112,6 +127,9 @@ Desde PowerShell:
 ```powershell
 Get-Content Aurora_BD.sql | mysql -u root -p
 Get-Content database\Aurora_MVP_seed.sql | mysql -u root -p aurora
+Get-Content database\migrations\20260925_preguntas_consulta.sql | mysql -u root -p aurora
+Get-Content database\migrations\20260926_plan_parto.sql | mysql -u root -p aurora
+Get-Content database\migrations\20260926_red_comunitaria.sql | mysql -u root -p aurora
 ```
 
 Para producción, utiliza un usuario MySQL dedicado con privilegios mínimos. No uses `root` ni una contraseña vacía.
@@ -178,20 +196,28 @@ El comando solicita los datos de forma interactiva y nunca recibe la contraseña
 
 ## Pruebas
 
-Ejecuta la suite desde la raíz del proyecto:
+Ejecuta la suite completa de pruebas desde la raíz del proyecto:
 
 ```powershell
 python -m pytest -q
 ```
 
-La suite cubre, entre otros casos:
+Para las pruebas de impresión PWA y eventos en JavaScript:
 
-- Cálculo de semana gestacional y validación de fechas.
-- Protección del panel administrativo.
-- Protección de rutas de recordatorios.
-- Registro y recuperación de contraseña.
-- Invalidación de tokens de recuperación reutilizados.
-- Cabeceras HTTP de seguridad.
+```powershell
+node --test tests/test_print_sheet.cjs tests/test_pwa_install.cjs
+node --check static/js/app.js
+```
+
+La suite de Python y las pruebas de JavaScript nativo cubren:
+
+- Cálculo orientativo de semana gestacional.
+- Plan de traslado, transporte y ficha familiar.
+- Contactos personales de apoyo y aislamiento entre cuentas.
+- Exclusión de rutas de seguimiento clínico fuera del alcance del MVP.
+- Fichas imprimibles offline y disparador nativo de impresión.
+- Protección del panel administrativo y roles de acceso.
+- Registro, recuperación de contraseña y cabeceras HTTP de seguridad.
 
 ## Despliegue
 
@@ -222,6 +248,7 @@ Aurora/
 ├── config.py                      # Configuración desde variables de entorno
 ├── extensions.py                  # Base de datos, login y CSRF
 ├── commands.py                    # Comandos CLI de Flask
+├── README.md                      # Guía de instalación, uso y despliegue
 ├── controllers/
 │   ├── auth.py                    # Login, registro y recuperación
 │   ├── routes.py                  # Flujos de gestante y PWA
@@ -232,7 +259,9 @@ Aurora/
 ├── static/                        # CSS, JavaScript, fuentes, assets y PWA
 ├── tests/                         # Pruebas pytest
 ├── Aurora_BD.sql                  # Esquema principal MySQL
-├── database/Aurora_MVP_seed.sql   # Datos iniciales
+├── database/                      # Seed y migraciones incrementales
+│   ├── Aurora_MVP_seed.sql         # Datos iniciales
+│   └── migrations/                 # Cambios para bases existentes
 ├── requirements.txt               # Dependencias
 └── run.bat                        # Arranque local o producción en Windows
 ```
@@ -241,19 +270,19 @@ Aurora/
 
 | Rol | Acceso |
 | --- | --- |
-| `usuario` | Perfil, embarazo, controles, recordatorios, calendario, guía, alertas y centros propios/disponibles. |
+| `usuario` | Perfil, embarazo, controles, preguntas, traslado y contactos personales de apoyo. |
 | `administrador` | Panel de contenidos, señales, centros, servicios y auditoría reciente. |
 | `auditor` | Definido en el esquema, pero sin interfaz funcional dedicada en el MVP. |
 
 ## PWA y disponibilidad sin conexión
 
-El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan algunos recursos estáticos y una página general de contingencia. La disponibilidad sin conexión es parcial: perfiles, controles, guía dinámica, centros y recordatorios requieren conexión. Aurora no envía notificaciones en segundo plano; los recordatorios se consultan dentro de la aplicación.
+El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan algunos recursos estáticos y una página general de contingencia. La disponibilidad sin conexión es parcial: perfil, embarazo, controles, preguntas, traslado, contactos y recordatorios requieren conexión y no se guardan en caché. La página de contingencia no muestra datos de la cuenta. Aurora no envía notificaciones en segundo plano; los recordatorios se consultan dentro de la aplicación.
 
-El directorio de demostración solo incluye centros tomados del listado oficial del MINSA (nombre, tipo y ubicación). Teléfonos, horarios, coordenadas y servicios no aparecen en la fuente y no se muestran. `seed-demo` no asigna servicios ni registra fechas de verificación y solo se ejecuta con `AURORA_DEMO=1`. Confirma directamente con el establecimiento antes de acudir.
+Los centros de demostración provienen del listado oficial del MINSA (nombre, tipo y ubicación). Teléfonos, horarios, coordenadas y servicios no aparecen en la fuente y no se muestran. `seed-demo` solo se ejecuta con `AURORA_DEMO=1` y no registra fechas de verificación; confirma directamente con el establecimiento antes de acudir.
 
-## Demo para revisión clínica
+## Demo y revisión de contenido clínico
 
-El contenido clínico no se publica: guía, señales e Inicio permanecen deshabilitados (fail-closed) hasta que exista un proceso de revisión clínica documentado. Para revisarlo con profesionales existe una vista separada, restringida al rol `administrador` y marcada como demo.
+El contenido clínico no se publica: la guía y las señales permanecen deshabilitadas (fail-closed) hasta que exista un proceso de revisión clínica documentado. Para revisarlo con profesionales existe una vista separada, restringida al rol `administrador` y marcada como demo.
 
 Los datos de demostración (perfil ficticio y centros oficiales del MINSA) solo se cargan en una base de demo. `seed-demo` exige `AURORA_DEMO=1`; sin esa variable se cancela para no ensuciar la base real.
 
@@ -291,7 +320,8 @@ Antes de publicar con datos reales, se recomienda completar:
 - Pruebas de integración contra MySQL y pruebas de aislamiento entre usuarios.
 - Monitorización, backups y restauración comprobada.
 - Política de privacidad, retención y eliminación de datos personales antes de cualquier uso real.
-- Revisión clínica responsable, fuentes concretas y validación local del directorio y de teléfonos de emergencia antes de publicar información de salud.
+- Revisión clínica responsable y fuentes concretas antes de publicar cualquier contenido de salud; validación local del directorio de centros.
+- Definir si se incorporan nuevas funciones: solo entran si ayudan a recordar, preparar, coordinar o llevar información a una consulta sin interpretar datos clínicos.
 
 ## Licencia
 

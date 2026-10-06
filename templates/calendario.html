@@ -1,43 +1,65 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Calendario | Aurora{% endblock %}
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell">
+<main id="main" tabindex="-1" class="app-shell section-shell calendar-page">
   {% set back_url = url_for('main.controles') %}
-  {% set back_label = 'Controles' %}
+  {% set back_label = 'Volver a Mis controles' %}
   {% set page_title = 'Calendario' %}
   {% include 'partials/page_header.html' %}
-  <p class="form-help">Los recordatorios aparecen al consultar Aurora; no se envían avisos en segundo plano.</p>
-  <a class="button button--primary button--wide" href="{{ url_for('main.nuevo_recordatorio') }}">+ Nuevo recordatorio</a>
+
+  <div class="calendar-intro">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <p>Los recordatorios aparecen al consultar Aurora; no se envían avisos en segundo plano.</p>
+  </div>
+  {% if current_user.rol and current_user.rol.nombre == 'usuario' %}
+  <a class="button button--primary button--wide" href="{{ url_for('main.nuevo_recordatorio') }}"><span class="material-symbols-outlined" aria-hidden="true">add</span>Nuevo recordatorio</a>
+  {% endif %}
+
   {% if not embarazo %}
     {% set empty_title = 'Tu calendario está vacío' %}
     {% set empty_text = 'Aquí aparecerán tus controles y recordatorios próximos.' %}
     {% set empty_url = none %}
     {% set empty_action = none %}
+    {% set empty_icon = 'calendar_month' %}
     {% include 'partials/empty_state.html' %}
+  {% else %}
+  <section class="calendar-section" aria-labelledby="calendar-controls-title">
+    <h2 id="calendar-controls-title">Controles</h2>
+    {% if controles %}
+      <div class="agenda">
+        {% for item in controles %}
+          <article class="agenda-item card-surface">
+            <span class="agenda-item__icon"><span class="material-symbols-outlined" aria-hidden="true">event_available</span></span>
+            <div class="agenda-item__body">
+              <h3>Control {{ item.numero_control }}</h3>
+              <p><span class="material-symbols-outlined" aria-hidden="true">calendar_today</span>{{ item.fecha_control.strftime('%d/%m/%Y') }}{% if item.hora_control %} · {{ item.hora_control.strftime('%H:%M') }}{% endif %}</p>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty compact-empty"><h3>Sin controles registrados</h3><p>Los controles prenatales aparecerán aquí.</p></div>
+    {% endif %}
+  </section>
+
+  <section class="calendar-section" aria-labelledby="calendar-reminders-title">
+    <h2 id="calendar-reminders-title">Recordatorios</h2>
+    {% if recordatorios %}
+      <div class="agenda">
+        {% for item in recordatorios %}
+          <article class="agenda-item card-surface">
+            <span class="agenda-item__icon agenda-item__icon--pink"><span class="material-symbols-outlined" aria-hidden="true">notifications</span></span>
+            <div class="agenda-item__body">
+              <h3>{{ item.titulo }}</h3>
+              <p><span class="material-symbols-outlined" aria-hidden="true">schedule</span>{{ item.fecha_hora.strftime('%d/%m/%Y · %H:%M') }}</p>
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty compact-empty"><h3>Tu calendario está vacío</h3><p>Aquí aparecerán tus recordatorios próximos.</p></div>
+    {% endif %}
+  </section>
   {% endif %}
-  <section class="card">
-    <h2>Controles</h2>
-    {% for item in controles %}
-      <p>{{ item.fecha_control.strftime('%d/%m/%Y') }} · Control {{ item.numero_control }}</p>
-    {% else %}
-      {% set empty_title = 'Sin controles registrados' %}
-      {% set empty_text = 'Los controles prenatales aparecerán aquí.' %}
-      {% set empty_url = none %}
-      {% set empty_action = none %}
-      {% include 'partials/empty_state.html' %}
-    {% endfor %}
-  </section>
-  <section class="card">
-    <h2>Recordatorios</h2>
-    {% for item in recordatorios %}
-      <p>{{ item.fecha_hora.strftime('%d/%m/%Y %H:%M') }} · {{ item.titulo }}</p>
-    {% else %}
-      {% set empty_title = 'Tu calendario está vacío' %}
-      {% set empty_text = 'Aquí aparecerán tus recordatorios próximos.' %}
-      {% set empty_url = none %}
-      {% set empty_action = none %}
-      {% include 'partials/empty_state.html' %}
-    {% endfor %}
-  </section>
 </main>
 {% endblock %}

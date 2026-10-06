@@ -7,24 +7,28 @@ from sqlalchemy import select
 from extensions import db
 from models.seguimiento import ControlPrenatal
 from models.usuario import Usuario
-from services.mvp import perfil_y_embarazo, recordatorios_pendientes
+from services.mvp import perfil_y_embarazo
 
 
 def calcular_semana_gestacional(
     fum: date | None,
     fpp: date | None,
     hoy: date | None = None,
+    metodo_fpp: str | None = None,
 ) -> int | None:
     """Calcula una semana visual de 0 a 42 sin valor clínico adicional."""
     hoy = hoy or date.today()
-    inicio = fum or (fpp - timedelta(days=280) if fpp else None)
+    if metodo_fpp in ("ecografia", "profesional") and fpp:
+        inicio = fpp - timedelta(days=280)
+    else:
+        inicio = fum or (fpp - timedelta(days=280) if fpp else None)
     if not inicio:
         return None
     return min(42, max(0, (hoy - inicio).days // 7))
 
 
 def calcular_trimestre(semana: int | None) -> int | None:
-    if semana is None or semana < 1:
+    if semana is None or semana < 0:
         return None
     if semana <= 13:
         return 1
@@ -41,6 +45,7 @@ def construir_inicio(usuario_id: int) -> dict:
     semana = calcular_semana_gestacional(
         embarazo.fum if embarazo else None,
         embarazo.fpp if embarazo else None,
+        metodo_fpp=embarazo.metodo_fpp if embarazo else None,
     )
     trimestre = calcular_trimestre(semana)
     hoy = date.today()
@@ -57,7 +62,6 @@ def construir_inicio(usuario_id: int) -> dict:
             .limit(1)
         )
 
-    recordatorios = recordatorios_pendientes(usuario_id, limite=3)
     contenidos = []
     senales = []
 
@@ -67,7 +71,7 @@ def construir_inicio(usuario_id: int) -> dict:
         "trimester": trimestre,
         "progress": round((semana or 0) / 42 * 100) if semana is not None else None,
         "control": control,
-        "recordatorios": recordatorios,
+        "dias_para_control": (control.fecha_control - hoy).days if control else None,
         "contenidos": contenidos,
         "senales": senales,
         "consentimiento_pendiente": bool(perfil and not perfil.consentimiento_datos),
