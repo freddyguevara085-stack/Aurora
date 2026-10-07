@@ -730,11 +730,12 @@ def test_calendario_oculta_nuevo_recordatorio_a_administradores(client, monkeypa
     assert b"/recordatorios/nuevo" not in respuesta.data
 
 
-def test_guia_muestra_borradores_solo_a_la_cuenta_demo(client, monkeypatch):
+def test_guia_muestra_borradores_solo_a_cuentas_demo(client, monkeypatch):
     from controllers import routes
-    from demo_nicaragua import BORRADORES, CUENTA_DEMO_EMAIL
+    from demo_nicaragua import BORRADORES, CUENTA_DEMO_EMAIL, CUENTAS_DEMO_EMAILS
 
     monkeypatch.setitem(client.application.config, "DEMO_MODE", True)
+    assert all(item["fuente"].startswith("minsa_") for item in BORRADORES)
 
     publica = client.get("/guia")
     assert b"Borrador de demostraci" not in publica.data
@@ -747,16 +748,21 @@ def test_guia_muestra_borradores_solo_a_la_cuenta_demo(client, monkeypatch):
         assert borrador["titulo"].encode() in demo.data
         assert borrador["texto"].encode() in demo.data
 
+    email_demo_adicional = next(email for email in CUENTAS_DEMO_EMAILS if email != CUENTA_DEMO_EMAIL)
+    _iniciar_sesion_falsa(client, monkeypatch, "usuario", usuario_id=8, email=email_demo_adicional)
+    assert b"Borrador de demostraci" in client.get("/guia").data
+
     _iniciar_sesion_falsa(client, monkeypatch, "usuario", usuario_id=9, email="persona@example.com")
     normal = client.get("/guia")
     assert "Borrador de demostraci".encode() not in normal.data
 
 
-def test_fuentes_muestra_contexto_con_su_fuente(client):
+def test_fuentes_muestra_solo_fuentes_minsa_recientes(client):
     respuesta = client.get("/fuentes")
     assert respuesta.status_code == 200
-    assert b"Contexto de Nicaragua" in respuesta.data
-    assert b"paho.org/es/nicaragua" in respuesta.data
+    assert b"Fuentes consultadas" in respuesta.data
+    assert b"MINSA - Actividades B\xc3\xa1sicas durante la Atenci\xc3\xb3n Prenatal (2022)" in respuesta.data
+    assert b"paho.org" not in respuesta.data
     assert b"revisi" in respuesta.data.lower()
 
 

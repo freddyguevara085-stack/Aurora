@@ -1,14 +1,17 @@
 {% set fum_value = form_data.get('fum') if form_data is not none else (embarazo.fum.isoformat() if embarazo and embarazo.fum else '') %}
 {% set fpp_value = form_data.get('fpp') if form_data is not none else (embarazo.fpp.isoformat() if embarazo and embarazo.fpp else '') %}
 {% set metodo_value = form_data.get('metodo_fpp') if form_data is not none else (embarazo.metodo_fpp if embarazo else '') %}
+{% if not metodo_value and fum_value %}{% set metodo_value = 'fum' %}{% endif %}
 <form method="post" class="stack-form" action="{{ url_for('main.embarazo', editar=1) if editar else url_for('main.embarazo') }}">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <fieldset>
     <legend>Fechas del embarazo</legend>
-    <label>FUM — Fecha de última menstruación<input name="fum" type="date" max="{{ date.today().isoformat() }}" value="{{ fum_value or '' }}"></label>
-    <small>Primer día de la última menstruación.</small>
-    <label>FPP — Fecha probable de parto<input name="fpp" type="date" value="{{ fpp_value or '' }}"></label>
-    <small>Fecha estimada; puede ajustarse con orientación profesional.</small>
+    <label for="fum">FUM — Fecha de última menstruación</label>
+    <input id="fum" name="fum" type="date" min="{{ min_fum }}" max="{{ date.isoformat() }}" value="{{ fum_value or '' }}" aria-describedby="fum-ayuda">
+    <small id="fum-ayuda">Indica el primer día. Para un embarazo activo, la fecha debe estar dentro de las últimas 42 semanas.</small>
+    <label for="fpp">FPP — Fecha probable de parto</label>
+    <input id="fpp" name="fpp" type="date" min="{{ min_fpp }}" max="{{ max_fpp }}" value="{{ fpp_value or '' }}" aria-describedby="fpp-ayuda">
+    <small id="fpp-ayuda">Con método FUM se calcula a 280 días de la FUM. Si la fecha viene de ecografía o profesional, selecciona ese método.</small>
   </fieldset>
   <fieldset>
     <legend>Método de estimación</legend>

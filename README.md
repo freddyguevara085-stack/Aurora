@@ -38,7 +38,7 @@
 - **Qué ofrece:** etapa orientativa del embarazo, agenda de controles, preguntas para la consulta, plan de traslado y apoyo, contactos personales y fichas imprimibles.
 - **Qué no ofrece:** diagnóstico, interpretación de síntomas, tratamientos, protocolos clínicos ni sustitución de la atención profesional.
 
-Quedaron **fuera del producto** el seguimiento de preeclampsia y el de puerperio, lactancia y recién nacido: sus rutas devuelven 404 y no aparecen en la navegación. El contenido clínico (guía y señales) permanece cerrado al público hasta contar con revisión clínica documentada.
+El seguimiento individual de puerperio, lactancia y recién nacido sigue fuera de los módulos de la aplicación. Para las cuatro cuentas ficticias, la guía de demostración muestra un panorama general desde la atención prenatal hasta el seguimiento postnatal, basado únicamente en materiales oficiales MINSA de 2020–2022 y marcado como pendiente de revisión clínica; no contiene pautas personalizadas.
 
 ## Qué incluye
 
@@ -282,9 +282,9 @@ Los centros de demostración provienen del listado oficial del MINSA (nombre, ti
 
 ## Demo y revisión de contenido clínico
 
-El contenido clínico no se publica: la guía y las señales permanecen deshabilitadas (fail-closed) hasta que exista un proceso de revisión clínica documentado. Para revisarlo con profesionales existe una vista separada, restringida al rol `administrador` y marcada como demo.
+Las orientaciones clínicas generales y las señales para cuentas normales permanecen deshabilitadas (fail-closed) hasta que exista revisión clínica documentada. La guía de proceso con fuentes MINSA se muestra solo a las cuatro cuentas ficticias cuando `AURORA_DEMO=1`; cada ficha lleva la marca de pendiente de revisión. La vista de revisión clínica sigue restringida al rol `administrador`.
 
-Los datos de demostración (cuatro perfiles ficticios y centros oficiales del MINSA) solo se cargan en una base de demo. `seed-demo` exige `AURORA_DEMO=1`; sin esa variable se cancela para no ensuciar la base real. El comando muestra contraseñas aleatorias; guárdalas y compártelas en privado, porque una nueva ejecución las cambia.
+Los datos de demostración (cuatro perfiles ficticios y centros oficiales del MINSA) solo se cargan en una base de demo. `seed-demo` exige `AURORA_DEMO=1`; sin esa variable se cancela para no ensuciar una base real. El comando muestra contraseñas aleatorias; guárdalas y compártelas en privado, porque una nueva ejecución las cambia.
 
 1. Activar el modo demo (solo en la base/entorno de demo):
    - PowerShell: `$env:AURORA_DEMO = "1"`

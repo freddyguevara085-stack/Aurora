@@ -18,13 +18,21 @@ def calcular_semana_gestacional(
 ) -> int | None:
     """Calcula una semana visual de 0 a 42 sin valor clínico adicional."""
     hoy = hoy or date.today()
-    if metodo_fpp in ("ecografia", "profesional") and fpp:
-        inicio = fpp - timedelta(days=280)
-    else:
-        inicio = fum or (fpp - timedelta(days=280) if fpp else None)
+    inicio = fecha_inicio_gestacion(fum, fpp, metodo_fpp)
     if not inicio:
         return None
     return min(42, max(0, (hoy - inicio).days // 7))
+
+
+def fecha_inicio_gestacion(
+    fum: date | None,
+    fpp: date | None,
+    metodo_fpp: str | None = None,
+) -> date | None:
+    """Deriva la fecha de inicio visual según el método de estimación registrado."""
+    if metodo_fpp in ("ecografia", "profesional", "otro") and fpp:
+        return fpp - timedelta(days=280)
+    return fum or (fpp - timedelta(days=280) if fpp else None)
 
 
 def calcular_trimestre(semana: int | None) -> int | None:

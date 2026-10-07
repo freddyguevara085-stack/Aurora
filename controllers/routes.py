@@ -7,8 +7,8 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 
 from controllers.admin import admin_required
-from demo_nicaragua import BORRADORES, CONTEXTO, CUENTA_DEMO_EMAIL, FECHA_CONSULTA, FUENTES
-from services.home import calcular_semana_gestacional, construir_inicio
+from demo_nicaragua import BORRADORES, CONTEXTO, CUENTAS_DEMO_EMAILS, FECHA_CONSULTA, FUENTES
+from services.home import calcular_semana_gestacional, construir_inicio, fecha_inicio_gestacion
 from services.mvp import centros_activos, centro_activo, contenidos_publicados, controles_activos, perfil_y_embarazo, recordatorios_pendientes, servicios_disponibles
 from extensions import db
 from models.gestacion import ContactoComunitario, Embarazo, PerfilGestante, PlanParto
@@ -34,12 +34,16 @@ def _es_cuenta_demo():
     return (
         current_user.is_authenticated
         and current_app.config.get("DEMO_MODE")
-        and getattr(current_user, "email", None) == CUENTA_DEMO_EMAIL
+        and getattr(current_user, "email", None) in CUENTAS_DEMO_EMAILS
     )
 
 
-def validar_fechas_embarazo(fum_raw, fpp_raw, metodo):
-    """Normaliza fechas del embarazo sin aceptar estimaciones contradictorias."""
+def validar_fechas_embarazo(
+    fum_raw: str | None,
+    fpp_raw: str | None,
+    metodo: str | None,
+) -> tuple[date | None, date | None, str | None]:
+    """Valida fechas de un embarazo activo con un límite visual de 42 semanas."""
     try:
         fum = date.fromisoformat(fum_raw) if fum_raw else None
         fpp = date.fromisoformat(fpp_raw) if fpp_raw else None
@@ -47,17 +51,50 @@ def validar_fechas_embarazo(fum_raw, fpp_raw, metodo):
         return None, None, "Revisa el formato de las fechas."
     if not fum and not fpp:
         return None, None, "Indica la fecha de última menstruación o la fecha probable de parto."
-    if fum and fum > date.today():
+    hoy = date.today()
+    if metodo is None:
+        metodo = "fum" if fum else "otro"
+    if fum and fum > hoy:
         return None, None, "La fecha de última menstruación no puede estar en el futuro."
-    if not fum and fpp and fpp <= date.today():
-        return None, None, "La fecha probable de parto debe ser futura."
-    if metodo == "fum" and fum:
-        return fum, fum + timedelta(days=280), None
+    if fum and (hoy - fum).days > 42 * 7:
+        return None, None, "La FUM corresponde a más de 42 semanas; revisa la fecha del embarazo activo."
+    if fpp and fpp < hoy - timedelta(days=14):
+        return None, None, "La FPP corresponde a más de 42 semanas; revisa la fecha del embarazo activo."
+    if fpp and fpp > hoy + timedelta(days=280):
+        return None, None, "La FPP está a más de 40 semanas desde hoy; revisa la fecha."
+    if metodo == "fum" and not fum:
+        return None, None, "Indica la FUM o selecciona el método con el que se estimó la FPP."
+    if metodo in {"ecografia", "profesional", "otro"} and not fpp:
+        return None, None, "Indica la FPP según el método de estimación seleccionado."
     if fum and fpp:
         dias = (fpp - fum).days
         if dias < 1 or dias > 322:
             return None, None, "La relación entre las fechas no parece coherente."
+    if metodo == "fum" and fum:
+        calculada = fum + timedelta(days=280)
+        if fpp and fpp != calculada:
+            return None, None, "Con método FUM, la FPP se calcula a 280 días de esa fecha. Revisa las fechas o selecciona el método utilizado por tu profesional."
+        return fum, calculada, None
     return fum, fpp, None
+
+
+def validar_fecha_control(
+    fecha_control: date,
+    inicio_gestacion: date | None,
+    estado: str,
+    hoy: date | None = None,
+) -> str | None:
+    """Evita citas programadas pasadas o fuera de la gestación estimada."""
+    hoy = hoy or date.today()
+    if estado in {"programado", "reprogramado"} and fecha_control < hoy:
+        return "La fecha de una cita programada no puede estar en el pasado."
+    if inicio_gestacion:
+        dias = (fecha_control - inicio_gestacion).days
+        if dias < 0:
+            return "La fecha del control es anterior al inicio estimado del embarazo; revisa ambas fechas."
+        if dias > 42 * 7:
+            return "La fecha del control supera las 42 semanas estimadas; revisa los datos con tu profesional de salud."
+    return None
 
 
 @main_bp.route('/embarazo', methods=['GET', 'POST'])
@@ -72,7 +109,7 @@ def embarazo():
         form_data = request.form
         fum = request.form.get('fum') or None
         fpp = request.form.get('fpp') or None
-        metodo = request.form.get('metodo_fpp') or None
+        metodo = request.form.get('metodo_fpp') or ('fum' if fum else None)
         if metodo and metodo not in {'fum', 'ecografia', 'profesional', 'otro'}:
             flash('Método no válido.', 'error')
         else:
@@ -103,6 +140,9 @@ def embarazo():
         editar=editar,
         form_data=form_data,
         date=date.today(),
+        min_fum=(date.today() - timedelta(days=42 * 7)).isoformat(),
+        min_fpp=(date.today() - timedelta(days=14)).isoformat(),
+        max_fpp=(date.today() + timedelta(days=280)).isoformat(),
     )
 
 
@@ -188,13 +228,11 @@ def nuevo_control():
 
     semana_actual = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
 
-    inicio_gestacion = None
-    if activo:
-        if activo.metodo_fpp in ("ecografia", "profesional") and activo.fpp:
-            inicio_gestacion = activo.fpp - timedelta(days=280)
-        else:
-            inicio_gestacion = activo.fum or (activo.fpp - timedelta(days=280) if activo.fpp else None)
+    inicio_gestacion = fecha_inicio_gestacion(activo.fum, activo.fpp, activo.metodo_fpp) if activo else None
     inicio_gestacion_iso = inicio_gestacion.isoformat() if inicio_gestacion else ''
+    hoy = date.today()
+    max_control_date = (inicio_gestacion + timedelta(days=42 * 7)).isoformat() if inicio_gestacion else ''
+    error_fecha_control = None
 
     if request.method == 'POST':
         try:
@@ -209,14 +247,18 @@ def nuevo_control():
                 centro_input_raw = (request.form.get('centro_otro_nombre') or '').strip() or 'Puesto de salud comunitario'
 
             centro_id, centro_personalizado = _resolver_centro_input(centro_input_raw, centros)
-            estado = request.form.get('estado', 'programado')
+            estado = 'programado'
+            error_fecha_control = validar_fecha_control(fecha_control, inicio_gestacion, estado, hoy)
+            if error_fecha_control:
+                raise ValueError
 
-            edad_raw = request.form.get('edad_gestacional') or None
-            if edad_raw:
-                edad = float(edad_raw)
-            else:
-                edad_calc = calcular_semana_gestacional(activo.fum, activo.fpp, hoy=fecha_control, metodo_fpp=activo.metodo_fpp) if activo else None
-                edad = float(edad_calc) if edad_calc is not None else None
+            edad_calc = calcular_semana_gestacional(
+                activo.fum,
+                activo.fpp,
+                hoy=fecha_control,
+                metodo_fpp=activo.metodo_fpp,
+            )
+            edad = float(edad_calc) if edad_calc is not None else None
 
             tipo_control = (request.form.get('tipo_control') or '').strip()
             indicaciones_texto = (request.form.get('indicaciones') or '').strip()
@@ -232,7 +274,7 @@ def nuevo_control():
             indicaciones_final = " ".join(partes_indicaciones).strip() or None
             notas_final = (request.form.get('notas') or '').strip() or None
 
-            if numero < 1 or (edad is not None and not 0 <= edad <= 45) or estado not in {'programado', 'realizado', 'reprogramado', 'cancelado'}:
+            if numero < 1 or (edad is not None and not 0 <= edad <= 42):
                 raise ValueError
 
             db.session.add(ControlPrenatal(
@@ -251,7 +293,7 @@ def nuevo_control():
             flash('Control agendado con éxito.', 'success')
             return redirect(url_for('main.controles'))
         except (ValueError, TypeError):
-            flash('Revisa los datos del control.', 'error')
+            flash(error_fecha_control or 'Revisa los datos del control.', 'error')
         except SQLAlchemyError:
             db.session.rollback()
             flash('Ya existe ese número de control.', 'error')
@@ -267,6 +309,8 @@ def nuevo_control():
         semana_actual=semana_actual,
         inicio_gestacion_iso=inicio_gestacion_iso,
         tipo_control_actual='Control prenatal regular',
+        min_control_date=hoy.isoformat(),
+        max_control_date=max_control_date,
         form_data=request.form if request.method == 'POST' else None
     )
 
@@ -289,13 +333,17 @@ def editar_control(control_id):
     centros = _ordenar_centros_por_zona(centros_activos(), perfil)
     semana_actual = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
 
-    inicio_gestacion = None
-    if activo:
-        if activo.metodo_fpp in ("ecografia", "profesional") and activo.fpp:
-            inicio_gestacion = activo.fpp - timedelta(days=280)
-        else:
-            inicio_gestacion = activo.fum or (activo.fpp - timedelta(days=280) if activo.fpp else None)
+    inicio_gestacion = fecha_inicio_gestacion(
+        activo.fum if activo else None,
+        activo.fpp if activo else None,
+        activo.metodo_fpp if activo else None,
+    )
     inicio_gestacion_iso = inicio_gestacion.isoformat() if inicio_gestacion else ''
+    hoy = date.today()
+    max_control_date = (inicio_gestacion + timedelta(days=42 * 7)).isoformat() if inicio_gestacion else ''
+    estado_form = request.form.get('estado', control.estado) if request.method == 'POST' else control.estado
+    min_control_date = hoy.isoformat() if estado_form in {'programado', 'reprogramado'} else ''
+    error_fecha_control = None
 
     tipo_control_actual = 'Control prenatal regular'
     indicaciones_limpias = control.indicaciones or ''
@@ -325,6 +373,9 @@ def editar_control(control_id):
 
             centro_id, centro_personalizado = _resolver_centro_input(centro_input_raw, centros)
             if estado not in {'programado', 'realizado', 'reprogramado', 'cancelado'}:
+                raise ValueError
+            error_fecha_control = validar_fecha_control(fecha_control, inicio_gestacion, estado, hoy)
+            if error_fecha_control:
                 raise ValueError
 
             tipo_control = (request.form.get('tipo_control') or '').strip()
@@ -357,7 +408,7 @@ def editar_control(control_id):
             return redirect(url_for('main.controles'))
         except (ValueError, TypeError):
             db.session.rollback()
-            flash('Revisa la fecha, hora, estado y centro del control.', 'error')
+            flash(error_fecha_control or 'Revisa la fecha, hora, estado y centro del control.', 'error')
         except SQLAlchemyError:
             db.session.rollback()
             flash('No fue posible actualizar el control.', 'error')
@@ -392,6 +443,8 @@ def editar_control(control_id):
         semana_actual=semana_actual,
         semana_estimada=semana_estimada_control,
         inicio_gestacion_iso=inicio_gestacion_iso,
+        min_control_date=min_control_date,
+        max_control_date=max_control_date,
         tipo_control_actual=tipo_control_actual,
         indicaciones_limpias=indicaciones_limpias,
         form_data=request.form if request.method == 'POST' else None

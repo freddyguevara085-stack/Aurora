@@ -78,9 +78,12 @@
           name="fecha_control"
           type="date"
           class="form-input"
+          min="{{ min_control_date or '' }}"
+          max="{{ max_control_date or '' }}"
           value="{{ values.fecha_control if values and form_data else (values.fecha_control.isoformat() if values and values.fecha_control else '') }}"
           required
         >
+        <small class="form-help">Las citas nuevas deben ser hoy o posteriores y quedar dentro de las 42 semanas estimadas.</small>
       </div>
       <div class="form-group">
         <label for="hora_control" class="form-label">Hora <span class="optional-label">(opcional)</span></label>
@@ -143,7 +146,7 @@
       </div>
     </div>
     {% else %}
-    <input type="hidden" name="estado" value="programado">
+    <input id="estado" type="hidden" name="estado" value="programado">
     {% endif %}
 
     <!-- 4. Preguntas o notas para la consulta -->
@@ -194,8 +197,21 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   var fechaInput = document.getElementById('fecha_control');
+  var estadoInput = document.getElementById('estado');
   var noteEl = document.getElementById('calc-gestacional-note');
   var textEl = document.getElementById('calc-gestacional-text');
+  if (fechaInput && estadoInput) {
+    function actualizarLimiteFecha() {
+      if (estadoInput.value === 'programado' || estadoInput.value === 'reprogramado') {
+        var now = new Date();
+        fechaInput.min = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+      } else {
+        fechaInput.removeAttribute('min');
+      }
+    }
+    actualizarLimiteFecha();
+    estadoInput.addEventListener('change', actualizarLimiteFecha);
+  }
   if (fechaInput && noteEl && textEl) {
     var inicioStr = noteEl.getAttribute('data-inicio');
     if (inicioStr) {

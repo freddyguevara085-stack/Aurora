@@ -7,7 +7,7 @@
   {% set back_label = 'Inicio' %}
   {% set page_title = 'Guía prenatal' %}
   {% include 'partials/page_header.html' %}
-  <p class="orient-intro">Acompañamiento y orientación clara para cada etapa de tu embarazo.</p>
+  <p class="orient-intro">Guía de demostración basada en materiales oficiales del MINSA publicados desde 2020. El contenido está pendiente de revisión clínica y no sustituye la orientación de tu unidad de salud.</p>
 
   {% if orientaciones %}
   {# ── Buscador ── #}
@@ -25,10 +25,10 @@
       <span class="material-symbols-outlined" aria-hidden="true">kid_star</span>Mi trimestre ({{ user_trimestre }}.º)
     </button>
     {% endif %}
-    <button class="orient-chip" data-filter="alimentacion" type="button" aria-pressed="false">Alimentación y Cuidados</button>
-    <button class="orient-chip orient-chip--warn" data-filter="senales" type="button" aria-pressed="false">Señales de alarma</button>
-    <button class="orient-chip" data-filter="controles" type="button" aria-pressed="false">Trámites y Consultas</button>
-    <button class="orient-chip" data-filter="preparacion" type="button" aria-pressed="false">Preparación y Parto</button>
+    <button class="orient-chip" data-filter="controles" type="button" aria-pressed="false">Embarazo y controles</button>
+    <button class="orient-chip orient-chip--warn" data-filter="preparacion" type="button" aria-pressed="false">Preparación y parto</button>
+    <button class="orient-chip" data-filter="puerperio" type="button" aria-pressed="false">Puerperio y postnatal</button>
+    <button class="orient-chip" data-filter="registro" type="button" aria-pressed="false">Registro perinatal</button>
   </nav>
 
   {# ── Anuncio en vivo para lectores de pantalla ── #}
@@ -54,6 +54,9 @@
         <span class="orient-card__head">
           <span class="orient-chip orient-chip--cat">{{ item.categoria }}</span>
           <strong>{{ item.titulo }}</strong>
+          {% if item.es_borrador %}
+          <span class="status-badge status-badge--warning orient-card__draft-badge">Borrador de demostración · pendiente de revisión clínica</span>
+          {% endif %}
           {% if item.resumen %}
           <span class="orient-card__preview">{{ item.resumen }}</span>
           {% endif %}
@@ -63,9 +66,6 @@
       </button>
       <div class="orient-card__body" id="orient-body-{{ loop.index }}" hidden>
         <div class="orient-card__content">{{ item.cuerpo }}</div>
-        {% if item.es_borrador %}
-        <span class="status-badge status-badge--warning orient-card__draft-badge">Borrador de demostración — pendiente de revisión clínica</span>
-        {% endif %}
         {% if item.fuente_url and item.fuente_url != '#' %}
         <a class="orient-card__link" href="{{ item.fuente_url }}" target="_blank" rel="noopener noreferrer">
           <span class="material-symbols-outlined" aria-hidden="true">open_in_new</span>Ver fuente oficial
