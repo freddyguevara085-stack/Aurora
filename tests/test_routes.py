@@ -738,6 +738,13 @@ def test_clinica_previsional_se_identifica_y_muestra_requisito_inss(client, monk
     assert b"convenios con el INSS" in detalle.data
 
 
+def test_centros_estilos_responsivos_no_desbordan():
+    with open("static/css/pages.css", "r", encoding="utf-8") as f:
+        css = f.read()
+    assert "grid-template-columns: minmax(0, 1fr);" in css
+    assert "word-break: break-word;" in css
+
+
 def test_fuente_solo_acepta_http_o_https():
     from controllers.admin import _url_fuente_valida
 
