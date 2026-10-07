@@ -7,7 +7,7 @@
     {% set back_label = 'Inicio' %}
     {% set page_title = 'Centros de salud' %}
     {% include 'partials/page_header.html' %}
-    <p class="orient-intro">Encuentra hospitales, centros y casas maternas en Nicaragua.</p>
+    <p class="orient-intro">Encuentra hospitales, centros de salud, casas maternas y clínicas médicas previsionales del MINSA.</p>
 
     {# ── Aviso de demostración sobrio y elegante ── #}
     <aside class="centros-notice" role="note" id="demo-banner">
@@ -17,6 +17,15 @@
             <a href="{{ url_for('main.fuentes') }}" class="centros-notice__link">Saber más</a>
         </p>
     </aside>
+    {% if centros|selectattr('tipo_establecimiento', 'equalto', 'clinica')|list %}
+    <aside class="verification-notice" role="note">
+        <span class="material-symbols-outlined" aria-hidden="true">info</span>
+        <div>
+            <strong>Clínicas Médicas Previsionales (CMP MINSA)</strong>
+            <p>MINSA las describe para asegurados, jubilados y beneficiarios según convenios con el INSS. <a href="https://www.minsa.gob.ni/index.php/centros-e-institutos/clinicas-medicas-previsionales-del-ministerio-de-salud-cmp-minsa" target="_blank" rel="noopener noreferrer">Confirma aquí si la atención aplica a tu caso.</a></p>
+        </div>
+    </aside>
+    {% endif %}
 
     {# ── Buscador omnicanal en tiempo real ── #}
     <div class="centros-search">
@@ -43,6 +52,7 @@
             <button type="button" class="centros-chip {% if tipo == 'centro_salud' %}is-active{% endif %}" data-tipo="centro_salud" aria-pressed="{% if tipo == 'centro_salud' %}true{% else %}false{% endif %}">Centros de Salud</button>
             <button type="button" class="centros-chip {% if tipo == 'puesto_salud' %}is-active{% endif %}" data-tipo="puesto_salud" aria-pressed="{% if tipo == 'puesto_salud' %}true{% else %}false{% endif %}">Puestos de Salud</button>
             <button type="button" class="centros-chip {% if tipo == 'hospital' %}is-active{% endif %}" data-tipo="hospital" aria-pressed="{% if tipo == 'hospital' %}true{% else %}false{% endif %}">Hospitales</button>
+            <button type="button" class="centros-chip {% if tipo == 'clinica' %}is-active{% endif %}" data-tipo="clinica" aria-pressed="{% if tipo == 'clinica' %}true{% else %}false{% endif %}">Clínicas previsionales</button>
         </nav>
     </div>
 
@@ -52,7 +62,7 @@
     {# ── Listado de tarjetas de centros de atención ── #}
     <section class="centros-list" id="centros-list" aria-label="Listado de centros de atención">
         {% for centro in centros %}
-        {% set tipo_clean = centro.tipo_establecimiento|replace('_', ' ') %}
+        {% set tipo_clean = 'Clínica Médica Previsional' if centro.tipo_establecimiento == 'clinica' else centro.tipo_establecimiento|replace('_', ' ') %}
         {% set nombre_completo = centro.nombre if tipo_clean|lower in centro.nombre|lower else ((tipo_clean|capitalize) ~ ' ' ~ centro.nombre) %}
         <article class="centro-card aurora-card"
                  data-nombre="{{ nombre_completo|lower }}"

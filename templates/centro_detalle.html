@@ -26,10 +26,20 @@
     </section>
     {% endif %}
 
+    {% if centro.tipo_establecimiento == 'clinica' %}
+    <section class="verification-notice" role="note">
+        <span class="material-symbols-outlined" aria-hidden="true">info</span>
+        <div>
+            <strong>Clínica Médica Previsional (CMP MINSA)</strong>
+            <p>MINSA indica que estos servicios se brindan a asegurados, jubilados y beneficiarios según convenios con el INSS. <a href="https://www.minsa.gob.ni/index.php/centros-e-institutos/clinicas-medicas-previsionales-del-ministerio-de-salud-cmp-minsa" target="_blank" rel="noopener noreferrer">Consulta la fuente oficial</a> y confirma si aplica a tu caso.</p>
+        </div>
+    </section>
+    {% endif %}
+
     <article class="card aurora-card" style="margin-bottom: 24px;">
         <div style="margin-bottom: 16px;">
             <span class="status-badge status-badge--success" style="text-transform: capitalize;">
-                {{ centro.tipo_establecimiento|replace('_', ' ') }}
+                {{ 'Clínica Médica Previsional' if centro.tipo_establecimiento == 'clinica' else centro.tipo_establecimiento|replace('_', ' ') }}
             </span>
         </div>
 

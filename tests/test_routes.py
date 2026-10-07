@@ -696,6 +696,37 @@ def test_centros_consultables_sin_cuenta(client, monkeypatch):
     assert b"Directorio de demostraci\xc3\xb3n" in response.data
 
 
+def test_clinica_previsional_se_identifica_y_muestra_requisito_inss(client, monkeypatch):
+    from controllers import routes
+
+    clinica = SimpleNamespace(
+        id=7,
+        nombre="Puerto Cabezas",
+        tipo_establecimiento="clinica",
+        municipio="Puerto Cabezas",
+        departamento="RACCN",
+        fecha_verificacion=None,
+        direccion="Barrio El Cocal",
+        telefono=None,
+        horario=None,
+        latitud=None,
+        longitud=None,
+    )
+    monkeypatch.setattr(routes, "centros_activos", lambda: [clinica])
+    monkeypatch.setattr(routes, "centro_activo", lambda _centro_id: clinica)
+    monkeypatch.setattr(routes, "servicios_disponibles", lambda _centro_id: [])
+
+    listado = client.get("/centros")
+    assert listado.status_code == 200
+    assert b'data-tipo="clinica"' in listado.data
+    assert "Clínicas previsionales".encode() in listado.data
+
+    detalle = client.get("/centros/7")
+    assert detalle.status_code == 200
+    assert "Clínica Médica Previsional (CMP MINSA)".encode() in detalle.data
+    assert b"convenios con el INSS" in detalle.data
+
+
 def test_fuente_solo_acepta_http_o_https():
     from controllers.admin import _url_fuente_valida
 

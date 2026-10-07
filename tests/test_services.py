@@ -87,8 +87,8 @@ def test_guia_demo_cubre_filtros_y_directorio_solo_tiene_fuentes_minsa():
         "controles", "preparacion", "puerperio", "registro"
     }
     assert all(item["fuente"].startswith("minsa_") and item["fuente"] in FUENTES for item in BORRADORES)
-    assert len(CENTROS) >= 45
+    assert len(CENTROS) >= 65
     assert {centro["tipo_establecimiento"] for centro in CENTROS} == {
-        "hospital", "casa_materna", "centro_salud"
+        "hospital", "casa_materna", "centro_salud", "clinica"
     }
     assert all(centro["fuente"] in FUENTES for centro in CENTROS)

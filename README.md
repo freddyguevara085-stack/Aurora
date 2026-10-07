@@ -278,7 +278,7 @@ Aurora/
 
 El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan algunos recursos estáticos y una página general de contingencia. La disponibilidad sin conexión es parcial: perfil, embarazo, controles, preguntas, traslado, contactos y recordatorios requieren conexión y no se guardan en caché. La página de contingencia no muestra datos de la cuenta. Aurora no envía notificaciones en segundo plano; los recordatorios se consultan dentro de la aplicación.
 
-Los centros de demostración provienen del listado oficial del MINSA (nombre, tipo y ubicación; consultado el 2026-10-06). Teléfonos, horarios, coordenadas y servicios no aparecen en la fuente y no se muestran. `seed-demo` solo se ejecuta con `AURORA_DEMO=1` y no registra fechas de verificación; confirma directamente con el establecimiento antes de acudir.
+El directorio de demostración incluye hospitales, casas maternas, centros de salud y Clínicas Médicas Previsionales del listado oficial del MINSA (consultado el 2026-10-06). Teléfonos, horarios, coordenadas y servicios no se importan. Las CMP publicadas son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento. `seed-demo` solo se ejecuta con `AURORA_DEMO=1`.
 
 ## Demo y revisión de contenido clínico
 
