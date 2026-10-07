@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 
 from controllers.routes import validar_fecha_control, validar_fechas_embarazo
+from demo_nicaragua import BORRADORES, CENTROS, FUENTES
 from services.home import calcular_semana_gestacional
 
 
@@ -79,3 +80,15 @@ def test_validar_fecha_control_restringe_pasado_y_fuera_de_gestacion():
     assert "42 semanas" in validar_fecha_control(inicio + timedelta(days=295), inicio, "programado", hoy)
     assert validar_fecha_control(hoy + timedelta(days=2), inicio, "programado", hoy) is None
     assert validar_fecha_control(hoy - timedelta(days=7), inicio, "realizado", hoy) is None
+
+
+def test_guia_demo_cubre_filtros_y_directorio_solo_tiene_fuentes_minsa():
+    assert {item["categoria"] for item in BORRADORES} >= {
+        "controles", "preparacion", "puerperio", "registro"
+    }
+    assert all(item["fuente"].startswith("minsa_") and item["fuente"] in FUENTES for item in BORRADORES)
+    assert len(CENTROS) >= 45
+    assert {centro["tipo_establecimiento"] for centro in CENTROS} == {
+        "hospital", "casa_materna", "centro_salud"
+    }
+    assert all(centro["fuente"] in FUENTES for centro in CENTROS)

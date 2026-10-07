@@ -10,6 +10,7 @@ Fuentes MINSA consultadas el 2026-10-06:
 - MINSA - Elaboración y utilización del Censo Gerencial (2022).
 - MINSA - Atención del Recién Nacido (2022).
 - MINSA - Normativa 078, Sistema de Información Perinatal Plus.
+- MINSA - Red de Salud: hospitales, casas maternas y centros de salud.
 - MINSA Nicaragua - Red de Salud, Hospitales: https://www.minsa.gob.ni/index.php/red-de-salud/hospitales
 - MINSA Nicaragua - Red de Salud, Casa Materna: https://www.minsa.gob.ni/index.php/red-de-salud/casa-materna
 """
@@ -37,6 +38,10 @@ FUENTES = {
     "minsa_casas_maternas": {
         "nombre": "MINSA Nicaragua - Red de Salud: Casa Materna",
         "url": "https://www.minsa.gob.ni/index.php/red-de-salud/casa-materna",
+    },
+    "minsa_centros_salud": {
+        "nombre": "MINSA Nicaragua - Red de Salud: Centro de Salud",
+        "url": "https://www.minsa.gob.ni/index.php/red-de-salud/centro-de-salud",
     },
     "minsa_atencion_prenatal_2022": {
         "nombre": "MINSA - Actividades Básicas durante la Atención Prenatal (2022); cita Normativa 011, tercera edición (2020)",
@@ -178,6 +183,7 @@ BORRADORES = [
         "id": "inicio-atencion-prenatal",
         "titulo": "Inicio de la atención prenatal",
         "categoria": "controles",
+        "trimestre": 1,
         "texto": (
             "El material formativo del MINSA consultado para esta demostración presenta "
             "la captación prenatal como un proceso temprano y periódico. Idealmente, la "
@@ -202,6 +208,31 @@ BORRADORES = [
         "fuente": "minsa_atencion_prenatal_2022",
     },
     {
+        "id": "fum-fpp-fechas-orientativas",
+        "titulo": "FUM y FPP: fechas orientativas",
+        "categoria": "controles",
+        "texto": (
+            "El material formativo del MINSA explica la FPP como la fecha en que se "
+            "cumplen 40 semanas y describe su estimación con herramientas de datación "
+            "gestacional. En Aurora, el método FUM usa un cálculo aproximado de 280 días; "
+            "una estimación de ecografía o profesional puede ser distinta. Confirma tus "
+            "fechas con el personal de salud."
+        ),
+        "fuente": "minsa_atencion_prenatal_2022",
+    },
+    {
+        "id": "preparar-atencion-prenatal",
+        "titulo": "Preparar cada atención prenatal",
+        "categoria": "controles",
+        "texto": (
+            "El MINSA describe la atención prenatal como una secuencia periódica de "
+            "atenciones a cargo del personal de salud. Para una consulta puedes ordenar "
+            "tus fechas y anotar lo que deseas conversar. Los exámenes, valoraciones y "
+            "decisiones clínicas los realiza el equipo que te atiende."
+        ),
+        "fuente": "minsa_atencion_prenatal_2022",
+    },
+    {
         "id": "registro-perinatal-y-continuidad",
         "titulo": "Registro y continuidad de la atención",
         "categoria": "registro",
@@ -215,9 +246,34 @@ BORRADORES = [
         "fuente": "minsa_sip_plus_2022",
     },
     {
+        "id": "censo-gerencial-continuidad",
+        "titulo": "Seguimiento de citas y continuidad",
+        "categoria": "registro",
+        "texto": (
+            "El material formativo del Censo Gerencial del MINSA describe cómo los "
+            "servicios organizan el seguimiento de embarazadas, puérperas y postnatales. "
+            "Aurora no es ese registro institucional; aquí puedes anotar recordatorios "
+            "personales para conversar con tu unidad de salud."
+        ),
+        "fuente": "minsa_censo_gerencial_2022",
+    },
+    {
+        "id": "registro-parto-recien-nacido",
+        "titulo": "Registro del parto y del recién nacido",
+        "categoria": "registro",
+        "texto": (
+            "La documentación perinatal del MINSA incluye segmentos para registrar la "
+            "atención del parto y del recién nacido como parte de la continuidad con la "
+            "historia de embarazo. Ese registro clínico oficial lo completa el personal "
+            "de salud, no Aurora."
+        ),
+        "fuente": "minsa_sip_plus_2022",
+    },
+    {
         "id": "plan-de-parto-y-apoyo",
         "titulo": "Preparación y red de apoyo",
         "categoria": "preparacion",
+        "trimestre": 3,
         "texto": (
             "Los materiales formativos del MINSA incluyen la preparación del plan de parto "
             "y el seguimiento de la coordinación con una Casa Materna cuando corresponde. "
@@ -227,9 +283,23 @@ BORRADORES = [
         "fuente": "minsa_censo_gerencial_2022",
     },
     {
+        "id": "casa-materna-y-coordinacion",
+        "titulo": "Casa Materna y coordinación local",
+        "categoria": "preparacion",
+        "trimestre": 3,
+        "texto": (
+            "Los materiales del MINSA incluyen la coordinación con una Casa Materna "
+            "dentro de la organización alrededor del parto cuando corresponde. La unidad "
+            "de salud confirma si aplica a cada situación y la disponibilidad del servicio. "
+            "El directorio de Aurora no confirma cupos ni servicios."
+        ),
+        "fuente": "minsa_censo_gerencial_2022",
+    },
+    {
         "id": "parto-y-atencion-del-recien-nacido",
         "titulo": "Parto y atención del recién nacido",
-        "categoria": "parto",
+        "categoria": "preparacion",
+        "trimestre": 3,
         "texto": (
             "El MINSA publica materiales diferenciados para la atención del parto y la "
             "atención inmediata del recién nacido por personal de salud. La evaluación, "
@@ -251,7 +321,357 @@ BORRADORES = [
         ),
         "fuente": "minsa_censo_gerencial_2022",
     },
+    {
+        "id": "recien-nacido-y-lactancia",
+        "titulo": "Recién nacido, lactancia y apoyo",
+        "categoria": "puerperio",
+        "texto": (
+            "Los materiales formativos del MINSA incluyen la atención inmediata del recién "
+            "nacido y el acompañamiento a la lactancia como parte de la continuidad "
+            "materno-infantil. Para dudas o apoyo individual, conversa con el personal de "
+            "salud que atiende a la familia; esta ficha no da instrucciones clínicas."
+        ),
+        "fuente": "minsa_recien_nacido_2022",
+    },
 ]
+
+# Más registros del directorio público, comprobados en los listados MINSA
+# consultados el 2026-10-06. Se importan solo los campos publicados por MINSA.
+CENTROS.extend([
+    {
+        "nombre": "Hospital Primario Oswaldo Padilla",
+        "tipo_establecimiento": "hospital",
+        "silais": "RACCN BILWI",
+        "departamento": "RACCN",
+        "municipio": "Waspán",
+        "direccion": "Barrio Esteban Jaenz, casco urbano Waspam, Bo. Esteban Jaens",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Primario Ahmed Campos Corea, El Papayal",
+        "tipo_establecimiento": "hospital",
+        "silais": "BOACO",
+        "departamento": "Boaco",
+        "municipio": "San Lorenzo",
+        "direccion": "Km 104 carretera al Rama, Bo. El Papayal",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Primario San Francisco de Asís",
+        "tipo_establecimiento": "hospital",
+        "silais": "BOACO",
+        "departamento": "Boaco",
+        "municipio": "Camoapa",
+        "direccion": "De la farmacia del Divino Niño 7 cuadras al norte",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Primario San José",
+        "tipo_establecimiento": "hospital",
+        "silais": "CARAZO",
+        "departamento": "Carazo",
+        "municipio": "Diriamba",
+        "direccion": "Del Reloj 3 cuadras abajo, 4 cuadras al sur, Barrio La Libertad",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Primario Raymundo García",
+        "tipo_establecimiento": "hospital",
+        "silais": "CHINANDEGA",
+        "departamento": "Chinandega",
+        "municipio": "Somotillo",
+        "direccion": "Del Mercado Central 3 km hacia carretera Cinco Pinos, Las Colinas",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Primario Tomás Borge Martínez",
+        "tipo_establecimiento": "hospital",
+        "silais": "CHINANDEGA",
+        "departamento": "Chinandega",
+        "municipio": "Chichigalpa",
+        "direccion": "Empalme Chichigalpa, 200 m al este, carretera a León, San José",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Primario Monseñor Julio C. Videa",
+        "tipo_establecimiento": "hospital",
+        "silais": "ESTELI",
+        "departamento": "Estelí",
+        "municipio": "Pueblo Nuevo",
+        "direccion": "Salida hacia La Cofradía, contiguo al preescolar Janeth Rodríguez, Bo. Bayron Jiménez",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Primario Monte Carmelo",
+        "tipo_establecimiento": "hospital",
+        "silais": "GRANADA",
+        "departamento": "Granada",
+        "municipio": "Nandaime",
+        "direccion": "Plaza José Dolores Estrada 3 cuadras al oeste, Barrio Juan José Quezada",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Primario Odorico de Andrea",
+        "tipo_establecimiento": "hospital",
+        "silais": "JINOTEGA",
+        "departamento": "Jinotega",
+        "municipio": "San Rafael del Norte",
+        "direccion": "Del MINED 200 varas al sur, Barrio Uriel Blandón",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Regional César Amador Molina",
+        "tipo_establecimiento": "hospital",
+        "silais": "MATAGALPA",
+        "departamento": "Matagalpa",
+        "municipio": "Matagalpa",
+        "direccion": "Del Maxi Palí 1 km al oeste, Barrio Walter Mendoza",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Escuela Oscar Danilo Rosales",
+        "tipo_establecimiento": "hospital",
+        "silais": "LEON",
+        "departamento": "León",
+        "municipio": "León",
+        "direccion": "Catedral 1 cuadra al sur, Sagrario",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Hospital Departamental Gaspar García Laviana",
+        "tipo_establecimiento": "hospital",
+        "silais": "RIVAS",
+        "departamento": "Rivas",
+        "municipio": "Rivas",
+        "direccion": "Km 113 carretera a Tola, Barrio Pedro Espinoza",
+        "fuente": "minsa_hospitales",
+    },
+    {
+        "nombre": "Casa Materna Dalila Penglas",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "RACCN BILWI",
+        "departamento": "RACCN",
+        "municipio": "Prinzapolka",
+        "direccion": "Alamikamba, frente a la primera casa de médicos",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna Sahsa",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "RACCN BILWI",
+        "departamento": "RACCN",
+        "municipio": "Puerto Cabezas",
+        "direccion": "Calle principal, contiguo a la iglesia Morava",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna Santa Inés",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "RACCN BILWI",
+        "departamento": "RACCN",
+        "municipio": "Waspán",
+        "direccion": "Bo. Santa Inés, contiguo a clínica Santa Inés",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna Wanky Tagni",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "RACCN BILWI",
+        "departamento": "RACCN",
+        "municipio": "Waspán",
+        "direccion": "Bo. 4 de Mayo, frente a la casa del mecánico Taly",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna Gladys Aragón Fernández",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "BOACO",
+        "departamento": "Boaco",
+        "municipio": "Camoapa",
+        "direccion": "Antiguas instalaciones del Centro de Salud, Bo. San Martín, del Gallo más Gallo 15 varas al oeste",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna Arlen Siú",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "CARAZO",
+        "departamento": "Carazo",
+        "municipio": "El Rosario",
+        "direccion": "Estadio Municipal 300 m arriba, Bertha Díaz",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna Elba Barrios",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "CARAZO",
+        "departamento": "Carazo",
+        "municipio": "Dolores",
+        "direccion": "Contiguo al taller de los Espinozas",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna María Rural",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "CARAZO",
+        "departamento": "Carazo",
+        "municipio": "Diriamba",
+        "direccion": "Instalaciones del Centro de Salud Manuel de Jesús Rivera, Santa Cecilia",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna Nora Astorga",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "CHINANDEGA",
+        "departamento": "Chinandega",
+        "municipio": "Chichigalpa",
+        "direccion": "Contiguo al Hospital Primario Tomás Borge Martínez, empalme Chichigalpa 200 m al este, carretera a León",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna Acoyapa",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "CHONTALES",
+        "departamento": "Chontales",
+        "municipio": "Acoyapa",
+        "direccion": "En predio del Centro de Salud Familiar, sede municipal",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna La Trinidad",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "ESTELI",
+        "departamento": "Estelí",
+        "municipio": "La Trinidad",
+        "direccion": "Del hospital 2 cuadras al sur y 2 1/2 al oeste",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna Pueblo Nuevo",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "ESTELI",
+        "departamento": "Estelí",
+        "municipio": "Pueblo Nuevo",
+        "direccion": "Costado norte del Hospital Primario Monseñor Julio César Videa",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Casa Materna de Nandaime",
+        "tipo_establecimiento": "casa_materna",
+        "silais": "GRANADA",
+        "departamento": "Granada",
+        "municipio": "Nandaime",
+        "direccion": "Del Hospital Primario Monte Carmelo 3 cuadras al sur y media cuadra al este",
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "nombre": "Centro de Salud Ernesto Hodgson",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "RACCN BILWI",
+        "departamento": "RACCN",
+        "municipio": "Puerto Cabezas",
+        "direccion": "Frente al supermercado Monter, Barrio Libertad",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud María Antonieta Bendaña",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "BOACO",
+        "departamento": "Boaco",
+        "municipio": "Santa Lucía",
+        "direccion": "Contiguo a la Iglesia Católica, Barrio Sector 8",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud Ramón Guillén Navarro",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "BOACO",
+        "departamento": "Boaco",
+        "municipio": "Boaco",
+        "direccion": "Frente al Parque José Nieborowsky, Barrio Olama",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud San José de los Remates",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "BOACO",
+        "departamento": "Boaco",
+        "municipio": "San José de los Remates",
+        "direccion": "Policía Nacional 1 cuadra al este, Barrio Zona 3",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud Dr. Sócrates Flores Vivas",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "CARAZO",
+        "departamento": "Carazo",
+        "municipio": "San Marcos",
+        "direccion": "Instituto Juan XXII, 1 1/2 cuadras al norte, Colonia Manuel Moya",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud Gregoria Gutiérrez",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "CARAZO",
+        "departamento": "Carazo",
+        "municipio": "Dolores",
+        "direccion": "De PLASTINIC 6 cuadras abajo y 1 1/2 al sur, Dolores Central",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud Carolina Osejo",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "CHINANDEGA",
+        "departamento": "Chinandega",
+        "municipio": "Villanueva",
+        "direccion": "Contiguo al cementerio, casco urbano de Villanueva, Sector 6",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud Dra. Alma Nubia López",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "CHINANDEGA",
+        "departamento": "Chinandega",
+        "municipio": "Posoltega",
+        "direccion": "Del empalme de Posoltega 1,500 m al sur, frente a antena Claro, Juan XXIII Zona 2",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud Germán Pomares Ordóñez",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "CHINANDEGA",
+        "departamento": "Chinandega",
+        "municipio": "San Pedro del Norte",
+        "direccion": "Contiguo a la Iglesia Católica, Barrio Central",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud Pedro Narváez Cisneros",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "CARAZO",
+        "departamento": "Carazo",
+        "municipio": "Jinotepe",
+        "direccion": "Frente a los bomberos, Barrio San José",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud Fátima Pavón",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "ESTELI",
+        "departamento": "Estelí",
+        "municipio": "La Trinidad",
+        "direccion": "Costado norte del parque, Barrio San José",
+        "fuente": "minsa_centros_salud",
+    },
+    {
+        "nombre": "Centro de Salud Leonel Rugama Rugama",
+        "tipo_establecimiento": "centro_salud",
+        "silais": "ESTELI",
+        "departamento": "Estelí",
+        "municipio": "Estelí",
+        "direccion": "Frente al Instituto Nacional Francisco Luis Espinoza, Barrio Alfredo Lazo",
+        "fuente": "minsa_centros_salud",
+    },
+])
 
 # No se añade contexto clínico fuera de las fichas citadas de esta demostración.
 CONTEXTO = []

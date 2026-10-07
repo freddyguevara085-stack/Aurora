@@ -744,6 +744,8 @@ def test_guia_muestra_borradores_solo_a_cuentas_demo(client, monkeypatch):
     monkeypatch.setattr(routes, "perfil_y_embarazo", lambda _usuario_id: (None, None))
     demo = client.get("/guia")
     assert "Borrador de demostraci".encode() in demo.data
+    assert b'data-trimestre="1"' in demo.data
+    assert b'data-trimestre="3"' in demo.data
     for borrador in BORRADORES:
         assert borrador["titulo"].encode() in demo.data
         assert borrador["texto"].encode() in demo.data

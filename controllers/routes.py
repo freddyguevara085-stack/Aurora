@@ -960,7 +960,7 @@ def guia():
                 "resumen": item["texto"][:120] + ("…" if len(item["texto"]) > 120 else ""),
                 "cuerpo": item["texto"],
                 "categoria": item["categoria"].capitalize(),
-                "trimestre": None,
+                "trimestre": item.get("trimestre"),
                 "fuente_nombre": item["fuente_nombre"],
                 "fuente_url": item["fuente_url"],
                 "fecha_revision": f"consultada {FECHA_CONSULTA}",
