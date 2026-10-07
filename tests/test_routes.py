@@ -554,7 +554,8 @@ def test_login_incluye_skip_link_y_foco_principal(client):
 def test_inicio_publico_no_requiere_cuenta(client):
     response = client.get("/")
     assert response.status_code == 200
-    assert b"Un puente entre tu vida diaria" in response.data
+    assert b"Organiza tu" in response.data
+    assert b"atenci\xc3\xb3n prenatal." in response.data
     assert b"no es un servicio m\xc3\xa9dico" in response.data
 
 

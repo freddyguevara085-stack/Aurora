@@ -1,23 +1,95 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Aurora | Organiza tu atención prenatal{% endblock %}
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell section-shell">
-  <img src="{{ url_for('static', filename='icons/app-icon-192.png') }}" width="96" height="96" alt="Aurora" style="display:block;margin:0 auto 12px;">
-  <h1>Aurora</h1>
-  <p><strong>Un puente entre tu vida diaria y tu atención prenatal.</strong></p>
-  <p>Aurora te ayuda a recordar el próximo paso, preparar lo que quieres conversar y coordinar quién puede acompañarte. La atención y las decisiones de salud siguen en manos tuyas y del personal sanitario.</p>
-  <section class="card-surface" aria-labelledby="aurora-ofrece">
-    <h2 id="aurora-ofrece">Lo que puedes hacer</h2>
-    <ul>
-      <li>Organizar fechas y controles prenatales.</li>
-      <li>Anotar preguntas para tu próxima consulta.</li>
-      <li>Preparar el traslado, acompañante y contactos de apoyo.</li>
-      <li>Llevar una ficha sencilla a tu familia o consulta.</li>
-    </ul>
-  </section>
-  <p class="notice"><strong>Aurora no es un servicio médico.</strong> No diagnostica, interpreta síntomas, prescribe tratamientos ni reemplaza una consulta. Si necesitas atención, contacta al personal o servicio de salud de tu localidad.</p>
-  <a class="button button--primary button--wide" href="{{ url_for('auth.login') }}">Iniciar sesión</a>
-  <a class="button button--wide" href="{{ url_for('auth.registro') }}">Crear cuenta</a>
-  <p class="form-help"><a href="{{ url_for('main.acerca') }}">Qué es Aurora y cuáles son sus límites</a></p>
+<main id="main" tabindex="-1" class="public-home">
+  <div class="public-home__container">
+    <header class="public-home__header">
+      <a class="public-home__brand" href="{{ url_for('main.index') }}" aria-label="Aurora, inicio">
+        <img src="{{ url_for('static', filename='icons/app-icon-192.png') }}" width="42" height="42" alt="">
+        <span>Aurora</span>
+      </a>
+      <nav class="public-home__nav" aria-label="Navegación principal">
+        <a class="public-home__about-link" href="{{ url_for('main.acerca') }}">Qué es Aurora</a>
+        <a class="button button--secondary public-home__signin" href="{{ url_for('auth.login') }}">Iniciar sesión</a>
+      </nav>
+    </header>
+
+    <section class="public-home__hero" aria-labelledby="public-home-title">
+      <div class="public-home__copy">
+        <p class="public-home__eyebrow"><span aria-hidden="true"></span> Acompañamiento prenatal</p>
+        <h1 id="public-home-title">Organiza tu <span>atención prenatal.</span></h1>
+        <p class="public-home__lead">Recuerda el próximo paso, prepara tus preguntas y coordina quién puede acompañarte.</p>
+        <div class="public-home__actions">
+          <a class="button button--primary public-home__primary-action" href="{{ url_for('auth.registro') }}">
+            Crear cuenta <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+          </a>
+          <a class="public-home__login-link" href="{{ url_for('auth.login') }}">Ya tengo una cuenta</a>
+        </div>
+        <p class="public-home__demo-note"><span class="material-symbols-outlined" aria-hidden="true">info</span> Versión de prueba: utiliza datos ficticios; no ingreses información personal real.</p>
+      </div>
+
+      <aside class="public-home__preview" aria-labelledby="preview-title">
+        <div class="public-home__preview-glow" aria-hidden="true"></div>
+        <div class="public-home__preview-card">
+          <div class="public-home__preview-header">
+            <span class="public-home__preview-label">Una vista más clara</span>
+            <span class="public-home__preview-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          </div>
+          <h2 id="preview-title">Lo importante, en un solo lugar</h2>
+          <div class="public-home__preview-row">
+            <span class="public-home__preview-icon public-home__preview-icon--lavender material-symbols-outlined" aria-hidden="true">calendar_month</span>
+            <span><strong>Próximo control</strong><small>Fechas y recordatorios organizados</small></span>
+            <span class="material-symbols-outlined public-home__preview-check" aria-hidden="true">check_circle</span>
+          </div>
+          <div class="public-home__preview-row">
+            <span class="public-home__preview-icon public-home__preview-icon--peach material-symbols-outlined" aria-hidden="true">forum</span>
+            <span><strong>Preguntas preparadas</strong><small>Lo que quieres conversar en consulta</small></span>
+            <span class="material-symbols-outlined public-home__preview-check" aria-hidden="true">check_circle</span>
+          </div>
+          <div class="public-home__preview-foot"><span class="material-symbols-outlined" aria-hidden="true">favorite</span> A tu ritmo, con apoyo de confianza</div>
+        </div>
+        <span class="public-home__preview-caption">Vista ilustrativa · no representa datos reales</span>
+      </aside>
+    </section>
+
+    <section id="funciones" class="public-home__features" aria-labelledby="features-title">
+      <div class="public-home__section-heading">
+        <p class="public-home__eyebrow">Sencilla y práctica</p>
+        <h2 id="features-title">Un espacio para organizarte mejor</h2>
+      </div>
+      <div class="public-home__feature-grid">
+        <article class="public-home__feature">
+          <span class="material-symbols-outlined public-home__feature-icon public-home__feature-icon--lavender" aria-hidden="true">event_note</span>
+          <h3>Fechas y controles</h3>
+          <p>Ten a mano tus próximas citas y el seguimiento de tus controles.</p>
+        </article>
+        <article class="public-home__feature">
+          <span class="material-symbols-outlined public-home__feature-icon public-home__feature-icon--peach" aria-hidden="true">forum</span>
+          <h3>Preguntas para conversar</h3>
+          <p>Anota tus dudas para llevarlas a tu próxima consulta.</p>
+        </article>
+        <article class="public-home__feature">
+          <span class="material-symbols-outlined public-home__feature-icon public-home__feature-icon--pink" aria-hidden="true">diversity_3</span>
+          <h3>Traslado y apoyo</h3>
+          <p>Coordina quién puede acompañarte y ayudarte con el traslado.</p>
+        </article>
+        <article class="public-home__feature">
+          <span class="material-symbols-outlined public-home__feature-icon public-home__feature-icon--green" aria-hidden="true">description</span>
+          <h3>Una ficha sencilla</h3>
+          <p>Prepara un resumen práctico para compartir con tu familia.</p>
+        </article>
+      </div>
+    </section>
+
+    <aside class="public-home__safety" aria-label="Límite del servicio">
+      <span class="material-symbols-outlined" aria-hidden="true">health_and_safety</span>
+      <p><strong>Aurora no es un servicio médico.</strong> No diagnostica, interpreta síntomas ni prescribe tratamientos. La atención y las decisiones de salud corresponden a ti y al personal sanitario.</p>
+    </aside>
+
+    <footer class="public-home__footer">
+      <a href="{{ url_for('main.acerca') }}">Qué es Aurora y cuáles son sus límites</a>
+      <span>Organización para acompañar tu atención prenatal.</span>
+    </footer>
+  </div>
 </main>
 {% endblock %}
