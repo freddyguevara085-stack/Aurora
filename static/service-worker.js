@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aurora-shell-v23';
+const CACHE_NAME = 'aurora-shell-v24';
 const APP_SHELL = [
   '/manifest.json',
   '/offline.html',
@@ -13,7 +13,8 @@ const APP_SHELL = [
   '/static/fonts/poppins/poppins-600.woff2',
   '/static/fonts/poppins/poppins-700.woff2',
   '/static/fonts/material-symbols/material-symbols-outlined.ttf',
-  '/static/icons/app-icon-192.png'
+  '/static/icons/app-icon-192.png',
+  '/static/images/madre-amorosa.jpg'
 ];
 
 self.addEventListener('install', event => {

@@ -81,6 +81,34 @@ def validar_fechas_embarazo(
     return fum, fpp, None
 
 
+def fechas_embarazo_desde_edad_gestacional(
+    semanas_raw: str | None,
+    dias_raw: str | None,
+    fecha_raw: str | None,
+    hoy: date | None = None,
+) -> tuple[date | None, date | None, str | None]:
+    """Deriva una fecha probable de parto desde semanas indicadas y su fecha de referencia."""
+    if not semanas_raw and not dias_raw:
+        return None, None, None
+    hoy = hoy or date.today()
+    try:
+        semanas = int(semanas_raw or 0)
+        dias = int(dias_raw or 0)
+        referencia = date.fromisoformat(fecha_raw) if fecha_raw else hoy
+    except ValueError:
+        return None, None, "Revisa las semanas, los días y la fecha en que te indicaron la edad gestacional."
+    if not semanas_raw and dias:
+        return None, None, "Ingresa primero las semanas completas."
+    if semanas < 0 or semanas > 42 or dias < 0 or dias > 6 or (semanas == 42 and dias):
+        return None, None, "La edad gestacional debe estar entre 0 y 42 semanas y 0 a 6 días."
+    if referencia > hoy:
+        return None, None, "La fecha de referencia no puede estar en el futuro."
+    if (hoy - referencia).days + semanas * 7 + dias > 42 * 7:
+        return None, None, "La fecha y la edad gestacional superan las 42 semanas; revisa los datos."
+    inicio_estimado = referencia - timedelta(days=semanas * 7 + dias)
+    return None, inicio_estimado + timedelta(days=280), None
+
+
 def validar_fecha_control(
     fecha_control: date,
     inicio_gestacion: date | None,
@@ -113,23 +141,34 @@ def embarazo():
         fum = request.form.get('fum') or None
         fpp = request.form.get('fpp') or None
         metodo = request.form.get('metodo_fpp') or ('fum' if fum else None)
-        if metodo and metodo not in {'fum', 'ecografia', 'profesional', 'otro'}:
+        semanas_raw = request.form.get('semanas_gestacion') or None
+        dias_raw = request.form.get('dias_gestacion') or None
+        edad_ingresada = semanas_raw is not None or (dias_raw is not None and dias_raw != '0')
+        fum_fecha = fpp_fecha = None
+        if edad_ingresada:
+            fum_fecha, fpp_fecha, error = fechas_embarazo_desde_edad_gestacional(
+                semanas_raw, dias_raw, request.form.get('fecha_referencia_gestacion') or None
+            )
+            metodo = 'profesional'
+            if error:
+                flash(error, 'error')
+        elif metodo and metodo not in {'fum', 'ecografia', 'profesional', 'otro'}:
             flash('Método no válido.', 'error')
         else:
             fum_fecha, fpp_fecha, error = validar_fechas_embarazo(fum, fpp, metodo)
             if error:
                 flash(error, 'error')
-            else:
-                try:
-                    destino = activo or Embarazo(perfil_gestante_id=perfil.id, estado='activo')
-                    destino.fum, destino.fpp, destino.metodo_fpp = fum_fecha, fpp_fecha, metodo
-                    if not activo:
-                        db.session.add(destino)
-                    db.session.commit()
-                    return redirect(url_for('main.embarazo'))
-                except SQLAlchemyError:
-                    db.session.rollback()
-                    flash('No fue posible guardar la información del embarazo.', 'error')
+        if fum_fecha is not None or fpp_fecha is not None:
+            try:
+                destino = activo or Embarazo(perfil_gestante_id=perfil.id, estado='activo')
+                destino.fum, destino.fpp, destino.metodo_fpp = fum_fecha, fpp_fecha, metodo
+                if not activo:
+                    db.session.add(destino)
+                db.session.commit()
+                return redirect(url_for('main.embarazo'))
+            except SQLAlchemyError:
+                db.session.rollback()
+                flash('No fue posible guardar la información del embarazo.', 'error')
     controles = controles_activos(activo)
     semana = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
     proximo = next((control for control in controles if control.fecha_control >= date.today() and control.estado in {'programado', 'reprogramado'}), None)

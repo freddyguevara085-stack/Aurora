@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 
-from controllers.routes import validar_fecha_control, validar_fechas_embarazo
+from controllers.routes import fechas_embarazo_desde_edad_gestacional, validar_fecha_control, validar_fechas_embarazo
 from demo_nicaragua import BORRADORES, CENTROS, FUENTES, SENALES_ALERTA
 from services.home import calcular_semana_gestacional
 
@@ -23,6 +23,20 @@ def test_validar_fechas_embarazo_calcula_fpp_desde_fum():
     fum_esperada = date.today() - timedelta(days=100)
     fum, fpp, error = validar_fechas_embarazo(fum_esperada.isoformat(), None, "fum")
     assert (fum, fpp, error) == (fum_esperada, fum_esperada + timedelta(days=280), None)
+
+
+def test_edad_gestacional_indicada_se_convierte_en_fecha_que_sigue_avanzando():
+    referencia = date(2026, 10, 7)
+    fum, fpp, error = fechas_embarazo_desde_edad_gestacional("20", "3", referencia.isoformat(), referencia)
+    assert fum is None and fpp == referencia + timedelta(days=280 - 143) and error is None
+    assert calcular_semana_gestacional(fum, fpp, referencia, "profesional") == 20
+    assert calcular_semana_gestacional(fum, fpp, referencia + timedelta(days=7), "profesional") == 21
+
+
+def test_edad_gestacional_indicada_rechaza_valores_fuera_de_rango():
+    assert fechas_embarazo_desde_edad_gestacional("43", "0", date.today().isoformat())[2]
+    assert fechas_embarazo_desde_edad_gestacional("20", "7", date.today().isoformat())[2]
+    assert fechas_embarazo_desde_edad_gestacional(None, "2", date.today().isoformat())[2]
 
 
 def test_validar_fechas_embarazo_rechaza_relacion_incoherente():

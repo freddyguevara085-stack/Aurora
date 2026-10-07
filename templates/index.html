@@ -79,7 +79,7 @@
     } %}
 
     {# ── 1. Widget Gestacional Canónico ── #}
-    <section class="pregnancy-overview card-surface aurora-card" aria-label="Progreso del embarazo">
+    <a class="pregnancy-overview card-surface aurora-card card-tappable" href="{{ url_for('main.embarazo') }}" aria-label="Ver el detalle de tu embarazo: semana {{ home.week if home.week is not none else 'actual' }}">
       <div class="gestational-ring-wrap">
         <svg class="gestational-ring" viewBox="0 0 180 180" width="180" height="180" aria-hidden="true">
           <defs>
@@ -122,10 +122,10 @@
           <span>Semana 42</span>
         </div>
       </div>
-    </section>
+    </a>
 
     {# ── 2. Tarjeta: Tu próximo paso (Control Prenatal) ── #}
-    <section class="visit-card{% if home.dias_para_control in (0, 1) %} visit-card--soon{% endif %} card-surface aurora-card" aria-labelledby="visit-title">
+    <a class="visit-card{% if home.dias_para_control in (0, 1) %} visit-card--soon{% endif %} card-surface aurora-card card-tappable" href="{{ url_for('main.detalle_consulta') if home.control else url_for('main.nuevo_control') }}" aria-label="{% if home.control %}Ver detalles y preparar tu próxima consulta{% else %}Agendar tu próximo control prenatal{% endif %}">
       <header class="visit-card__header">
         <div>
           <p class="eyebrow">TU PRÓXIMO PASO</p>
@@ -142,14 +142,14 @@
           <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
           <span>{{ home.control.centro_nombre if home.control.centro_nombre else (home.control.centro_atencion.nombre if home.control.centro_atencion else 'Centro por confirmar') }}</span>
         </p>
-        <a class="button button--primary button--wide button--tactile visit-details-link" href="{{ url_for('main.detalle_consulta') }}">
+        <span class="button button--primary button--wide button--tactile visit-details-link" aria-hidden="true">
           Ver detalles y preparar consulta
-        </a>
+        </span>
       {% else %}
         <p class="visit-empty">Todavía no hay una cita en tu calendario. Cuando la agendes, Aurora te ayudará a tener a mano lo que quieras conversar.</p>
-        <a class="button button--primary button--wide button--tactile" href="{{ url_for('main.nuevo_control') }}">Agendar un control</a>
+        <span class="button button--primary button--wide button--tactile" aria-hidden="true">Agendar un control</span>
       {% endif %}
-    </section>
+    </a>
 
     {% if home.trimester == 3 %}
     <a class="birth-plan-reminder card-surface" href="{{ url_for('main.plan_parto') }}">
@@ -244,5 +244,23 @@
     {% endif %}
 
   {% endif %}
+  <footer class="home-tutorial-footer">
+    <button class="home-tutorial-trigger" type="button" data-guide-open>Cómo usar Aurora</button>
+  </footer>
 </main>
+<dialog class="aurora-tutorial" data-aurora-tutorial data-user-id="{{ current_user.id }}" aria-labelledby="aurora-tutorial-title">
+  <button class="aurora-tutorial__close" type="button" data-guide-skip aria-label="Cerrar la guía">×</button>
+  <img class="aurora-tutorial__image" src="{{ url_for('static', filename='images/madre-amorosa.jpg') }}" alt="" width="180" height="180">
+  <p class="eyebrow aurora-tutorial__step" data-guide-step>Paso 1 de 3</p>
+  <div aria-live="polite" aria-atomic="true">
+    <h2 id="aurora-tutorial-title" data-guide-title>Bienvenida a Aurora</h2>
+    <p class="aurora-tutorial__copy" data-guide-copy>Organiza la información de tu embarazo, tus controles y tus preguntas para la atención prenatal.</p>
+  </div>
+  <progress class="aurora-tutorial__progress" data-guide-progress max="3" value="1" aria-label="Paso 1 de 3"></progress>
+  <div class="aurora-tutorial__actions">
+    <button class="button button--secondary" type="button" data-guide-back hidden>Volver</button>
+    <button class="button button--secondary" type="button" data-guide-skip>Saltar guía</button>
+    <button class="button button--primary" type="button" data-guide-next>Continuar</button>
+  </div>
+</dialog>
 {% endblock %}

@@ -76,8 +76,8 @@
     } %}
 
     {# ── FASE 2: Tarjeta Gestacional Principal (Alineación con Inicio) ── #}
-    <section class="pregnancy-visual card-surface aurora-card" aria-label="Progreso gestacional">
-      <div class="gestational-ring-wrap">
+    <section class="pregnancy-visual card-surface aurora-card" aria-label="Progreso del embarazo">
+      <a class="gestational-ring-wrap pregnancy-week-link" href="{{ url_for('main.embarazo', editar=1) }}" aria-label="Editar la semana y los datos de tu embarazo">
         <svg class="gestational-ring" viewBox="0 0 180 180" width="180" height="180" aria-hidden="true">
           <defs>
             <linearGradient id="aurora-ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -112,7 +112,7 @@
             {% endif %}
           </span>
         </div>
-      </div>
+      </a>
 
       {% if semana and semana in analogias %}
       <p class="gestational-analogy">
@@ -129,16 +129,17 @@
           <span>Semana 42</span>
         </div>
       </div>
+
     </section>
 
     {# ── FASE 3.1: Tarjeta: Tu embarazo esta semana ── #}
-    <section class="pregnancy-status card-surface aurora-card">
+    <a class="pregnancy-status card-surface aurora-card card-tappable" href="{{ url_for('main.embarazo', editar=1) }}" aria-label="Editar datos del embarazo: fecha de último periodo, fecha probable de parto y próximo control">
       <header class="card-header">
         <h3 class="card-header__title aurora-card-title">
           <span class="material-symbols-outlined" aria-hidden="true">info</span>
           <span>Tu embarazo esta semana</span>
         </h3>
-        <a href="{{ url_for('main.embarazo', editar=1) }}" class="card-header__link link-edit" aria-label="Editar datos del embarazo">Editar datos ›</a>
+        <span class="card-header__link link-edit" aria-hidden="true">Editar datos ›</span>
       </header>
       <div class="status-rows">
         <div class="status-row">
@@ -156,10 +157,10 @@
           </div>
         </div>
       </div>
-    </section>
+    </a>
 
     {# ── FASE 3.2: Tarjeta: Mis controles prenatales ── #}
-    <section class="prenatal-controls card-surface aurora-card">
+    <section class="prenatal-controls card-surface aurora-card" aria-label="Historial de controles prenatales">
       <header class="card-header-stacked">
         <h3 class="card-header__title aurora-card-title">
           <span class="material-symbols-outlined" aria-hidden="true">medical_services</span>

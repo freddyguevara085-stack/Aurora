@@ -222,6 +222,55 @@ function prepararSkeletonNavegacion() {
   window.addEventListener('pageshow', limpiar);
 }
 
+function prepararGuiaInicial() {
+  const dialogo = document.querySelector('[data-aurora-tutorial]');
+  if (!dialogo) return;
+
+  const pasos = [
+    ['Bienvenida a Aurora', 'Organiza la información de tu embarazo, tus controles y tus preguntas para la atención prenatal.'],
+    ['Registra lo que ya sabes', 'Puedes indicar la FUM, la fecha probable de parto o las semanas que te informó un profesional.'],
+    ['Tu semana avanza automáticamente', 'Aurora calcula la semana con tus fechas. Si no coincide, puedes corregirlas desde “Mi embarazo”.'],
+  ];
+  const titulo = dialogo.querySelector('[data-guide-title]');
+  const copia = dialogo.querySelector('[data-guide-copy]');
+  const etiqueta = dialogo.querySelector('[data-guide-step]');
+  const progreso = dialogo.querySelector('[data-guide-progress]');
+  const anterior = dialogo.querySelector('[data-guide-back]');
+  const siguiente = dialogo.querySelector('[data-guide-next]');
+  const clave = `aurora-guia-v1-${dialogo.dataset.userId}`;
+  let paso = 0;
+
+  const renderizarPaso = () => {
+    [titulo.textContent, copia.textContent] = pasos[paso];
+    etiqueta.textContent = `Paso ${paso + 1} de ${pasos.length}`;
+    progreso.value = paso + 1;
+    progreso.setAttribute('aria-label', etiqueta.textContent);
+    anterior.hidden = paso === 0;
+    siguiente.textContent = paso === pasos.length - 1 ? 'Empezar' : 'Continuar';
+  };
+  const abrir = () => {
+    paso = 0;
+    renderizarPaso();
+    dialogo.showModal();
+  };
+
+  dialogo.querySelectorAll('[data-guide-skip]').forEach(boton => boton.addEventListener('click', () => dialogo.close()));
+  anterior.addEventListener('click', () => { paso -= 1; renderizarPaso(); });
+  siguiente.addEventListener('click', () => {
+    if (paso === pasos.length - 1) dialogo.close();
+    else { paso += 1; renderizarPaso(); }
+  });
+  dialogo.addEventListener('close', () => {
+    try { localStorage.setItem(clave, 'visto'); } catch {}
+  });
+  document.querySelector('[data-guide-open]')?.addEventListener('click', abrir);
+  try {
+    if (localStorage.getItem(clave) !== 'visto') abrir();
+  } catch {
+    // El acceso manual sigue disponible si el navegador bloquea el almacenamiento local.
+  }
+}
+
 // Guía prenatal / Orientación: acordeón accesible y filtrado reactivo
 function prepararOrientacion() {
   const contenedor = document.getElementById('orient-list');
@@ -583,6 +632,7 @@ window.addEventListener('load', () => {
   prepararEnvioDeFormularios();
   prepararRecuperacionDeFormularios();
   prepararSkeletonNavegacion();
+  prepararGuiaInicial();
   prepararOrientacion();
   prepararDirectorioCentros();
 });

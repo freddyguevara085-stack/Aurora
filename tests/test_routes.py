@@ -288,6 +288,10 @@ def test_inicio_muestra_preparacion_de_proxima_consulta(client, monkeypatch):
     html = respuesta.get_data(as_text=True)
     assert "coco" in html
     assert "Semana 42" in html
+    assert b"data-aurora-tutorial" in respuesta.data
+    assert b"madre-amorosa.jpg" in respuesta.data
+    assert b"data-guide-open" in respuesta.data
+    assert client.get("/static/images/madre-amorosa.jpg").status_code == 200
     assert "Segundo trimestre" in html
     assert "Trimestre 2" not in html
     assert "Estás avanzando en la semana" not in html
@@ -554,6 +558,7 @@ def test_login_incluye_skip_link_y_foco_principal(client):
 def test_inicio_publico_no_requiere_cuenta(client):
     response = client.get("/")
     assert response.status_code == 200
+    assert b"data-aurora-tutorial" not in response.data
     assert b"Organiza tu" in response.data
     assert b"atenci\xc3\xb3n prenatal." in response.data
     assert b"no es un servicio m\xc3\xa9dico" in response.data
@@ -1366,6 +1371,10 @@ def test_embarazo_vista_refactorizada_ui(client, monkeypatch):
     assert 'aria-valuemax="42"' in html
     assert 'Semana 42' in html
     assert 'de 42' not in html
+    assert 'class="gestational-ring-wrap pregnancy-week-link" href="/embarazo?editar=1"' in html
+    assert "La semana avanza automáticamente según tus fechas registradas" not in html
+    assert "Ver guía de esta semana" not in html
+    assert "Editar fechas del embarazo" not in html
 
     # 3. Enlace integrado "Editar datos" en la tarjeta y sin botón huérfano
     assert "card-header__link" in html

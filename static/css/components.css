@@ -909,3 +909,9 @@ body:has(.install-banner:not([hidden])) .alert-fab{bottom:calc(218px + env(safe-
 .skeleton__card{height:96px}
 @keyframes skeleton-shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
 @media (prefers-reduced-motion:reduce){.skeleton__bar,.skeleton__card{animation:none;background:var(--soft)}}
+
+/* Accesos directos táctiles */
+.card-tappable{display:block;color:inherit;text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.card-tappable:active,.shortcut-card:active,.birth-plan-reminder:active,.consent-notice:active{transform:scale(.98);opacity:.95}
+.card-tappable:focus-visible,.shortcut-card:focus-visible,.birth-plan-reminder:focus-visible,.consent-notice:focus-visible{outline:3px solid var(--aurora-purple);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.card-tappable:active,.shortcut-card:active,.birth-plan-reminder:active,.consent-notice:active{transform:none}}
