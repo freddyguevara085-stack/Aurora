@@ -278,24 +278,30 @@ Aurora/
 
 El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan algunos recursos estáticos y una página general de contingencia. La disponibilidad sin conexión es parcial: perfil, embarazo, controles, preguntas, traslado, contactos y recordatorios requieren conexión y no se guardan en caché. La página de contingencia no muestra datos de la cuenta. Aurora no envía notificaciones en segundo plano; los recordatorios se consultan dentro de la aplicación.
 
-El directorio de demostración replica el listado oficial de la Red de Salud del MINSA (consultado el 2026-10-06): 438 establecimientos entre hospitales (con su subtipo: primario, departamental o regional), casas maternas, centros de salud y Clínicas Médicas Previsionales, con SILAIS, departamento, municipio, localidad y zona urbano/rural tal como los publica la fuente. Teléfonos, horarios, coordenadas y servicios no aparecen en el listado y no se importan. Las CMP son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento. `seed-demo` solo se ejecuta con `AURORA_DEMO=1`; al ejecutarlo sincroniza el directorio con el listado y retira los centros activos que no provienen de él.
+El directorio de demostración replica el listado oficial de la Red de Salud del MINSA (consultado el 2026-10-06): 438 establecimientos entre hospitales (con su subtipo: primario, departamental, regional o de referencia nacional), casas maternas, centros de salud y Clínicas Médicas Previsionales, cubriendo los 15 departamentos y 2 regiones autónomas de toda Nicaragua (153 municipios), con SILAIS, departamento, municipio, localidad y zona urbano/rural tal como los publica la fuente. Teléfonos, horarios, coordenadas y servicios no aparecen en el listado y no se importan. Las CMP son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento.
+
+Para poblar o actualizar el directorio en la base de datos de Railway:
+- Ejecuta `railway ssh -s web -- python initialize_railway_db.py` (crea tablas e inserta/sincroniza los 438 centros y las 10 señales de alerta oficiales).
+- O de forma independiente vía Flask CLI: `railway ssh -s web -- flask --app app seed-centros`.
 
 ## Demo y revisión de contenido clínico
 
-Las orientaciones clínicas generales y las señales para cuentas normales permanecen deshabilitadas (fail-closed) hasta que exista revisión clínica documentada. La guía de proceso con fuentes MINSA se muestra solo a las cuatro cuentas ficticias cuando `AURORA_DEMO=1`; cada ficha lleva la marca de pendiente de revisión. La vista de revisión clínica sigue restringida al rol `administrador`.
+Para facilitar la revisión manual por parte de profesionales de salud en esta versión de prueba, la guía incluye 24 orientaciones detalladas que abarcan tanto el calendario prenatal como la resolución de dudas sobre las señales de alerta y emergencias obstétricas (sangrado vaginal, dolor de cabeza intenso con visión borrosa/zumbidos por preeclampsia, salida de líquido amniótico, disminución de movimientos fetales, fiebre e infecciones, contracciones prematuras, hinchazón súbita, dolor epigástrico y convulsiones), así como el rol del plan de parto y las Casas Maternas ante un traslado urgente.
 
-Los datos de demostración (cuatro perfiles ficticios y centros oficiales del MINSA) solo se cargan en una base de demo. `seed-demo` exige `AURORA_DEMO=1`; sin esa variable se cancela para no ensuciar una base real. El comando muestra contraseñas aleatorias; guárdalas y compártelas en privado, porque una nueva ejecución las cambia.
+En modo de demostración (`AURORA_DEMO=1`), las cuentas de prueba y administradores pueden consultar el catálogo de señales de alerta en `/alertas`, las orientaciones en `/guia` (con filtro rápido para *Señales de alerta y emergencias*) y el panel de revisión clínica en `/demo/revision-clinica`. Cada ficha lleva la advertencia de que está pendiente de revisión clínica.
+
+Los datos de demostración (cuatro perfiles ficticios, centros oficiales del MINSA y catálogo de alertas) se cargan con `seed-demo` (requiere `AURORA_DEMO=1`):
 
 1. Activar el modo demo (solo en la base/entorno de demo):
    - PowerShell: `$env:AURORA_DEMO = "1"`
    - Linux/macOS: `export AURORA_DEMO=1`
-2. Cargar cuatro cuentas ficticias y centros oficiales: `flask --app app seed-demo`
-   - Railway (solo para este comando): `railway ssh -s web -- env AURORA_DEMO=1 flask --app app seed-demo`
-   - Si la base ya existía antes de añadir las columnas `subtipo` y `zona`, reinicia el esquema primero con `railway ssh -s web -- python initialize_railway_db.py`; el inicializador añade las columnas que falten sin borrar datos.
+2. Cargar perfiles de demostración, agenda y sincronizar centros: `flask --app app seed-demo`
+   - Railway: `railway ssh -s web -- env AURORA_DEMO=1 flask --app app seed-demo`
+   - Si solo deseas inicializar el esquema y los centros/señales en Railway sin crear usuarios ficticios: `railway ssh -s web -- python initialize_railway_db.py`.
 3. Crear una cuenta revisora con rol `administrador`; la contraseña se pide de forma interactiva y no queda escrita en el código:
    `flask --app app create-user` → elegir el id del rol `administrador`.
 4. Iniciar la aplicación: `python app.py`
-5. Ingresar en `http://localhost:5000/login` con la cuenta revisora y abrir `http://localhost:5000/demo/revision-clinica`.
+5. Ingresar en `http://localhost:5000/login` con la cuenta revisora o de prueba y abrir `/guia`, `/alertas` o `/demo/revision-clinica`.
 
 La vista muestra el aviso **PENDIENTE DE REVISIÓN CLÍNICA — NO USAR PARA ATENCIÓN** y cita el nombre de la fuente, la URL directa y la fecha de consulta de cada dato. Las fechas de consulta no son fechas de revisión clínica.
 

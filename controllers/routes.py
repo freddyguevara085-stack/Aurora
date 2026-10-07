@@ -34,7 +34,10 @@ def _es_cuenta_demo():
     return (
         current_user.is_authenticated
         and current_app.config.get("DEMO_MODE")
-        and getattr(current_user, "email", None) in CUENTAS_DEMO_EMAILS
+        and (
+            getattr(current_user, "email", None) in CUENTAS_DEMO_EMAILS
+            or (getattr(current_user, "rol", None) and getattr(current_user.rol, "nombre", None) == "administrador")
+        )
     )
 
 
@@ -984,7 +987,11 @@ def detalle_guia(contenido_id):
 
 @main_bp.route('/alertas')
 def alertas():
-    return render_template('alertas.html', senales=[])
+    senales = []
+    if _es_cuenta_demo():
+        from demo_nicaragua import SENALES_ALERTA
+        senales = SENALES_ALERTA
+    return render_template('alertas.html', senales=senales)
 
 
 @main_bp.route('/centros')

@@ -687,6 +687,17 @@ def test_alertas_consultables_sin_cuenta(client, monkeypatch):
     assert b"Se\xc3\xb1ales de alerta" in response.data
 
 
+def test_alertas_muestra_senales_a_cuenta_demo(client, monkeypatch):
+    from demo_nicaragua import CUENTA_DEMO_EMAIL, SENALES_ALERTA
+
+    monkeypatch.setitem(client.application.config, "DEMO_MODE", True)
+    _iniciar_sesion_falsa(client, monkeypatch, "usuario", email=CUENTA_DEMO_EMAIL)
+    response = client.get("/alertas")
+    assert response.status_code == 200
+    for senal in SENALES_ALERTA:
+        assert senal["titulo"].encode() in response.data
+
+
 def test_centros_consultables_sin_cuenta(client, monkeypatch):
     from controllers import routes
 

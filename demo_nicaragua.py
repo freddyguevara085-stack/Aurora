@@ -15,6 +15,8 @@ Fuentes MINSA consultadas el 2026-10-06:
 - MINSA Nicaragua - Red de Salud, Casa Materna: https://www.minsa.gob.ni/index.php/red-de-salud/casa-materna
 """
 
+from datetime import date
+
 # Cuentas ficticias. Solo ven estos borradores cuando DEMO_MODE está activo.
 CUENTA_DEMO_EMAIL = "maria.demo@aurora.ni"
 CUENTAS_DEMO_EMAILS = frozenset({
@@ -189,89 +191,89 @@ CENTROS = [   {   'nombre': 'Hospital Departamental José Nieborowsky',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 2',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 2',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Antonio Lenín Fonseca',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 2',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 2',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital de Rehabilitación Aldo Chavarría',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 2',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 2',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Nacional Centro Nacional de Oftalmología (CENAO)',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 2',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 2',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Psicosocial',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 2',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 2',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Bertha Calderón Roque',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 3',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 3',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Fernando Vélez Paiz',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 3',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 3',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Nacional de Radioterapia "Nora Astorga"',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 3',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 3',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Solidaridad',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 4',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 4',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Infantil Manuel de Jesús Rivera "La Mascota"',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 5',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 5',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Manolo Morales Peralta',
         'tipo_establecimiento': 'hospital',
         'subtipo': 'Hospital con servicios de Referencia Nacional',
         'silais': 'MANAGUA',
-        'departamento': 'Distrito 5',
+        'departamento': 'Managua',
         'municipio': 'Managua',
-        'direccion': 'Managua',
+        'direccion': 'Managua, Distrito 5',
         'fuente': 'minsa_hospitales'},
     {   'nombre': 'Hospital Departamental Pedro Altamirano',
         'tipo_establecimiento': 'hospital',
@@ -3820,6 +3822,338 @@ BORRADORES = [
             "salud que atiende a la familia; esta ficha no da instrucciones clínicas."
         ),
         "fuente": "minsa_recien_nacido_2022",
+    },
+    {
+        "id": "dudas-sangrado-vaginal",
+        "titulo": "¿Qué hacer ante sangrado vaginal durante el embarazo?",
+        "categoria": "alertas",
+        "texto": (
+            "El sangrado por la vagina durante cualquier etapa del embarazo no es un síntoma "
+            "normal. En el primer trimestre puede advertir amenaza de aborto o implantación fuera "
+            "del útero; en la segunda mitad puede deberse a desprendimiento prematuro de placenta o "
+            "placenta previa. La orientación del MINSA es acudir de forma inmediata al centro de "
+            "salud u hospital más próximo. Durante el traslado, evita esfuerzos físicos, no utilices "
+            "tampones ni duchas vaginales, no tomes medicamentos caseros y lleva tu tarjeta de control "
+            "prenatal con tu acompañante."
+        ),
+        "fuente": "minsa_atencion_prenatal_2022",
+    },
+    {
+        "id": "dudas-dolor-cabeza-preeclampsia",
+        "titulo": "Dolor de cabeza severo, visión borrosa y zumbidos: sospecha de preeclampsia",
+        "categoria": "alertas",
+        "trimestre": 2,
+        "texto": (
+            "Un dolor de cabeza intenso y pulsátil que no cede con el reposo, ver lucecitas o chispas "
+            "(fosfenos), escuchar pitos o zumbidos en los oídos (acúfenos) o ver nublado son señales de "
+            "alarma de presión arterial peligrosamente alta (preeclampsia). La preeclampsia es una de las "
+            "principales causas de complicaciones maternas. Ante estos síntomas, es indispensable acudir "
+            "de urgencia a la unidad de salud para medir la presión arterial y recibir valoración médica "
+            "inmediata; el reposo no la cura."
+        ),
+        "fuente": "minsa_atencion_prenatal_2022",
+    },
+    {
+        "id": "dudas-salida-liquido-amniotico",
+        "titulo": "Pérdida de líquido por la vagina: ¿cómo diferenciarlo y qué hacer?",
+        "categoria": "alertas",
+        "trimestre": 3,
+        "texto": (
+            "La salida involuntaria de líquido acuoso, transparente o ligeramente blanquecino en chorro "
+            "o goteo continuo indica la rotura de la bolsa de las aguas (rotura prematura de membranas). "
+            "A diferencia del flujo vaginal o de escapes de orina, el líquido amniótico continúa saliendo "
+            "y empapa la ropa. Al romperse la bolsa, el bebé pierde su barrera protectora contra bacterias. "
+            "Colócate una toalla limpia, fíjate si el líquido tiene olor fuerte o color verdoso (signo de "
+            "sufrimiento fetal) y trasládate sin demora a la unidad de salud."
+        ),
+        "fuente": "minsa_censo_gerencial_2022",
+    },
+    {
+        "id": "dudas-movimientos-del-bebe",
+        "titulo": "Movimientos del bebé: ¿cuándo consultar con urgencia?",
+        "categoria": "alertas",
+        "trimestre": 2,
+        "texto": (
+            "A partir de las 20 a 22 semanas de gestación, los movimientos del bebé se perciben con "
+            "regularidad diaria, especialmente después de las comidas o al descansar. Si pasan varias horas "
+            "sin percibir movimientos o notas una reducción notable respecto a su actividad cotidiana, "
+            "recuéstate sobre tu costado izquierdo en un ambiente tranquilo durante una hora para observar. "
+            "Si no sientes movimientos claros y activos, acude inmediatamente al centro de salud u hospital "
+            "para que el personal escuche los latidos cardíacos fetales."
+        ),
+        "fuente": "minsa_atencion_prenatal_2022",
+    },
+    {
+        "id": "dudas-fiebre-e-infecciones-urinarias",
+        "titulo": "Fiebre y dolor al orinar: riesgos de infección en el embarazo",
+        "categoria": "alertas",
+        "texto": (
+            "Una temperatura axilar superior a 38 °C con escalofríos, o la presencia de dolor en la espalda "
+            "baja y ardor al orinar, son señales de alerta. Las infecciones de vías urinarias son comunes en "
+            "el embarazo y, si no se tratan oportunamente con antibióticos prescritos por personal de salud, "
+            "pueden desencadenar contracciones uterinas y provocar un parto prematuro. Mantente hidratada y "
+            "acude a la unidad de salud para un examen general de orina; nunca te automediques."
+        ),
+        "fuente": "minsa_atencion_prenatal_2022",
+    },
+    {
+        "id": "dudas-contracciones-antes-de-tiempo",
+        "titulo": "Dolor abdominal y contracciones antes de la semana 37",
+        "categoria": "alertas",
+        "trimestre": 3,
+        "texto": (
+            "Sentir endurecimiento rítmico y doloroso del abdomen con una frecuencia de 2 o más veces en 10 "
+            "minutos antes de cumplir las 37 semanas puede indicar una amenaza de parto prematuro. A "
+            "diferencia de las contracciones irregulares de práctica (Braxton Hicks), las contracciones de "
+            "parto pretérmino se vuelven continuas y dolorosas. Ante esto, suspende tus actividades, recuéstate "
+            "sobre tu lado izquierdo y trasládate de inmediato a la unidad de salud con tu plan de parto."
+        ),
+        "fuente": "minsa_censo_gerencial_2022",
+    },
+    {
+        "id": "dudas-hinchazon-edema-patologico",
+        "titulo": "Hinchazón en cara y manos vs. pesadez común de pies",
+        "categoria": "alertas",
+        "trimestre": 3,
+        "texto": (
+            "Es común sentir pesadez o hinchazón leve en pies y tobillos al final de la tarde por el calor o "
+            "caminar, la cual mejora elevando las piernas. Por el contrario, despertarse por la mañana con la "
+            "cara hinchada, párpados abotagados o las manos tan tensas que no puedes cerrar los puños o quitarte "
+            "anillos es un edema patológico. Es un signo de alarma asociado a preeclampsia que requiere revisión "
+            "médica urgente con control de presión arterial."
+        ),
+        "fuente": "minsa_atencion_prenatal_2022",
+    },
+    {
+        "id": "dudas-dolor-epigastrico-boca-estomago",
+        "titulo": "Dolor severo en la boca del estómago en el embarazo avanzado",
+        "categoria": "alertas",
+        "trimestre": 3,
+        "texto": (
+            "Un dolor constante, opresivo o punzante en la parte alta del vientre (boca del estómago) o bajo las "
+            "costillas derechas que no alivia con alimentos ni antiácidos es una emergencia médica. En gestantes con "
+            "presión arterial alterada, este síntoma puede anunciar afectación del hígado por preeclampsia severa o "
+            "síndrome HELLP. Requiere traslado urgente con acompañante a un hospital con servicio gineco-obstétrico."
+        ),
+        "fuente": "minsa_censo_gerencial_2022",
+    },
+    {
+        "id": "dudas-convulsiones-emergencia",
+        "titulo": "Convulsiones o pérdida del conocimiento: emergencia obstétrica (Eclampsia)",
+        "categoria": "alertas",
+        "trimestre": 3,
+        "texto": (
+            "La aparición de sacudidas involuntarias del cuerpo o desmayo con pérdida de conciencia durante la "
+            "gestación o el puerperio es una emergencia crítica (eclampsia). La persona acompañante debe recostar a "
+            "la mujer de lado izquierdo sobre un lugar seguro, proteger su cabeza de golpes, despejar su respiración, "
+            "no sujetarla violentamente ni meter objetos o líquidos en su boca, y organizar el traslado inmediato en "
+            "vehículo al hospital más cercano alertando a la red comunitaria."
+        ),
+        "fuente": "minsa_censo_gerencial_2022",
+    },
+    {
+        "id": "dudas-plan-parto-y-traslado-urgente",
+        "titulo": "El plan de parto y traslado ante una señal de emergencia",
+        "categoria": "preparacion",
+        "trimestre": 3,
+        "texto": (
+            "El plan de parto del MINSA es una herramienta fundamental ante cualquier señal de peligro. En Aurora "
+            "puedes tener anotado quién es tu acompañante principal, quién cuida a tus otros hijos y el contacto de "
+            "transporte acordado (taxi, caponera o vehículo local). Ante una alerta médica, activa de inmediato este "
+            "plan sin perder minutos valiosos buscando transporte no planificado."
+        ),
+        "fuente": "minsa_censo_gerencial_2022",
+    },
+    {
+        "id": "dudas-casa-materna-estancia-preventiva",
+        "titulo": "Casas Maternas: alojamiento preventivo para evitar emergencias de camino",
+        "categoria": "preparacion",
+        "trimestre": 3,
+        "texto": (
+            "La red de Casas Maternas de Nicaragua brinda hospedaje, alimentación y vigilancia prenatal a gestantes "
+            "que habitan en comunidades rurales lejanas o presentan factores de riesgo. Ingresar a una Casa Materna días "
+            "antes de la fecha probable de parto garantiza estar a pocos pasos del centro de salud u hospital, evitando "
+            "las demoras de caminos rurales difíciles si se presenta una señal de peligro o el inicio del parto."
+        ),
+        "fuente": "minsa_casas_maternas",
+    },
+    {
+        "id": "dudas-molestias-comunes-vs-alarmas",
+        "titulo": "¿Molestia común del embarazo o señal de peligro? Pautas de orientación",
+        "categoria": "controles",
+        "texto": (
+            "El cuerpo experimenta cambios frecuentes: cansancio leve, ganas de orinar a menudo, náuseas al inicio o "
+            "punzadas breves en los lados del abdomen por estiramiento muscular. Una señal de peligro se diferencia por "
+            "ser intensa, continua o inhabitual: sangrado, fiebre, líquido que brota, dolor abdominal persistente o "
+            "dolor de cabeza con alteraciones visuales. Ante cualquier duda, la indicación del personal de salud es no "
+            "esperar y acudir a valoración médica."
+        ),
+        "fuente": "minsa_atencion_prenatal_2022",
+    },
+]
+
+SENALES_ALERTA = [
+    {
+        "titulo": "Sangrado vaginal en cualquier etapa de la gestación",
+        "descripcion": (
+            "Salida de sangre por la vagina, sea escasa o abundante, con o sin dolor en el vientre. Puede "
+            "advertir amenaza de aborto, desprendimiento prematuro de placenta, placenta previa o complicaciones "
+            "cervicales."
+        ),
+        "accion_recomendada": (
+            "Acude de inmediato a la unidad de salud u hospital más cercano. Guarda reposo durante el traslado, "
+            "no introduzcas nada en la vagina, no te automediques y lleva tu tarjeta de control con tu acompañante."
+        ),
+        "orden_visual": 1,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
+    },
+    {
+        "titulo": "Dolor de cabeza intenso con visión borrosa, zumbidos o lucecitas",
+        "descripcion": (
+            "Dolor de cabeza fuerte, constante y punzante que no alivia con reposo, ver lucecitas (fosfenos), "
+            "escuchar zumbidos o pitos en los oídos (acúfenos) o visión nublada. Son signos de alarma de presión "
+            "arterial peligrosamente alta (preeclampsia)."
+        ),
+        "accion_recomendada": (
+            "Acude de urgencia al centro de salud u hospital para control de presión arterial. La preeclampsia "
+            "requiere atención médica inmediata para prevenir convulsiones (eclampsia)."
+        ),
+        "orden_visual": 2,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
+    },
+    {
+        "titulo": "Salida repentina de líquido por la vagina (rotura de membranas)",
+        "descripcion": (
+            "Salida involuntaria y continua de líquido acuoso transparente o blanquecino por la vagina antes de "
+            "tiempo o antes de las contracciones de parto. Indica rotura prematura de la bolsa de las aguas."
+        ),
+        "accion_recomendada": (
+            "Colócate una toalla higiénica limpia y acude sin demora a la unidad de salud. Observa si el líquido "
+            "es claro, amarillento o verdoso (signo de alerta) e infórmalo al médico."
+        ),
+        "orden_visual": 3,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
+    },
+    {
+        "titulo": "Disminución o ausencia de movimientos del bebé",
+        "descripcion": (
+            "A partir de las 20 a 22 semanas, si dejas de sentir que tu bebé se mueve o percibes una disminución "
+            "marcada y prolongada de sus movimientos habituales, puede indicar compromiso del bienestar fetal."
+        ),
+        "accion_recomendada": (
+            "Recuéstate de lado izquierdo durante una hora concentrándote en los movimientos. Si no los percibes o "
+            "son muy escasos, dirígete de inmediato al centro de salud para escuchar los latidos fetales."
+        ),
+        "orden_visual": 4,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
+    },
+    {
+        "titulo": "Fiebre alta (mayor a 38 °C) y escalofríos",
+        "descripcion": (
+            "Temperatura corporal mayor o igual a 38 °C, temblores o sudoración. Puede originarse por infección de "
+            "vías urinarias, infección uterina u otras enfermedades agudas infecciosas."
+        ),
+        "accion_recomendada": (
+            "Bebe agua y busca atención médica oportuna. No tomes antibióticos ni medicamentos sin indicación médica; "
+            "el personal de salud debe diagnosticar la causa para proteger a la madre y al bebé."
+        ),
+        "orden_visual": 5,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
+    },
+    {
+        "titulo": "Dolor abdominal severo o contracciones frecuentes antes de las 37 semanas",
+        "descripcion": (
+            "Dolor tipo cólico fuerte en el bajo vientre o endurecimiento regular del abdomen más de 2 veces en 10 "
+            "minutos antes de cumplir las 37 semanas. Señal de amenaza de parto prematuro."
+        ),
+        "accion_recomendada": (
+            "Suspende esfuerzos, recuéstate de lado izquierdo y acude con tu acompañante a la unidad de salud de "
+            "inmediato para valorar el cuello uterino y recibir tratamiento oportuno."
+        ),
+        "orden_visual": 6,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
+    },
+    {
+        "titulo": "Hinchazón repentina de cara, párpados y manos",
+        "descripcion": (
+            "Despertar con la cara hinchada, párpados abultados o las manos tan inflamadas que no puedes cerrar los "
+            "puños o sacarte anillos. Es un edema patológico característico de preeclampsia."
+        ),
+        "accion_recomendada": (
+            "Acude de inmediato para toma de presión arterial y examen de proteínas en orina en la unidad de salud "
+            "más cercana."
+        ),
+        "orden_visual": 7,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
+    },
+    {
+        "titulo": "Dolor severo en la boca del estómago (epigastralgia)",
+        "descripcion": (
+            "Dolor intenso, ardiente o punzante en la parte alta del vientre o debajo de las costillas derechas, que "
+            "no alivia con alimentos ni antiácidos y puede acompañarse de náuseas o mareos."
+        ),
+        "accion_recomendada": (
+            "Requiere traslado de emergencia al hospital. En embarazos avanzados puede indicar compromiso hepático "
+            "asociado a preeclampsia severa o síndrome de HELLP."
+        ),
+        "orden_visual": 8,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
+    },
+    {
+        "titulo": "Convulsiones o desmayos con pérdida del conocimiento",
+        "descripcion": (
+            "Movimientos bruscos involuntarios del cuerpo o desmayo repentino durante el embarazo o puerperio. "
+            "Constituye la máxima emergencia obstétrica (eclampsia)."
+        ),
+        "accion_recomendada": (
+            "Colocar a la gestante recostada sobre su lado izquierdo en superficie protegida, vigilar que respire "
+            "libremente, no meter objetos en su boca y organizar traslado de emergencia inmediato al hospital."
+        ),
+        "orden_visual": 9,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
+    },
+    {
+        "titulo": "Dificultad para respirar, fatiga extrema o palidez muy marcada",
+        "descripcion": (
+            "Sensación de ahogo en reposo, respiración agitada ante mínimos esfuerzos, palidez evidente en labios y "
+            "uñas, o mareos continuos con sensación de desvanecimiento."
+        ),
+        "accion_recomendada": (
+            "Acude a revisión médica. Puede deberse a anemia grave o complicaciones cardiorrespiratorias que exigen "
+            "atención clínica urgente."
+        ),
+        "orden_visual": 10,
+        "fuente_nombre": "MINSA Nicaragua - Normativa 011 / Protocolos de Atención Prenatal",
+        "fuente_url": "https://www.minsa.gob.ni/",
+        "fecha_revision": date(2026, 10, 6),
+        "activo": 1,
     },
 ]
 

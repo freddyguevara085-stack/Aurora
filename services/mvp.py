@@ -44,7 +44,7 @@ def centros_activos(busqueda="", tipo=""):
         query = query.where(or_(CentroAtencion.nombre.ilike(termino), CentroAtencion.municipio.ilike(termino)))
     if tipo in {"hospital", "centro_salud", "puesto_salud", "casa_materna", "clinica", "otro"}:
         query = query.where(CentroAtencion.tipo_establecimiento == tipo)
-    return db.session.scalars(query.order_by(CentroAtencion.nombre).limit(50)).all()
+    return db.session.scalars(query.order_by(CentroAtencion.nombre).limit(1000)).all()
 
 
 def servicios_disponibles(centro_id):

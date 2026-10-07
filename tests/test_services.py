@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 
 from controllers.routes import validar_fecha_control, validar_fechas_embarazo
-from demo_nicaragua import BORRADORES, CENTROS, FUENTES
+from demo_nicaragua import BORRADORES, CENTROS, FUENTES, SENALES_ALERTA
 from services.home import calcular_semana_gestacional
 
 
@@ -84,10 +84,15 @@ def test_validar_fecha_control_restringe_pasado_y_fuera_de_gestacion():
 
 def test_guia_demo_cubre_filtros_y_directorio_solo_tiene_fuentes_minsa():
     assert {item["categoria"] for item in BORRADORES} >= {
-        "controles", "preparacion", "puerperio", "registro"
+        "controles", "preparacion", "puerperio", "registro", "alertas"
     }
     assert all(item["fuente"].startswith("minsa_") and item["fuente"] in FUENTES for item in BORRADORES)
     assert len(CENTROS) >= 430
+    assert len(SENALES_ALERTA) == 10
+    assert all(s["activo"] == 1 and s["titulo"] and s["accion_recomendada"] for s in SENALES_ALERTA)
+    deptos = {centro["departamento"] for centro in CENTROS}
+    assert len(deptos) == 17
+    assert not any("Distrito" in d for d in deptos)
     assert {centro["tipo_establecimiento"] for centro in CENTROS} == {
         "hospital", "casa_materna", "centro_salud", "clinica"
     }

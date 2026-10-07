@@ -6,7 +6,7 @@ import click
 from werkzeug.security import generate_password_hash
 
 from demo_nicaragua import CENTROS as CENTROS_VERIFICADOS
-from demo_nicaragua import CUENTA_DEMO_EMAIL
+from demo_nicaragua import CUENTA_DEMO_EMAIL, SENALES_ALERTA
 from extensions import db
 from models.acceso import Rol
 from models.directorio import CentroAtencion
@@ -77,11 +77,31 @@ def register_commands(app) -> None:
             .where(ContenidoPrenatal.creado_por_usuario_id.is_(None))
             .values(publicado=0)
         )
-        db.session.execute(
-            db.update(SenalAlerta)
-            .where(SenalAlerta.creado_por_usuario_id.is_(None))
-            .values(activo=0)
-        )
+        for senal_datos in SENALES_ALERTA:
+            existente_senal = db.session.scalar(
+                db.select(SenalAlerta).where(SenalAlerta.titulo == senal_datos["titulo"])
+            )
+            if existente_senal:
+                existente_senal.descripcion = senal_datos["descripcion"]
+                existente_senal.accion_recomendada = senal_datos["accion_recomendada"]
+                existente_senal.orden_visual = senal_datos["orden_visual"]
+                existente_senal.fuente_nombre = senal_datos["fuente_nombre"]
+                existente_senal.fuente_url = senal_datos.get("fuente_url")
+                existente_senal.fecha_revision = senal_datos["fecha_revision"]
+                existente_senal.activo = 1
+            else:
+                db.session.add(
+                    SenalAlerta(
+                        titulo=senal_datos["titulo"],
+                        descripcion=senal_datos["descripcion"],
+                        accion_recomendada=senal_datos["accion_recomendada"],
+                        orden_visual=senal_datos["orden_visual"],
+                        fuente_nombre=senal_datos["fuente_nombre"],
+                        fuente_url=senal_datos.get("fuente_url"),
+                        fecha_revision=senal_datos["fecha_revision"],
+                        activo=1,
+                    )
+                )
 
         # Centros confirmados en el listado oficial del MINSA. Idempotente:
         # inserta los faltantes, sincroniza los existentes con el listado y
@@ -492,5 +512,47 @@ def register_commands(app) -> None:
             click.echo(f"  * {email} / {password}")
         click.echo("  * Perfiles, agendas y apoyos ficticios; sin teléfonos reales.")
         click.echo("  * Teléfonos y horarios de centros: no confirmados en la fuente.")
-        click.echo("  * Contenido clínico: no se publica; permanece como borrador.")
         click.echo("¡Datos de demostración listos!")
+
+    @app.cli.command("seed-centros")
+    def seed_centros() -> None:
+        """Puebla o sincroniza el directorio nacional de centros de salud del MINSA."""
+        click.echo("Sincronizando directorio MINSA (hospitales, centros de salud, casas maternas)...")
+        nuevos = 0
+        actualizados = 0
+        for datos in CENTROS_VERIFICADOS:
+            existente = db.session.scalar(
+                db.select(CentroAtencion).where(
+                    CentroAtencion.nombre == datos["nombre"],
+                    CentroAtencion.municipio == datos["municipio"],
+                )
+            )
+            if existente:
+                existente.tipo_establecimiento = datos["tipo_establecimiento"]
+                existente.subtipo = datos.get("subtipo")
+                existente.silais = datos["silais"]
+                existente.departamento = datos["departamento"]
+                existente.direccion = datos["direccion"]
+                existente.zona = datos.get("zona")
+                existente.activo = 1
+                actualizados += 1
+            else:
+                db.session.add(
+                    CentroAtencion(
+                        nombre=datos["nombre"],
+                        tipo_establecimiento=datos["tipo_establecimiento"],
+                        subtipo=datos.get("subtipo"),
+                        zona=datos.get("zona"),
+                        silais=datos["silais"],
+                        departamento=datos["departamento"],
+                        municipio=datos["municipio"],
+                        direccion=datos["direccion"],
+                        activo=1,
+                    )
+                )
+                nuevos += 1
+        db.session.commit()
+        click.echo(
+            f"Directorio MINSA listo: {len(CENTROS_VERIFICADOS)} centros de toda Nicaragua "
+            f"({nuevos} nuevos, {actualizados} actualizados)."
+        )
