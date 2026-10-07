@@ -39,14 +39,14 @@
     <article class="card aurora-card" style="margin-bottom: 24px;">
         <div style="margin-bottom: 16px;">
             <span class="status-badge status-badge--success" style="text-transform: capitalize;">
-                {{ 'Clínica Médica Previsional' if centro.tipo_establecimiento == 'clinica' else centro.tipo_establecimiento|replace('_', ' ') }}
+                {% if centro.tipo_establecimiento == 'clinica' %}Clínica Médica Previsional{% elif centro.subtipo %}{{ centro.subtipo }}{% else %}{{ centro.tipo_establecimiento|replace('_', ' ') }}{% endif %}
             </span>
         </div>
 
         <h1 style="margin-top: 0; font-size: 22px; line-height: 1.3;">{{ centro.nombre }}</h1>
         <div class="muted-row" style="margin-bottom: 20px;">
             <span class="material-symbols-outlined" aria-hidden="true">map</span>
-            <span>{{ centro.municipio }}, {{ centro.departamento }}</span>
+            <span>{{ centro.municipio }}, {{ centro.departamento }}{% if centro.zona %} · zona {{ centro.zona }}{% endif %}</span>
         </div>
 
         {% if centro.direccion %}

@@ -278,7 +278,7 @@ Aurora/
 
 El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan algunos recursos estáticos y una página general de contingencia. La disponibilidad sin conexión es parcial: perfil, embarazo, controles, preguntas, traslado, contactos y recordatorios requieren conexión y no se guardan en caché. La página de contingencia no muestra datos de la cuenta. Aurora no envía notificaciones en segundo plano; los recordatorios se consultan dentro de la aplicación.
 
-El directorio de demostración incluye hospitales, casas maternas, centros de salud y Clínicas Médicas Previsionales del listado oficial del MINSA (consultado el 2026-10-06). Teléfonos, horarios, coordenadas y servicios no se importan. Las CMP publicadas son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento. `seed-demo` solo se ejecuta con `AURORA_DEMO=1`.
+El directorio de demostración replica el listado oficial de la Red de Salud del MINSA (consultado el 2026-10-06): 438 establecimientos entre hospitales (con su subtipo: primario, departamental o regional), casas maternas, centros de salud y Clínicas Médicas Previsionales, con SILAIS, departamento, municipio, localidad y zona urbano/rural tal como los publica la fuente. Teléfonos, horarios, coordenadas y servicios no aparecen en el listado y no se importan. Las CMP son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento. `seed-demo` solo se ejecuta con `AURORA_DEMO=1`; al ejecutarlo sincroniza el directorio con el listado y retira los centros activos que no provienen de él.
 
 ## Demo y revisión de contenido clínico
 
@@ -291,6 +291,7 @@ Los datos de demostración (cuatro perfiles ficticios y centros oficiales del MI
    - Linux/macOS: `export AURORA_DEMO=1`
 2. Cargar cuatro cuentas ficticias y centros oficiales: `flask --app app seed-demo`
    - Railway (solo para este comando): `railway ssh -s web -- env AURORA_DEMO=1 flask --app app seed-demo`
+   - Si la base ya existía antes de añadir las columnas `subtipo` y `zona`, reinicia el esquema primero con `railway ssh -s web -- python initialize_railway_db.py`; el inicializador añade las columnas que falten sin borrar datos.
 3. Crear una cuenta revisora con rol `administrador`; la contraseña se pide de forma interactiva y no queda escrita en el código:
    `flask --app app create-user` → elegir el id del rol `administrador`.
 4. Iniciar la aplicación: `python app.py`

@@ -98,6 +98,8 @@ create table if not exists centros_atencion (
     'clinica',
     'otro'
   ) not null default 'centro_salud',
+  subtipo varchar(60) null,
+  zona enum('urbano', 'rural') null,
   silais varchar(100) null,
   municipio varchar(100) not null,
   departamento varchar(100) not null,

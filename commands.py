@@ -83,9 +83,14 @@ def register_commands(app) -> None:
             .values(activo=0)
         )
 
-        # Centros confirmados en fuentes oficiales (MINSA). Idempotente: solo
-        # inserta los que no existen y no modifica centros preexistentes.
+        # Centros confirmados en el listado oficial del MINSA. Idempotente:
+        # inserta los faltantes, sincroniza los existentes con el listado y
+        # retira del directorio activo los que no provienen del listado
+        # (p. ej. registros de seeds anteriores con nombres distintos).
         centros_nuevos = 0
+        claves_canonicas = {
+            (datos["nombre"], datos["municipio"]) for datos in CENTROS_VERIFICADOS
+        }
         for datos in CENTROS_VERIFICADOS:
             existente = db.session.scalar(
                 db.select(CentroAtencion).where(
@@ -94,11 +99,20 @@ def register_commands(app) -> None:
                 )
             )
             if existente:
+                existente.tipo_establecimiento = datos["tipo_establecimiento"]
+                existente.subtipo = datos.get("subtipo")
+                existente.silais = datos["silais"]
+                existente.departamento = datos["departamento"]
+                existente.direccion = datos["direccion"]
+                existente.zona = datos.get("zona")
+                existente.activo = 1
                 continue
             db.session.add(
                 CentroAtencion(
                     nombre=datos["nombre"],
                     tipo_establecimiento=datos["tipo_establecimiento"],
+                    subtipo=datos.get("subtipo"),
+                    zona=datos.get("zona"),
                     silais=datos["silais"],
                     departamento=datos["departamento"],
                     municipio=datos["municipio"],
@@ -112,7 +126,18 @@ def register_commands(app) -> None:
                 )
             )
             centros_nuevos += 1
+        retirados = 0
+        for centro in db.session.scalars(
+            db.select(CentroAtencion).where(CentroAtencion.activo == 1)
+        ):
+            if (centro.nombre, centro.municipio) not in claves_canonicas:
+                centro.activo = 0
+                retirados += 1
         db.session.flush()
+        click.echo(
+            f"Directorio MINSA listo: {len(CENTROS_VERIFICADOS)} centros del listado "
+            f"({centros_nuevos} nuevos, {retirados} retirados)."
+        )
 
         # 4. Asegurar cuenta de prueba principal
         rol_usuario = db.session.scalar(db.select(Rol).filter_by(nombre="usuario"))

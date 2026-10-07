@@ -27,6 +27,11 @@ class CentroAtencion(db.Model):
         nullable=False,
         server_default=db.text("'centro_salud'"),
     )
+    subtipo = db.Column(db.String(60), nullable=True)
+    zona = db.Column(
+        ENUM("urbano", "rural"),
+        nullable=True,
+    )
     silais = db.Column(db.String(100), nullable=True)
     municipio = db.Column(db.String(100), nullable=False)
     departamento = db.Column(db.String(100), nullable=False)
