@@ -228,8 +228,15 @@ def _resolver_centro_input(texto, centros):
     for c in centros:
         c_nom = (getattr(c, 'nombre', None) or '').strip()
         c_mun = (getattr(c, 'municipio', None) or '').strip()
-        c_completo = f"{c_nom} ({c_mun})".lower() if c_mun else c_nom.lower()
-        if raw_lower == c_nom.lower() or raw_lower == c_completo:
+        c_dep = (getattr(c, 'departamento', None) or '').strip()
+        variantes = {c_nom.lower()}
+        if c_mun:
+            variantes.add(f"{c_nom} ({c_mun})".lower())
+        if c_dep:
+            variantes.add(f"{c_nom} ({c_dep})".lower())
+            if c_mun:
+                variantes.add(f"{c_nom} ({c_mun}, {c_dep})".lower())
+        if raw_lower in variantes:
             return getattr(c, 'id', None), None
 
     return None, raw[:150]

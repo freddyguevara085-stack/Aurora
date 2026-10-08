@@ -126,7 +126,7 @@
       >
       <datalist id="centros_sugeridos">
         {% for c in centros %}
-          <option value="{{ c.nombre }}{% if c.municipio %} ({{ c.municipio }}){% endif %}"></option>
+          <option value="{{ c.nombre }}{% if c.municipio %} ({{ c.municipio }}{% if c.departamento %}, {{ c.departamento }}{% endif %}){% elif c.departamento %} ({{ c.departamento }}){% endif %}"></option>
         {% endfor %}
       </datalist>
       <span class="form-hint">Escribe tu puesto local si no aparece en la lista.</span>
