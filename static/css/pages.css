@@ -2316,6 +2316,9 @@
 .birth-followup-note{display:flex;gap:8px;margin:12px 0;padding:10px 12px;border-radius:10px;background:#fff8e7;color:#654b13;font-size:13px;line-height:1.45}
 .birth-followup-note .material-symbols-outlined{font-size:18px;flex:0 0 auto}
 .birth-record-card{display:flex;flex-direction:column;gap:14px}
+.birth-form-card{min-width:0}
+.birth-form{min-width:0}
+.birth-form__date-input{box-sizing:border-box;display:block;width:100%;min-width:0;min-height:48px}
 
 
 /* FASE 4: Botones con eliminación de Pill Overload (12px radius, min 48px height) */

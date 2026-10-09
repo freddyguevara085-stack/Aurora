@@ -12,6 +12,7 @@ from services.mvp import (
     centro_activo,
     contenidos_publicados,
     perfil_y_embarazo,
+    senales_activas,
     servicios_disponibles,
 )
 
@@ -101,11 +102,7 @@ def detalle_guia(contenido_id):
 
 @main_bp.route('/alertas')
 def alertas():
-    senales = []
-    if _es_cuenta_demo():
-        from demo_nicaragua import SENALES_ALERTA
-        senales = SENALES_ALERTA
-    return render_template('alertas.html', senales=senales)
+    return render_template('alertas.html', senales=senales_activas())
 
 
 @main_bp.route('/centros')

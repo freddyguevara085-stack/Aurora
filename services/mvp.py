@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy import or_, select
 
 from extensions import db
+from models.contenido import ContenidoPrenatal, SenalAlerta
 from models.directorio import CentroAtencion, CentroServicio, Servicio
 from models.gestacion import Embarazo, PerfilGestante
 from models.seguimiento import ControlPrenatal, Recordatorio
@@ -44,8 +45,27 @@ def recordatorios_pendientes(usuario_id, limite=10):
 
 
 def contenidos_publicados(trimestre=None, categoria=None):
-    # ponytail: fail closed until Aurora has a documented clinical-review workflow.
-    return []
+    """Devuelve solamente las orientaciones que administración publicó."""
+    query = select(ContenidoPrenatal).where(ContenidoPrenatal.publicado == 1)
+    if trimestre in (1, 2, 3):
+        query = query.where(
+            (ContenidoPrenatal.trimestre.is_(None))
+            | (ContenidoPrenatal.trimestre == trimestre)
+        )
+    if categoria:
+        query = query.where(ContenidoPrenatal.categoria == categoria)
+    return db.session.scalars(
+        query.order_by(ContenidoPrenatal.updated_at.desc(), ContenidoPrenatal.id.desc())
+    ).all()
+
+
+def senales_activas():
+    """Devuelve las señales que administración dejó activas y ordenadas."""
+    return db.session.scalars(
+        select(SenalAlerta)
+        .where(SenalAlerta.activo == 1)
+        .order_by(SenalAlerta.orden_visual, SenalAlerta.id)
+    ).all()
 
 
 def centro_activo(centro_id):

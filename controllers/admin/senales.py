@@ -65,8 +65,6 @@ def validar_datos_senal(form_data):
             errores.append("La fecha de revisión debe tener formato AAAA-MM-DD válido.")
 
     activo = 1 if form_data.get("activo") in ("1", "true", "on") else 0
-    if activo:
-        errores.append("La publicación requiere revisión clínica documentada, todavía no disponible en Aurora.")
 
     datos = {
         "titulo": titulo,
@@ -206,9 +204,6 @@ def toggle_senal(senal_id):
     item = db.session.get(SenalAlerta, senal_id)
     if not item:
         abort(404)
-    if not item.activo:
-        flash("La publicación está deshabilitada hasta contar con revisión clínica documentada.", "error")
-        return redirect(url_for("admin.senales"))
     return _alternar(
         item,
         "activo",

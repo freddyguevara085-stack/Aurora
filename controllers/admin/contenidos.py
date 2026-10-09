@@ -93,8 +93,6 @@ def validar_datos_contenido(form_data):
                 errores.append("Las semanas de gestación deben ser números enteros.")
 
     publicado = 1 if form_data.get("publicado") in ("1", "true", "on") else 0
-    if publicado:
-        errores.append("La publicación requiere revisión clínica documentada, todavía no disponible en Aurora.")
 
     datos = {
         "titulo": titulo,
@@ -284,9 +282,6 @@ def toggle_publicacion_contenido(contenido_id):
     item = db.session.get(ContenidoPrenatal, contenido_id)
     if not item:
         abort(404)
-    if not item.publicado:
-        flash("La publicación está deshabilitada hasta contar con revisión clínica documentada.", "error")
-        return redirect(url_for("admin.contenidos"))
     return _alternar(
         item,
         "publicado",

@@ -39,6 +39,7 @@ def gestante(client, monkeypatch):
     monkeypatch.setattr(publicas_mod, "perfil_y_embarazo", lambda _id: (None, None))
     monkeypatch.setattr(publicas_mod, "construir_inicio", lambda _id: {"control": None})
     monkeypatch.setattr(publicas_mod, "contenidos_publicados", lambda *_a, **_k: [])
+    monkeypatch.setattr(publicas_mod, "senales_activas", lambda: [])
     monkeypatch.setattr(publicas_mod, "centros_activos", lambda *_a, **_k: [])
     return client
 
@@ -74,5 +75,8 @@ def test_indice_conserva_alertas_y_guia(gestante):
 
 def test_admin_carga_el_script_de_confirmacion():
     html = open("templates/admin/base_admin.html", encoding="utf-8").read()
-    assert "js/app.js" in html
-    assert 'id="aurora-confirm"' in html
+    base = open("templates/layouts/base.html", encoding="utf-8").read()
+    assert "js/app.js" not in html
+    assert 'id="aurora-confirm"' not in html
+    assert "js/app.js" in base
+    assert 'id="aurora-confirm"' in base

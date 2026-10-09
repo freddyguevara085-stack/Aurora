@@ -573,68 +573,42 @@ def test_guia_consultable_sin_cuenta(client, monkeypatch):
     assert b"Gu\xc3\xada prenatal" in response.data
 
 
-def test_contenido_clinico_publicado_queda_oculto_sin_revision(client, monkeypatch):
+def test_contenido_y_senal_publicados_por_admin_se_muestran(client, monkeypatch):
     from datetime import date
 
+    from controllers import publicas as publicas_routes
     from extensions import db
     from models.contenido import ContenidoPrenatal, SenalAlerta
-
-    etiqueta = "FUGA_CLINICA_DEMO_4242"
-    contenido = ContenidoPrenatal(
-        id=4242,
-        titulo=etiqueta,
-        resumen=etiqueta,
-        contenido=etiqueta,
-        categoria=etiqueta,
-        fuente_nombre=etiqueta,
-        fecha_revision=date(2026, 1, 1),
-        publicado=1,
-    )
-    senal = SenalAlerta(
-        id=4242,
-        titulo=etiqueta,
-        descripcion=etiqueta,
-        accion_recomendada=etiqueta,
-        orden_visual=1,
-        fuente_nombre=etiqueta,
-        fecha_revision=date(2026, 1, 1),
-        activo=1,
-    )
-    # Simula que la base de datos contiene contenido publicado y señales activas.
-    monkeypatch.setattr(
-        db.session, "scalars", lambda _query: SimpleNamespace(all=lambda: [contenido, senal])
-    )
-    monkeypatch.setattr(db.session, "scalar", lambda _query: contenido)
-
-    for ruta in ("/", "/guia", f"/guia/{contenido.id}", "/alertas"):
-        respuesta = client.get(ruta)
-        assert respuesta.status_code in (200, 404), ruta
-        assert etiqueta.encode() not in respuesta.data, ruta
-
-    assert client.get(f"/guia/{contenido.id}").status_code == 404
-
-    # Inicio autenticado: construir_inicio() tampoco debe devolver las filas publicadas.
     from models.usuario import Usuario
     from services import home as home_service
 
+    etiqueta = "PUBLICADO_POR_ADMIN_4242"
+    contenido = ContenidoPrenatal(
+        id=4242, titulo=etiqueta, resumen=etiqueta, contenido=etiqueta,
+        categoria=etiqueta, fuente_nombre=etiqueta, fecha_revision=date(2026, 1, 1), publicado=1,
+    )
+    senal = SenalAlerta(
+        id=4242, titulo=etiqueta, descripcion=etiqueta, accion_recomendada=etiqueta,
+        orden_visual=1, fuente_nombre=etiqueta, fecha_revision=date(2026, 1, 1), activo=1,
+    )
+    monkeypatch.setattr(publicas_routes, "contenidos_publicados", lambda *_a, **_k: [contenido])
+    monkeypatch.setattr(publicas_routes, "senales_activas", lambda: [senal])
+
+    assert etiqueta.encode() in client.get("/guia").data
+    assert etiqueta.encode() in client.get("/alertas").data
+
     monkeypatch.setattr(
-        db.session,
-        "get",
-        lambda model, _key: SimpleNamespace(nombres="Demo") if model is Usuario else None,
+        db.session, "get", lambda model, _key: SimpleNamespace(nombres="Demo") if model is Usuario else None,
     )
     monkeypatch.setattr(home_service, "perfil_y_embarazo", lambda _usuario_id: (None, None))
+    monkeypatch.setattr(home_service, "contenidos_publicados", lambda *_a, **_k: [contenido])
+    monkeypatch.setattr(home_service, "senales_activas", lambda: [senal])
 
     with client.application.app_context():
         inicio = home_service.construir_inicio(7)
 
-    assert inicio["contenidos"] == []
-    assert inicio["senales"] == []
-    titulos_inicio = [getattr(item, "titulo", "") for item in inicio["contenidos"] + inicio["senales"]]
-    assert etiqueta not in titulos_inicio
-
-    # Las filas publicadas/activas no se modifican ni se eliminan.
-    assert contenido.publicado == 1
-    assert senal.activo == 1
+    assert inicio["contenidos"] == [contenido]
+    assert inicio["senales"] == [senal]
 
 
 def test_revision_clinica_requiere_cuenta(client):
@@ -708,11 +682,11 @@ def test_descarga_apk_entrega_archivo_adjunto(client):
     assert "Aurora.apk" in response.headers["Content-Disposition"]
 
 
-def test_alertas_muestra_senales_a_cuenta_demo(client, monkeypatch):
-    from demo_nicaragua import CUENTA_DEMO_EMAIL, SENALES_ALERTA
+def test_alertas_muestra_senales_activas_de_administracion(client, monkeypatch):
+    from controllers import publicas as routes
+    from demo_nicaragua import SENALES_ALERTA
 
-    monkeypatch.setitem(client.application.config, "DEMO_MODE", True)
-    _iniciar_sesion_falsa(client, monkeypatch, "usuario", email=CUENTA_DEMO_EMAIL)
+    monkeypatch.setattr(routes, "senales_activas", lambda: SENALES_ALERTA)
     response = client.get("/alertas")
     assert response.status_code == 200
     for senal in SENALES_ALERTA:
@@ -1443,6 +1417,30 @@ def test_registrar_nacimiento_guarda_fecha_real_sin_cambiar_fpp(client, monkeypa
     assert embarazo.fecha_nacimiento_real == date(2026, 10, 8)
     assert embarazo.fecha_fin == date(2026, 10, 8)
     assert embarazo.estado == "finalizado"
+
+
+def test_formulario_nacimiento_se_muestra_y_permite_corregir_fecha(client, monkeypatch):
+    from datetime import date
+    from types import SimpleNamespace
+
+    from controllers import gestante as routes
+
+    perfil = SimpleNamespace(id=1)
+    embarazo = SimpleNamespace(
+        id=11,
+        fpp=date(2026, 10, 8),
+        fecha_nacimiento_real=date(2026, 10, 7),
+    )
+    _iniciar_sesion_falsa(client, monkeypatch, "usuario")
+    monkeypatch.setattr(routes, "perfil_y_embarazo", lambda _usuario_id: (perfil, embarazo))
+
+    respuesta = client.get("/embarazo/nacimiento")
+
+    assert respuesta.status_code == 200
+    assert b'name="fecha_nacimiento_real"' in respuesta.data
+    assert b'birth-form__date-input' in respuesta.data
+    assert b"Corregir fecha real del nacimiento" in respuesta.data
+    assert b"2026-10-07" in respuesta.data
 
 
 def test_perfil_vista_refactorizada_ui(client, monkeypatch):

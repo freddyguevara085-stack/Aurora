@@ -19,11 +19,11 @@
     <p class="form-help">Registrar o corregir la fecha real no modifica la fecha probable, que es solo una estimación.</p>
   </section>
 
-  <section class="card-surface setup-card">
-    <form method="post" class="stack-form" data-confirm="¿Confirmas que deseas guardar esta fecha real del nacimiento?" data-confirm-ok="Guardar fecha">
+  <section class="card-surface setup-card birth-form-card">
+    <form method="post" class="stack-form birth-form" data-confirm="¿Confirmas que deseas guardar esta fecha real del nacimiento?" data-confirm-ok="Guardar fecha">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <label for="fecha_nacimiento_real">Fecha real del nacimiento</label>
-      <input id="fecha_nacimiento_real" name="fecha_nacimiento_real" type="date" max="{{ date.isoformat() }}" required value="{{ form_data.get('fecha_nacimiento_real') if form_data is not none else (embarazo.fecha_nacimiento_real.isoformat() if embarazo.fecha_nacimiento_real else '') }}" aria-describedby="fecha-real-ayuda">
+      <input class="birth-form__date-input" id="fecha_nacimiento_real" name="fecha_nacimiento_real" type="date" max="{{ date.isoformat() }}" required value="{{ form_data.get('fecha_nacimiento_real') if form_data is not none else (embarazo.fecha_nacimiento_real.isoformat() if embarazo.fecha_nacimiento_real else '') }}" aria-describedby="fecha-real-ayuda">
       <small id="fecha-real-ayuda">No puede ser una fecha futura. Confirma la fecha antes de guardarla.</small>
       <div class="pregnancy-form-actions">
         <button class="button button--primary button--wide" type="submit">{{ 'Guardar corrección' if embarazo.fecha_nacimiento_real else 'Guardar fecha real' }}</button>

@@ -117,8 +117,9 @@
       {% set is_act = (form_data.get('activo') in ['1', 'true', 'on']) if form_data else (senal.activo == 1 if senal else false) %}
       <label class="checkbox-row">
         <input type="checkbox" name="activo" value="1" {% if is_act %}checked{% endif %}>
-        <strong>Publicación temporalmente deshabilitada hasta revisión clínica</strong>
+        <strong>Mostrar esta señal en la aplicación</strong>
       </label>
+      <small class="form-help">Se mostrará a las gestantes solo si está marcada. Verifica la fuente y la fecha de revisión antes de activarla.</small>
     </fieldset>
 
     <div class="form-actions-bar">

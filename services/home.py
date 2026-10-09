@@ -8,7 +8,12 @@ from extensions import db
 from models.seguimiento import ControlPrenatal
 from models.usuario import Usuario
 from services.gestacion import seguimiento_fecha_parto
-from services.mvp import perfil_y_embarazo, ultimo_embarazo_con_nacimiento
+from services.mvp import (
+    contenidos_publicados,
+    perfil_y_embarazo,
+    ultimo_embarazo_con_nacimiento,
+    senales_activas,
+)
 
 
 def calcular_semana_gestacional(
@@ -72,8 +77,10 @@ def construir_inicio(usuario_id: int) -> dict:
             .limit(1)
         )
 
-    contenidos = []
-    senales = []
+    contenidos = contenidos_publicados(trimestre=trimestre)
+    if not contenidos:
+        contenidos = contenidos_publicados()
+    senales = senales_activas()
 
     return {
         "user_name": usuario.nombres.split()[0] if usuario and usuario.nombres else "",
