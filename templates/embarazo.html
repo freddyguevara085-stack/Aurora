@@ -22,7 +22,7 @@
   {% include 'partials/flash.html' %}
 
   {% if embarazo and seguimiento and seguimiento.estado == 'nacimiento_registrado' %}
-    <section class="card-surface birth-followup-card" aria-labelledby="birth-followup-title">
+    <section class="card-surface birth-followup-card birth-followup-card--summary" aria-labelledby="birth-followup-title">
       <header class="card-header-stacked">
         <h2 id="birth-followup-title" class="card-header__title aurora-card-title"><span class="material-symbols-outlined" aria-hidden="true">child_friendly</span><span>Nacimiento registrado</span></h2>
         <p class="card-header__meta">Seguimiento informativo de tus fechas registradas.</p>

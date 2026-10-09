@@ -564,9 +564,19 @@ proceso de actualización de Azure descrito arriba.
 
 El directorio de demostración replica el listado oficial de la Red de Salud del MINSA (consultado el 2026-10-06): 438 establecimientos entre hospitales (con su subtipo: primario, departamental, regional o de referencia nacional), casas maternas, centros de salud y Clínicas Médicas Previsionales, cubriendo los 15 departamentos y 2 regiones autónomas de toda Nicaragua (153 municipios), con SILAIS, departamento, municipio, localidad y zona urbano/rural tal como los publica la fuente. Teléfonos, horarios, coordenadas y servicios no aparecen en el listado y no se importan. Las CMP son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento.
 
-Para poblar o actualizar el directorio en la base de datos de Railway:
-- Ejecuta `railway ssh -s web -- python initialize_railway_db.py` (crea tablas e inserta/sincroniza los 438 centros y las 10 señales de alerta oficiales).
-- O de forma independiente vía Flask CLI: `railway ssh -s web -- flask --app app seed-centros`.
+Para poblar o actualizar el directorio en la base de datos de Azure, conéctate
+por SSH a la VM y ejecuta el comando desde la carpeta del proyecto. `seed-centros`
+solo sincroniza los establecimientos del MINSA; no crea cuentas ficticias:
+
+```bash
+cd ~/Aurora
+source .venv/bin/activate
+flask --app app seed-centros
+sudo systemctl restart aurora
+```
+
+Comprueba el resultado en el directorio público de Aurora. No ejecutes el comando
+desde `~`: Git y Flask necesitan estar dentro de `~/Aurora`.
 
 ## Demo y revisión de contenido clínico
 
@@ -574,14 +584,20 @@ Para facilitar la revisión manual por parte de profesionales de salud en esta v
 
 En modo de demostración (`AURORA_DEMO=1`), las cuentas de prueba y administradores pueden consultar los datos ficticios de la guía y el panel de revisión clínica en `/demo/revision-clinica`. En producción, `/guia` muestra las orientaciones que administración publicó y `/alertas` muestra las señales que administración activó.
 
-Los datos de demostración (cuatro perfiles ficticios, centros oficiales del MINSA y catálogo de alertas) se cargan con `seed-demo` (requiere `AURORA_DEMO=1`):
+Los datos de demostración (cuatro perfiles ficticios, centros oficiales del MINSA
+y catálogo de alertas) se cargan con `seed-demo`. Esta operación requiere
+`AURORA_DEMO=1` y debe ejecutarse únicamente en una base de demostración separada;
+no la ejecutes en la base de producción de Azure porque crea o restablece cuentas
+y datos ficticios.
 
 1. Activar el modo demo (solo en la base/entorno de demo):
    - PowerShell: `$env:AURORA_DEMO = "1"`
    - Linux/macOS: `export AURORA_DEMO=1`
-2. Cargar perfiles de demostración, agenda y sincronizar centros: `flask --app app seed-demo`
-   - Railway: `railway ssh -s web -- env AURORA_DEMO=1 flask --app app seed-demo`
-   - Si solo deseas inicializar el esquema y los centros/señales en Railway sin crear usuarios ficticios: `railway ssh -s web -- python initialize_railway_db.py`.
+2. En el entorno de demostración, cargar perfiles ficticios, agenda y centros:
+   `flask --app app seed-demo`. En la VM de Azure, primero entra a `~/Aurora`,
+   activa `.venv` y configura `AURORA_DEMO=1` en el entorno de demostración antes
+   de ejecutar el comando. Para actualizar únicamente los centros en Azure usa
+   `flask --app app seed-centros`, descrito arriba.
 3. Crear una cuenta revisora con rol `administrador`; la contraseña se pide de forma interactiva y no queda escrita en el código:
    `flask --app app create-user` → elegir el id del rol `administrador`.
 4. Iniciar la aplicación: `python app.py`
