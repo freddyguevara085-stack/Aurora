@@ -323,6 +323,17 @@ compartida vive en `services/`, evitando dependencias entre controladores.
 
 El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan algunos recursos estáticos y una página general de contingencia. La disponibilidad sin conexión es parcial: perfil, embarazo, controles, preguntas, traslado, contactos y recordatorios requieren conexión y no se guardan en caché. La página de contingencia no muestra datos de la cuenta. Aurora no envía notificaciones en segundo plano; los recordatorios se consultan dentro de la aplicación.
 
+## APK para Android
+
+El proyecto incluye una envoltura Android en [`android/`](android/). Esta versión
+mantiene Flask, las sesiones y MySQL en un servidor HTTPS y abre Aurora dentro
+de una aplicación móvil. Antes de compilar, cambia `server_url` en
+[`android/app/src/main/res/values/strings.xml`](android/app/src/main/res/values/strings.xml)
+por el dominio público de producción. Después abre `android/` en Android Studio
+y usa **Build > Build APK(s)**. No uses `localhost`, `127.0.0.1` ni HTTP: desde
+el teléfono esas direcciones no apuntan al servidor y el módulo bloquea tráfico
+sin cifrado.
+
 El directorio de demostración replica el listado oficial de la Red de Salud del MINSA (consultado el 2026-10-06): 438 establecimientos entre hospitales (con su subtipo: primario, departamental, regional o de referencia nacional), casas maternas, centros de salud y Clínicas Médicas Previsionales, cubriendo los 15 departamentos y 2 regiones autónomas de toda Nicaragua (153 municipios), con SILAIS, departamento, municipio, localidad y zona urbano/rural tal como los publica la fuente. Teléfonos, horarios, coordenadas y servicios no aparecen en el listado y no se importan. Las CMP son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento.
 
 Para poblar o actualizar el directorio en la base de datos de Railway:
