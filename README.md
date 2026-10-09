@@ -25,10 +25,11 @@
 - [Configuración](#configuración)
 - [Ejecución](#ejecución)
 - [Pruebas](#pruebas)
-- [Despliegue](#despliegue)
+- [Despliegue en Azure Virtual Machine](#despliegue-en-azure-virtual-machine)
 - [Estructura](#estructura)
 - [Roles](#roles)
 - [PWA y disponibilidad sin conexión](#pwa-y-disponibilidad-sin-conexión)
+- [APK para Android](#apk-para-android)
 - [Seguridad](#seguridad)
 - [Limitaciones y próximos pasos](#limitaciones-y-próximos-pasos)
 
@@ -46,6 +47,7 @@ Aurora está diseñada como un **medio sencillo de organización** entre la gest
 
 ### 1. Embarazo y controles
 - Registro y seguimiento del embarazo activo con cálculo orientativo de semana gestacional, trimestre y FPP.
+- Registro y corrección de la fecha real del nacimiento, conservando por separado la FPP como estimación.
 - Registro, reprogramación y consulta de controles prenatales (programados, realizados, reprogramados).
 - **Preguntas para la consulta:** dudas anotadas por la gestante para conversar con el personal de salud.
 - Hoja imprimible de preparación de la cita (`/consulta/imprimir`).
@@ -57,7 +59,7 @@ Aurora está diseñada como un **medio sencillo de organización** entre la gest
 
 ### 3. Para administración
 - Panel protegido para gestionar contenidos, señales de alerta, centros y servicios.
-- El contenido sanitario permanece cerrado al público hasta tener revisión clínica documentada.
+- Las orientaciones marcadas como **publicadas** y las señales marcadas como **activas** se muestran en la guía y en las alertas. Cada registro exige fuente y fecha de revisión.
 - Registro de actividad administrativa mediante auditoría.
 
 ## Tecnologías
@@ -223,7 +225,217 @@ La suite de Python y las pruebas de JavaScript nativo cubren:
 - Registro, recuperación de contraseña y cabeceras HTTP de seguridad.
 - Fábrica de aplicación (`create_app`) y registro de rutas (`tests/test_arquitectura.py`).
 
-## Despliegue
+## Despliegue en Azure Virtual Machine
+
+La demostración de Aurora se despliega en una máquina virtual Ubuntu de Azure.
+La arquitectura es:
+
+```text
+Teléfono o navegador ── HTTPS :443 ──> Nginx ──> Aurora / Waitress :8000 ──> MySQL local
+```
+
+La base de datos permanece dentro de la VM; no se abre su puerto a Internet.
+La URL pública de demostración actual es
+[`https://158-158-0-166.sslip.io`](https://158-158-0-166.sslip.io). El dominio
+`sslip.io` resuelve hacia la IP pública de la VM; en un despliegue permanente se
+recomienda usar un dominio propio.
+
+### 1. Crear y preparar la VM
+
+1. En Azure Portal crea una **Virtual Machine** con Ubuntu LTS y un usuario
+   administrador, por ejemplo `adminaurora`.
+2. En el grupo de seguridad de red (NSG) habilita las reglas entrantes:
+   - `22/TCP` para SSH, idealmente limitado a tu IP.
+   - `80/TCP` para HTTP y validación de certificados.
+   - `443/TCP` para HTTPS.
+3. Descarga la clave SSH y conéctate desde Windows:
+
+   ```powershell
+   ssh -i "C:\ruta\a\hackton_key.pem" adminaurora@IP_PUBLICA
+   ```
+
+   Si OpenSSH indica que la clave tiene permisos demasiado abiertos, limita sus
+   permisos en Windows antes de conectar. Nunca subas el archivo `.pem` al
+   repositorio.
+4. Ya dentro de la VM instala las dependencias del sistema:
+
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   sudo apt install -y python3 python3-venv python3-pip mysql-server nginx git certbot python3-certbot-nginx
+   ```
+
+### 2. Descargar Aurora e instalar sus dependencias
+
+```bash
+cd ~
+git clone https://github.com/freddyguevara085-stack/Aurora.git
+cd Aurora
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+```
+
+### 3. Crear la base de datos y aplicar el esquema
+
+Usa MySQL local solo desde la VM. El siguiente ejemplo crea un usuario limitado
+para Aurora; reemplaza `CONTRASENA_SEGURA` por un secreto propio:
+
+```bash
+sudo mysql
+```
+
+```sql
+CREATE DATABASE aurora CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'aurora_app'@'localhost' IDENTIFIED BY 'CONTRASENA_SEGURA';
+GRANT ALL PRIVILEGES ON aurora.* TO 'aurora_app'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+Inicializa una base nueva y aplica todas las migraciones:
+
+```bash
+sudo mysql < Aurora_BD.sql
+sudo mysql aurora < database/Aurora_MVP_seed.sql
+sudo mysql aurora < database/migrations/20260925_preguntas_consulta.sql
+sudo mysql aurora < database/migrations/20260926_plan_parto.sql
+sudo mysql aurora < database/migrations/20260926_red_comunitaria.sql
+sudo mysql aurora < database/migrations/20261008_seguimiento_nacimiento.sql
+```
+
+En una base que ya existe, aplica solamente las migraciones aún no ejecutadas.
+Por ejemplo, la columna de fecha real de nacimiento se puede comprobar con:
+
+```bash
+sudo mysql aurora -e "SHOW COLUMNS FROM embarazos LIKE 'fecha_nacimiento_real';"
+```
+
+### 4. Configurar secretos y ejecutar Aurora como servicio
+
+Crea `/home/adminaurora/Aurora/.env` con permisos privados. No lo añadas a Git:
+
+```dotenv
+SECRET_KEY=una-clave-larga-generada-aleatoriamente
+AURORA_ENV=production
+AURORA_DEBUG=0
+SESSION_COOKIE_SECURE=1
+PORT=8000
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3306
+MYSQL_DATABASE=aurora
+MYSQL_USER=aurora_app
+MYSQL_PASSWORD=CONTRASENA_SEGURA
+```
+
+```bash
+chmod 600 .env
+```
+
+Crea el servicio `/etc/systemd/system/aurora.service`:
+
+```ini
+[Unit]
+Description=Aurora Flask application
+After=network.target mysql.service
+
+[Service]
+User=adminaurora
+WorkingDirectory=/home/adminaurora/Aurora
+EnvironmentFile=/home/adminaurora/Aurora/.env
+ExecStart=/home/adminaurora/Aurora/.venv/bin/python /home/adminaurora/Aurora/wsgi.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Actívalo y verifica su estado:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now aurora
+sudo systemctl status aurora
+```
+
+El estado esperado es `active (running)`.
+
+### 5. Publicar con Nginx, firewall y HTTPS
+
+Crea `/etc/nginx/sites-available/aurora` y sustituye `DOMINIO_PUBLICO` por tu
+dominio o por el host `sslip.io` de tu IP:
+
+```nginx
+server {
+    listen 80;
+    server_name DOMINIO_PUBLICO;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+```bash
+sudo ln -s /etc/nginx/sites-available/aurora /etc/nginx/sites-enabled/aurora
+sudo nginx -t
+sudo systemctl reload nginx
+sudo ufw allow OpenSSH
+sudo ufw allow 'Nginx Full'
+sudo ufw --force enable
+sudo certbot --nginx -d DOMINIO_PUBLICO
+```
+
+Verifica el despliegue desde la VM o desde tu equipo:
+
+```bash
+curl -I https://DOMINIO_PUBLICO
+sudo systemctl status aurora
+sudo ufw status
+```
+
+### 6. Crear cuentas administrativas de demostración
+
+Desde `~/Aurora` ejecuta una vez por cada cuenta:
+
+```bash
+source .venv/bin/activate
+flask --app app create-user
+```
+
+Elige el id `2` (`administrador`) cuando el comando pregunte el rol. La
+contraseña se solicita de forma oculta; no se escribe en el historial ni en el
+repositorio.
+
+### 7. Actualizar Azure después de cambios locales
+
+En tu computadora, desde la raíz del repositorio:
+
+```powershell
+git add .
+git commit -m "Describe el cambio"
+git push origin main
+```
+
+Después conéctate a la VM y actualiza el código:
+
+```bash
+cd ~/Aurora
+git pull --ff-only origin main
+# Ejecuta aquí cada migración nueva que acompañe el cambio.
+sudo systemctl restart aurora
+sudo systemctl status aurora
+```
+
+Nginx no necesita reiniciarse cuando cambian solo Python, HTML, CSS o archivos
+estáticos. Usa `sudo nginx -t && sudo systemctl reload nginx` únicamente si
+cambiaste su configuración.
+
+### Alternativa: ejecución directa en Windows
 
 En Windows, `run.bat` selecciona el modo mediante `AURORA_ENV`:
 
@@ -243,7 +455,7 @@ python wsgi.py
 
 Coloca HTTPS delante de Waitress mediante un proxy o balanceador, configura copias de seguridad de MySQL y verifica la restauración antes de aceptar datos reales.
 
-### Despliegue en Microsoft Azure App Service
+### Alternativa: despliegue en Microsoft Azure App Service
 
 Aurora queda preparada para App Service sin cambiar su código. Pasos recomendados
 (verifícalos primero en local; este repositorio no crea recursos de Azure):
@@ -319,7 +531,7 @@ compartida vive en `services/`, evitando dependencias entre controladores.
 | Rol | Acceso |
 | --- | --- |
 | `usuario` | Perfil, embarazo, controles, preguntas, traslado y contactos personales de apoyo. |
-| `administrador` | Panel de contenidos, señales, centros, servicios y auditoría reciente. |
+| `administrador` | Panel de contenidos, señales, centros, servicios y auditoría reciente. Puede publicar orientaciones y activar señales visibles para las gestantes. |
 | `auditor` | Definido en el esquema, pero sin interfaz funcional dedicada en el MVP. |
 
 ## PWA y disponibilidad sin conexión
@@ -333,9 +545,22 @@ mantiene Flask, las sesiones y MySQL en un servidor HTTPS y abre Aurora dentro
 de una aplicación móvil. Antes de compilar, cambia `server_url` en
 [`android/app/src/main/res/values/strings.xml`](android/app/src/main/res/values/strings.xml)
 por el dominio público de producción. Después abre `android/` en Android Studio
-y usa **Build > Build APK(s)**. No uses `localhost`, `127.0.0.1` ni HTTP: desde
+y usa **Build > Build APK(s)**. El resultado se genera normalmente en
+`android/app/build/outputs/apk/debug/app-debug.apk`. No uses `localhost`, `127.0.0.1` ni HTTP: desde
 el teléfono esas direcciones no apuntan al servidor y el módulo bloquea tráfico
 sin cifrado.
+
+Para el entregable de descarga, la APK publicada se almacena como
+[`static/downloads/Aurora.apk`](static/downloads/Aurora.apk). La landing pública
+incluye el botón de descarga y Aurora la entrega desde:
+
+```text
+https://DOMINIO_PUBLICO/descargar/aurora.apk
+```
+
+Cada vez que cambies `server_url` o el proyecto Android, genera una APK nueva,
+reemplaza `static/downloads/Aurora.apk`, realiza `git commit` y aplica el
+proceso de actualización de Azure descrito arriba.
 
 El directorio de demostración replica el listado oficial de la Red de Salud del MINSA (consultado el 2026-10-06): 438 establecimientos entre hospitales (con su subtipo: primario, departamental, regional o de referencia nacional), casas maternas, centros de salud y Clínicas Médicas Previsionales, cubriendo los 15 departamentos y 2 regiones autónomas de toda Nicaragua (153 municipios), con SILAIS, departamento, municipio, localidad y zona urbano/rural tal como los publica la fuente. Teléfonos, horarios, coordenadas y servicios no aparecen en el listado y no se importan. Las CMP son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento.
 
@@ -347,7 +572,7 @@ Para poblar o actualizar el directorio en la base de datos de Railway:
 
 Para facilitar la revisión manual por parte de profesionales de salud en esta versión de prueba, la guía incluye 24 orientaciones detalladas que abarcan tanto el calendario prenatal como la resolución de dudas sobre las señales de alerta y emergencias obstétricas (sangrado vaginal, dolor de cabeza intenso con visión borrosa/zumbidos por preeclampsia, salida de líquido amniótico, disminución de movimientos fetales, fiebre e infecciones, contracciones prematuras, hinchazón súbita, dolor epigástrico y convulsiones), así como el rol del plan de parto y las Casas Maternas ante un traslado urgente.
 
-En modo de demostración (`AURORA_DEMO=1`), las cuentas de prueba y administradores pueden consultar el catálogo de señales de alerta en `/alertas`, las orientaciones en `/guia` (con filtro rápido para *Señales de alerta y emergencias*) y el panel de revisión clínica en `/demo/revision-clinica`. Cada ficha lleva la advertencia de que está pendiente de revisión clínica.
+En modo de demostración (`AURORA_DEMO=1`), las cuentas de prueba y administradores pueden consultar los datos ficticios de la guía y el panel de revisión clínica en `/demo/revision-clinica`. En producción, `/guia` muestra las orientaciones que administración publicó y `/alertas` muestra las señales que administración activó.
 
 Los datos de demostración (cuatro perfiles ficticios, centros oficiales del MINSA y catálogo de alertas) se cargan con `seed-demo` (requiere `AURORA_DEMO=1`):
 
