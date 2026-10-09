@@ -24,7 +24,7 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <label for="fecha_nacimiento_real">Fecha real del nacimiento</label>
       <input class="birth-form__date-input" id="fecha_nacimiento_real" name="fecha_nacimiento_real" type="date" max="{{ date.isoformat() }}" required value="{{ form_data.get('fecha_nacimiento_real') if form_data is not none else (embarazo.fecha_nacimiento_real.isoformat() if embarazo.fecha_nacimiento_real else '') }}" aria-describedby="fecha-real-ayuda">
-      <small id="fecha-real-ayuda">No puede ser una fecha futura. Confirma la fecha antes de guardarla.</small>
+      <small id="fecha-real-ayuda">Puedes registrar una fecha pasada o la fecha de hoy. No se permiten fechas futuras porque el nacimiento aún no habría ocurrido.</small>
       <div class="pregnancy-form-actions">
         <button class="button button--primary button--wide" type="submit">{{ 'Guardar corrección' if embarazo.fecha_nacimiento_real else 'Guardar fecha real' }}</button>
         <a class="button button--secondary button--wide" href="{{ url_for('main.embarazo') }}">Cancelar</a>

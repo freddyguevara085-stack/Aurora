@@ -40,7 +40,7 @@
             <select id="centros-depto" class="centros-depto-select" aria-label="Filtrar por departamento">
                 <option value="">Todos los departamentos</option>
                 {% for depto in departamentos %}
-                <option value="{{ depto }}" {% if (departamento == depto) or (not departamento and departamento_usuario == depto) %}selected{% endif %}>{{ depto }}</option>
+                <option value="{{ depto }}" {% if departamento == depto %}selected{% endif %}>{{ depto }}</option>
                 {% endfor %}
             </select>
             <span class="material-symbols-outlined centros-depto-chevron" aria-hidden="true">expand_more</span>

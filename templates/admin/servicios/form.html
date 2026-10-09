@@ -54,6 +54,26 @@
       </label>
     </fieldset>
 
+    <fieldset>
+      <legend>Centros donde está disponible</legend>
+      <p class="form-help">Un servicio solo se muestra a las usuarias dentro de la ficha de los centros que selecciones aquí.</p>
+      <div class="services-checkbox-grid">
+        {% for centro in centros %}
+          <label class="checkbox-row" style="background: var(--soft); padding: 8px 12px; border-radius: 10px;">
+            <input
+              type="checkbox"
+              name="centros_ids"
+              value="{{ centro.id }}"
+              {% if centro.id in centros_asignados_ids %}checked{% endif %}
+            >
+            <span><strong>{{ centro.nombre }}</strong><small>{{ centro.municipio }}, {{ centro.departamento }}</small></span>
+          </label>
+        {% else %}
+          <p class="muted-text">No hay centros activos disponibles. Crea o activa un centro antes de asociar este servicio.</p>
+        {% endfor %}
+      </div>
+    </fieldset>
+
     <div class="form-actions-bar">
       <button type="submit" class="button button--primary">
         <span class="material-symbols-outlined" aria-hidden="true">save</span>

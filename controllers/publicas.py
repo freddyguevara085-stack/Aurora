@@ -110,17 +110,10 @@ def centros():
     centros = centros_activos()
     departamentos = sorted(list(set(c.departamento for c in centros if getattr(c, "departamento", None))))
 
-    departamento_usuario = None
-    if current_user.is_authenticated:
-        perfil, _ = perfil_y_embarazo(current_user.id)
-        if perfil and perfil.departamento:
-            departamento_usuario = perfil.departamento
-
     return render_template(
         'centros.html',
         centros=centros,
         departamentos=departamentos,
-        departamento_usuario=departamento_usuario,
         es_demo=_es_cuenta_demo(),
         q=(request.args.get('q') or '').strip()[:80],
         tipo=(request.args.get('tipo') or '').strip(),

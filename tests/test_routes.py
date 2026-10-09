@@ -740,6 +740,39 @@ def test_centros_estilos_responsivos_no_desbordan():
     assert "word-break: break-word;" in css
 
 
+def test_directorio_no_oculta_centros_por_departamento_del_perfil():
+    from pathlib import Path
+
+    plantilla = (Path(__file__).resolve().parent.parent / "templates" / "centros.html").read_text(encoding="utf-8")
+
+    assert "departamento_usuario" not in plantilla
+    assert "Todos los departamentos" in plantilla
+
+
+def test_servicio_admin_acepta_centros_para_mostrarlo_en_sus_fichas(monkeypatch):
+    from werkzeug.datastructures import MultiDict
+
+    from controllers.admin.servicios import validar_datos_servicio
+    from extensions import db
+
+    monkeypatch.setattr(db.session, "scalar", lambda _query: None)
+    datos, centros_ids, errores = validar_datos_servicio(
+        MultiDict(
+            [
+                ("nombre", "VacunaciÃ³n"),
+                ("descripcion", "Servicio de ejemplo"),
+                ("activo", "1"),
+                ("centros_ids", "2"),
+                ("centros_ids", "7"),
+            ]
+        )
+    )
+
+    assert errores == []
+    assert datos["activo"] == 1
+    assert centros_ids == [2, 7]
+
+
 def test_fuente_solo_acepta_http_o_https():
     from controllers.admin import _url_fuente_valida
 
