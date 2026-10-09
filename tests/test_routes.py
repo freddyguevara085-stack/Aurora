@@ -692,6 +692,22 @@ def test_alertas_consultables_sin_cuenta(client, monkeypatch):
     assert b"Se\xc3\xb1ales de alerta" in response.data
 
 
+def test_landing_publica_ofrece_descarga_android(client):
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert b"/descargar/aurora.apk" in response.data
+    assert b"Descargar para Android" in response.data
+
+
+def test_descarga_apk_entrega_archivo_adjunto(client):
+    response = client.get("/descargar/aurora.apk")
+
+    assert response.status_code == 200
+    assert "attachment;" in response.headers["Content-Disposition"]
+    assert "Aurora.apk" in response.headers["Content-Disposition"]
+
+
 def test_alertas_muestra_senales_a_cuenta_demo(client, monkeypatch):
     from demo_nicaragua import CUENTA_DEMO_EMAIL, SENALES_ALERTA
 

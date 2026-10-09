@@ -25,6 +25,17 @@ def index():
     return render_template('index.html', home=home_data)
 
 
+@main_bp.route('/descargar/aurora.apk')
+def descargar_apk():
+    """Entrega la versión Android publicada desde la página de inicio."""
+    return send_from_directory(
+        'static/downloads',
+        'Aurora.apk',
+        as_attachment=True,
+        download_name='Aurora.apk',
+    )
+
+
 @main_bp.route('/guia')
 def guia():
     activo = None

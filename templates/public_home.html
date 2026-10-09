@@ -10,6 +10,9 @@
       </a>
       <nav class="public-home__nav" aria-label="Navegación principal">
         <a class="public-home__about-link" href="{{ url_for('main.acerca') }}">Qué es Aurora</a>
+        <a class="public-home__download-link" href="{{ url_for('main.descargar_apk') }}">
+          <span class="material-symbols-outlined" aria-hidden="true">download</span> Descargar app
+        </a>
         <a class="button button--secondary public-home__signin" href="{{ url_for('auth.login') }}">Iniciar sesión</a>
       </nav>
     </header>
@@ -23,8 +26,12 @@
           <a class="button button--primary public-home__primary-action" href="{{ url_for('auth.registro') }}">
             Crear cuenta <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
           </a>
+          <a class="button button--secondary public-home__download-action" href="{{ url_for('main.descargar_apk') }}">
+            <span class="material-symbols-outlined" aria-hidden="true">android</span> Descargar para Android
+          </a>
           <a class="public-home__login-link" href="{{ url_for('auth.login') }}">Ya tengo una cuenta</a>
         </div>
+        <p class="public-home__download-note"><span class="material-symbols-outlined" aria-hidden="true">install_mobile</span> APK para Android. Al instalar, el teléfono puede pedir permiso para usar esta fuente.</p>
         <p class="public-home__demo-note"><span class="material-symbols-outlined" aria-hidden="true">info</span> Versión de prueba: utiliza datos ficticios; no ingreses información personal real.</p>
       </div>
 

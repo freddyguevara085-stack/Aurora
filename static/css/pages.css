@@ -3391,7 +3391,8 @@
 
 .public-home__brand,
 .public-home__nav,
-.public-home__about-link {
+.public-home__about-link,
+.public-home__download-link {
   display: inline-flex;
   align-items: center;
 }
@@ -3400,7 +3401,10 @@
 .public-home__brand img { display: block; width: 42px; height: 42px; border-radius: 13px; }
 .public-home__nav { gap: 26px; }
 .public-home__about-link { min-height: 44px; color: var(--muted); font-size: 14px; }
+.public-home__download-link { min-height: 44px; gap: 5px; color: var(--primary); font-size: 14px; font-weight: 600; }
+.public-home__download-link .material-symbols-outlined { font-size: 18px; }
 .public-home__about-link:hover,
+.public-home__download-link:hover,
 .public-home__login-link:hover,
 .public-home__footer a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 4px; }
 .public-home__signin { min-height: 44px; }
@@ -3424,7 +3428,11 @@
 .public-home__primary-action .material-symbols-outlined { font-size: 19px; transition: transform .18s ease; }
 .public-home__primary-action:hover { box-shadow: 0 7px 18px rgba(108, 75, 163, .25); transform: translateY(-1px); }
 .public-home__primary-action:hover .material-symbols-outlined { transform: translateX(3px); }
+.public-home__download-action { min-height: 52px; padding-inline: 18px; }
+.public-home__download-action .material-symbols-outlined { font-size: 19px; }
 .public-home__login-link { display: inline-flex; min-height: 44px; align-items: center; color: var(--muted); font-size: 14px; font-weight: 500; }
+.public-home__download-note { display: flex; max-width: 55ch; align-items: flex-start; gap: 8px; margin: 16px 0 0; color: #5c5364; font-size: 13px; line-height: 1.5; }
+.public-home__download-note .material-symbols-outlined { flex: 0 0 auto; color: var(--primary); font-size: 18px; }
 .public-home__demo-note { display: flex; max-width: 52ch; align-items: flex-start; gap: 8px; margin: 22px 0 0; color: #5c5364; font-size: 13px; line-height: 1.5; }
 .public-home__demo-note .material-symbols-outlined { flex: 0 0 auto; color: var(--primary); font-size: 18px; }
 
@@ -3494,6 +3502,7 @@
   .public-home__hero { padding-top: 40px; }
   .public-home__actions { display: grid; gap: 8px; margin-top: 24px; }
   .public-home__primary-action { width: 100%; }
+  .public-home__download-action { width: 100%; }
   .public-home__login-link { justify-content: center; }
   .public-home__preview { padding: 14px; border-radius: 22px; }
   .public-home__preview-card { padding: 19px; }

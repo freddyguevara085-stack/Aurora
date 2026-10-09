@@ -1,4 +1,4 @@
 <resources>
     <string name="app_name">Aurora</string>
-    <string name="server_url">https://CAMBIA-ESTA-URL-por-tu-dominio.example/</string>
+    <string name="server_url">https://158-158-0-166.sslip.io/</string>
 </resources>
