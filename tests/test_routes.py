@@ -1641,9 +1641,9 @@ def test_nuevo_control_datalist_centros_ui(client, monkeypatch):
     assert 'placeholder="Buscar centro o puesto local..."' in html
     assert 'class="form-hint">Escribe tu puesto local si no aparece en la lista.</span>' in html
 
-    # 2. Opciones sugeridas con nombre y municipio
-    assert 'value="Centro de Salud San Juan (Matagalpa)"' in html
-    assert 'value="Hospital Bertha Calderón (Managua)"' in html
+    # 2. Opciones sugeridas con nombre, municipio y departamento (permite buscar por depto)
+    assert 'value="Centro de Salud San Juan (Matagalpa, Matagalpa)"' in html
+    assert 'value="Hospital Bertha Calderón (Managua, Managua)"' in html
 
     # 3. Se eliminó el <select> rígido y el contenedor condicional huérfano
     assert '<select id="centro_atencion_id"' not in html
