@@ -56,6 +56,16 @@ def construir_inicio(usuario_id: int) -> dict:
     usuario = db.session.get(Usuario, usuario_id)
     perfil, embarazo = perfil_y_embarazo(usuario_id)
     nacimiento = ultimo_embarazo_con_nacimiento(perfil.id) if perfil and not embarazo else None
+    semana_al_nacimiento = (
+        calcular_semana_gestacional(
+            nacimiento.fum,
+            nacimiento.fpp,
+            hoy=nacimiento.fecha_nacimiento_real,
+            metodo_fpp=nacimiento.metodo_fpp,
+        )
+        if nacimiento and nacimiento.fecha_nacimiento_real
+        else None
+    )
 
     semana = calcular_semana_gestacional(
         embarazo.fum if embarazo else None,
@@ -97,5 +107,6 @@ def construir_inicio(usuario_id: int) -> dict:
             getattr(nacimiento, "fecha_nacimiento_real", None),
         ) if (embarazo or nacimiento) else None,
         "nacimiento": nacimiento,
+        "week_at_birth": semana_al_nacimiento,
         "empty_message": "No hay un embarazo activo asociado a esta cuenta." if not embarazo and not nacimiento else None,
     }

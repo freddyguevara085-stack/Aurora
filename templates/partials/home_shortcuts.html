@@ -1,0 +1,39 @@
+<section class="home-shortcuts" aria-label="Accesos directos">
+  <div class="home-shortcuts-grid">
+    <a class="shortcut-card shortcut-card--alert card-surface aurora-card" href="{{ url_for('main.alertas') }}">
+      <div class="shortcut-card__header">
+        <span class="shortcut-icon shortcut-icon--warn"><span class="material-symbols-outlined" aria-hidden="true">warning</span></span>
+        <span class="chevron" aria-hidden="true">›</span>
+      </div>
+      <div class="shortcut-card__body"><strong>Señales de alerta</strong><span>Cuándo buscar atención</span></div>
+    </a>
+    <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.red_comunitaria') }}">
+      <div class="shortcut-card__header">
+        <span class="shortcut-icon shortcut-icon--support"><span class="material-symbols-outlined" aria-hidden="true">groups</span></span>
+        <span class="chevron" aria-hidden="true">›</span>
+      </div>
+      <div class="shortcut-card__body"><strong>Mi red de apoyo</strong><span>Contactos y traslado</span></div>
+    </a>
+    <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.controles') }}">
+      <div class="shortcut-card__header">
+        <span class="shortcut-icon shortcut-icon--questions"><span class="material-symbols-outlined" aria-hidden="true">medical_services</span></span>
+        <span class="chevron" aria-hidden="true">›</span>
+      </div>
+      <div class="shortcut-card__body"><strong>Mis controles</strong><span>Próximas citas e historial</span></div>
+    </a>
+    <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.preguntas_consulta') }}">
+      <div class="shortcut-card__header">
+        <span class="shortcut-icon shortcut-icon--questions"><span class="material-symbols-outlined" aria-hidden="true">help_outline</span></span>
+        <span class="chevron" aria-hidden="true">›</span>
+      </div>
+      <div class="shortcut-card__body"><strong>Mis preguntas</strong><span>Para tu consulta médica</span></div>
+    </a>
+    <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.guia') }}">
+      <div class="shortcut-card__header">
+        <span class="shortcut-icon shortcut-icon--guide"><span class="material-symbols-outlined" aria-hidden="true">menu_book</span></span>
+        <span class="chevron" aria-hidden="true">›</span>
+      </div>
+      <div class="shortcut-card__body"><strong>Guía prenatal</strong><span>Cuidados y orientación</span></div>
+    </a>
+  </div>
+</section>

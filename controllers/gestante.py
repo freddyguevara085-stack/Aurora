@@ -85,9 +85,19 @@ def embarazo():
                 db.session.rollback()
                 flash('No fue posible guardar la información del embarazo.', 'error')
     embarazo_mostrado = activo or (ultimo_embarazo_con_nacimiento(perfil.id) if perfil else None)
-    controles = controles_activos(activo)
+    controles = controles_activos(embarazo_mostrado)
     semana = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
-    proximo = next((control for control in controles if control.fecha_control >= date.today() and control.estado in {'programado', 'reprogramado'}), None)
+    semana_al_nacimiento = (
+        calcular_semana_gestacional(
+            embarazo_mostrado.fum,
+            embarazo_mostrado.fpp,
+            hoy=embarazo_mostrado.fecha_nacimiento_real,
+            metodo_fpp=embarazo_mostrado.metodo_fpp,
+        )
+        if embarazo_mostrado and embarazo_mostrado.fecha_nacimiento_real
+        else None
+    )
+    proximo = next((control for control in controles if activo and control.fecha_control >= date.today() and control.estado in {'programado', 'reprogramado'}), None)
     return render_template(
         'embarazo.html',
         perfil=perfil,
@@ -95,6 +105,7 @@ def embarazo():
         controles=controles,
         proximo=proximo,
         semana=semana,
+        semana_al_nacimiento=semana_al_nacimiento,
         editar=editar,
         form_data=form_data,
         date=date.today(),
@@ -150,13 +161,14 @@ def registrar_nacimiento():
 @login_required
 def controles():
     perfil, activo = perfil_y_embarazo(current_user.id)
-    controles = controles_activos(activo)
+    embarazo_mostrado = activo or (ultimo_embarazo_con_nacimiento(perfil.id) if perfil else None)
+    controles = controles_activos(embarazo_mostrado)
     hoy = date.today()
-    proximos = [control for control in controles if control.fecha_control >= hoy and control.estado in {'programado', 'reprogramado'}]
+    proximos = [control for control in controles if activo and control.fecha_control >= hoy and control.estado in {'programado', 'reprogramado'}]
     proximo = min(proximos, key=lambda control: (control.fecha_control, control.hora_control or datetime.min.time()), default=None)
-    anteriores = [c for c in reversed(controles) if c.fecha_control < hoy or c.estado in ('realizado', 'cancelado')]
+    anteriores = list(reversed(controles)) if not activo else [c for c in reversed(controles) if c.fecha_control < hoy or c.estado in ('realizado', 'cancelado')]
     dias_para_proximo = (proximo.fecha_control - hoy).days if proximo else None
-    return render_template('controles.html', embarazo=activo, controles=controles, proximo=proximo, anteriores=anteriores, dias_para_proximo=dias_para_proximo)
+    return render_template('controles.html', embarazo=embarazo_mostrado, puede_agendar=bool(activo), controles=controles, proximo=proximo, anteriores=anteriores, dias_para_proximo=dias_para_proximo)
 
 
 @main_bp.route('/controles/nuevo', methods=['GET', 'POST'])

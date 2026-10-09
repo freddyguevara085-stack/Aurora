@@ -36,6 +36,27 @@
       <p class="form-help">La fecha probable es una estimación. Sigue las indicaciones de tu personal de salud.</p>
       <a class="button button--secondary button--wide" href="{{ url_for('main.registrar_nacimiento') }}">Corregir fecha real</a>
     </section>
+    {% if semana_al_nacimiento is not none %}
+      <section class="card-surface aurora-card" aria-label="Semana del embarazo al nacimiento">
+        <h2 class="aurora-card-title">Semana al momento del nacimiento</h2>
+        <p>La estimación corresponde a la semana {{ semana_al_nacimiento }}.</p>
+      </section>
+    {% endif %}
+    <section class="prenatal-controls card-surface aurora-card" aria-label="Historial de controles prenatales">
+      <header class="card-header-stacked">
+        <h2 class="card-header__title aurora-card-title"><span class="material-symbols-outlined" aria-hidden="true">medical_services</span><span>Mis controles prenatales</span></h2>
+        <p class="card-header__meta">{{ controles|length }} control{{ 'es' if controles|length != 1 else '' }} registrado{{ 's' if controles|length != 1 else '' }}.</p>
+      </header>
+      <p class="card-desc aurora-card-desc">Este embarazo está marcado como finalizado. Puedes consultar el historial de controles, pero no agendar nuevos controles prenatales para este embarazo.</p>
+      <a class="button button--secondary button--wide" href="{{ url_for('main.controles') }}">Ver mis controles</a>
+    </section>
+    <section class="birth-plan-entry card-surface aurora-card" aria-labelledby="birth-plan-title">
+      <header class="card-header-stacked">
+        <h2 id="birth-plan-title" class="card-header__title aurora-card-title"><span class="material-symbols-outlined" aria-hidden="true">groups</span><span>Mi red de apoyo</span></h2>
+        <p class="card-header__meta">Consulta o actualiza tus contactos de confianza.</p>
+      </header>
+      <a class="button button--secondary button--wide" href="{{ url_for('main.red_comunitaria') }}">Ver mi red de apoyo</a>
+    </section>
   {% elif embarazo and editar %}
     <section class="card-surface setup-card pregnancy-edit-card">
       <p class="form-help">La fecha probable de parto es una estimación y puede ajustarse con orientación profesional.</p>

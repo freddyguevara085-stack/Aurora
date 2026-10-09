@@ -33,6 +33,14 @@
         <a class="button button--secondary" href="{{ url_for('main.embarazo') }}">Ver seguimiento</a>
       </div>
     </section>
+    {% if home.week_at_birth is not none %}
+      <section class="card-surface aurora-card" aria-label="Semana del embarazo al nacimiento">
+        <h2 class="aurora-card-title">Semana al momento del nacimiento</h2>
+        <p>La estimación corresponde a la semana {{ home.week_at_birth }}. La fecha probable de parto era {{ home.nacimiento.fpp.strftime('%d/%m/%Y') if home.nacimiento.fpp else 'no registrada' }}.</p>
+      </section>
+    {% endif %}
+    <a class="card-surface aurora-card" href="{{ url_for('main.controles') }}">Consultar mis controles prenatales <span aria-hidden="true">›</span></a>
+    {% include 'partials/home_shortcuts.html' %}
   {% elif home.empty_message %}
     {% set empty_title = 'Sin embarazo activo' %}
     {% set empty_text = home.empty_message %}
@@ -176,65 +184,7 @@
     {% endif %}
 
     {# ── 3. Reorganización de Accesos Directos (Grid Compacto de 2 Columnas) ── #}
-    <section class="home-shortcuts" aria-label="Accesos directos">
-      <div class="home-shortcuts-grid">
-        <!-- Señales de alerta (fondo blanco, icono rosa suave) -->
-        <a class="shortcut-card shortcut-card--alert card-surface aurora-card" href="{{ url_for('main.alertas') }}">
-          <div class="shortcut-card__header">
-            <span class="shortcut-icon shortcut-icon--warn">
-              <span class="material-symbols-outlined" aria-hidden="true">warning</span>
-            </span>
-            <span class="chevron" aria-hidden="true">›</span>
-          </div>
-          <div class="shortcut-card__body">
-            <strong>Señales de alerta</strong>
-            <span>Cuándo buscar atención</span>
-          </div>
-        </a>
-
-        <!-- Mi red de apoyo -->
-        <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.red_comunitaria') }}">
-          <div class="shortcut-card__header">
-            <span class="shortcut-icon shortcut-icon--support">
-              <span class="material-symbols-outlined" aria-hidden="true">groups</span>
-            </span>
-            <span class="chevron" aria-hidden="true">›</span>
-          </div>
-          <div class="shortcut-card__body">
-            <strong>Mi red de apoyo</strong>
-            <span>Contactos y traslado</span>
-          </div>
-        </a>
-
-        <!-- Mis preguntas -->
-        <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.preguntas_consulta') }}">
-          <div class="shortcut-card__header">
-            <span class="shortcut-icon shortcut-icon--questions">
-              <span class="material-symbols-outlined" aria-hidden="true">help_outline</span>
-            </span>
-            <span class="chevron" aria-hidden="true">›</span>
-          </div>
-          <div class="shortcut-card__body">
-            <strong>Mis preguntas</strong>
-            <span>Para tu consulta médica</span>
-          </div>
-        </a>
-
-        <!-- Guía prenatal -->
-        <a class="shortcut-card card-surface aurora-card" href="{{ url_for('main.guia') }}">
-          <div class="shortcut-card__header">
-            <span class="shortcut-icon shortcut-icon--guide">
-              <span class="material-symbols-outlined" aria-hidden="true">menu_book</span>
-            </span>
-            <span class="chevron" aria-hidden="true">›</span>
-          </div>
-          <div class="shortcut-card__body">
-            <strong>Guía prenatal</strong>
-            <span>Cuidados y orientación</span>
-          </div>
-        </a>
-      </div>
-    </section>
+    {% include 'partials/home_shortcuts.html' %}
 
     {# ── 4. Guía con artículo destacado si existe contenido publicado ── #}
     {% if home.contenidos %}

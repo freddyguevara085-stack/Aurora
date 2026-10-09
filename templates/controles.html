@@ -17,17 +17,29 @@
           <h2 class="controls-hero__title">Mis citas y controles</h2>
           <p class="controls-hero__subtitle">Lleva el seguimiento ordenado de tus consultas y exámenes.</p>
         </div>
-        <a class="button button--primary controls-hero__add-btn" href="{{ url_for('main.nuevo_control') }}">
-          <span class="material-symbols-outlined" aria-hidden="true">add</span>
-          <span>Registrar nuevo control</span>
-        </a>
+        {% if puede_agendar %}
+          <a class="button button--primary controls-hero__add-btn" href="{{ url_for('main.nuevo_control') }}">
+            <span class="material-symbols-outlined" aria-hidden="true">add</span>
+            <span>Registrar nuevo control</span>
+          </a>
+        {% endif %}
       </div>
     </section>
+
+    {% if not puede_agendar %}
+      <p class="form-help">Este embarazo está marcado como finalizado. Aquí puedes consultar los controles que quedaron registrados.</p>
+    {% endif %}
 
     <section class="controls-section" aria-labelledby="proximo-control-heading">
       <h2 id="proximo-control-heading">Próximo control</h2>
 
-      {% if proximo %}
+      {% if not puede_agendar %}
+        <div class="card-surface aurora-card empty-next-card">
+          <span class="material-symbols-outlined empty-next-card__icon" aria-hidden="true">event_busy</span>
+          <h3>Embarazo finalizado</h3>
+          <p>Los controles nuevos solo se registran durante un embarazo activo.</p>
+        </div>
+      {% elif proximo %}
         {% set meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'] %}
         {% set fecha_cita = proximo.fecha_control %}
         <article class="card-surface aurora-card next-appointment-card">
@@ -132,10 +144,12 @@
               </div>
 
               <div class="history-card__footer">
-                <a class="history-card__link" href="{{ url_for('main.editar_control', control_id=control.id) }}">
-                  <span>Ver detalles o editar</span>
-                  <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
-                </a>
+                {% if puede_agendar %}
+                  <a class="history-card__link" href="{{ url_for('main.editar_control', control_id=control.id) }}">
+                    <span>Ver detalles o editar</span>
+                    <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+                  </a>
+                {% endif %}
               </div>
             </article>
           {% endfor %}
