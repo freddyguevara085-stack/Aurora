@@ -59,7 +59,7 @@ def test_preguntas_requiere_sesion_y_rol_de_gestante(client, monkeypatch):
 def test_alert_fab_visible_para_usuaria_no_en_alertas_ni_visitante(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import publicas as routes
     from extensions import db
 
     monkeypatch.setattr(db.session, "scalars", lambda _query: SimpleNamespace(all=lambda: []))
@@ -99,7 +99,7 @@ def test_alert_fab_visible_para_usuaria_no_en_alertas_ni_visitante(client, monke
 
 
 def test_preguntas_lista_solo_datos_de_la_cuenta(client, monkeypatch):
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     _iniciar_sesion_falsa(client, monkeypatch, "usuario", usuario_id=7)
@@ -133,7 +133,7 @@ def test_preguntas_lista_solo_datos_de_la_cuenta(client, monkeypatch):
 
 
 def test_preguntas_guardar_valida_y_asigna_la_cuenta(client, monkeypatch):
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     _iniciar_sesion_falsa(client, monkeypatch, "usuario", usuario_id=7)
@@ -243,7 +243,7 @@ def test_inicio_muestra_preparacion_de_proxima_consulta(client, monkeypatch):
     from datetime import date, time, timedelta
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import publicas as routes
 
     control = SimpleNamespace(
         id=4,
@@ -309,7 +309,7 @@ def test_inicio_muestra_preparacion_de_proxima_consulta(client, monkeypatch):
 
 
 def test_inicio_sin_proxima_consulta_no_muestra_compartir(client, monkeypatch):
-    from controllers import routes
+    from controllers import publicas as routes
 
     monkeypatch.setitem(client.application.config, "DEMO_MODE", False)
     monkeypatch.setattr(
@@ -350,7 +350,7 @@ def test_detalle_consulta_muestra_compartir_y_acceso_a_preguntas(client, monkeyp
     from datetime import date, time
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     control = SimpleNamespace(
         fecha_control=date(2026, 10, 12),
@@ -384,7 +384,7 @@ def test_hoja_impresa_incluye_logistica_y_preguntas_pendientes(client, monkeypat
     from datetime import date, time
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     control = SimpleNamespace(
@@ -414,7 +414,7 @@ def test_hoja_impresa_incluye_logistica_y_preguntas_pendientes(client, monkeypat
 
 
 def test_hoja_impresa_sin_cita_redirige(client, monkeypatch):
-    from controllers import routes
+    from controllers import gestante as routes
 
     monkeypatch.setitem(client.application.config, "DEMO_MODE", False)
     monkeypatch.setattr(
@@ -447,7 +447,7 @@ def test_hoja_impresa_no_incluye_notas_de_control_ni_parametros(client, monkeypa
     from datetime import date
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     control = SimpleNamespace(
@@ -565,7 +565,7 @@ def test_inicio_publico_no_requiere_cuenta(client):
 
 
 def test_guia_consultable_sin_cuenta(client, monkeypatch):
-    from controllers import routes
+    from controllers import publicas as routes
 
     monkeypatch.setattr(routes, "contenidos_publicados", lambda *_args, **_kwargs: [])
     response = client.get("/guia")
@@ -704,7 +704,7 @@ def test_alertas_muestra_senales_a_cuenta_demo(client, monkeypatch):
 
 
 def test_centros_consultables_sin_cuenta(client, monkeypatch):
-    from controllers import routes
+    from controllers import publicas as routes
 
     monkeypatch.setattr(routes, "centros_activos", lambda *_args: [])
     response = client.get("/centros")
@@ -713,7 +713,7 @@ def test_centros_consultables_sin_cuenta(client, monkeypatch):
 
 
 def test_clinica_previsional_se_identifica_y_muestra_requisito_inss(client, monkeypatch):
-    from controllers import routes
+    from controllers import publicas as routes
 
     clinica = SimpleNamespace(
         id=7,
@@ -772,7 +772,7 @@ def test_seguimientos_clinicos_no_forman_parte_del_mvp(client):
 
 
 def test_calendario_oculta_nuevo_recordatorio_a_administradores(client, monkeypatch):
-    from controllers import routes
+    from controllers import gestante as routes
 
     _iniciar_sesion_falsa(client, monkeypatch, "administrador")
     monkeypatch.setattr(routes, "perfil_y_embarazo", lambda _usuario_id: (None, None))
@@ -785,7 +785,7 @@ def test_calendario_oculta_nuevo_recordatorio_a_administradores(client, monkeypa
 
 
 def test_guia_muestra_borradores_solo_a_cuentas_demo(client, monkeypatch):
-    from controllers import routes
+    from controllers import publicas as routes
     from demo_nicaragua import BORRADORES, CUENTA_DEMO_EMAIL, CUENTAS_DEMO_EMAILS
 
     monkeypatch.setitem(client.application.config, "DEMO_MODE", True)
@@ -845,7 +845,7 @@ def test_plan_parto_requiere_autenticacion_y_rol_gestante(client, monkeypatch):
 
 
 def test_plan_parto_sin_embarazo_redirige(client, monkeypatch):
-    from controllers import routes
+    from controllers import gestante as routes
 
     _iniciar_sesion_falsa(client, monkeypatch, "usuario")
     monkeypatch.setattr(routes, "perfil_y_embarazo", lambda _usuario_id: (None, None))
@@ -859,7 +859,7 @@ def test_plan_parto_sin_embarazo_redirige(client, monkeypatch):
 def test_guardar_y_editar_plan_parto(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     embarazo = SimpleNamespace(id=11, plan_parto=None)
@@ -903,7 +903,7 @@ def test_guardar_y_editar_plan_parto(client, monkeypatch):
 def test_plan_parto_rechaza_transporte_invalido(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     embarazo = SimpleNamespace(id=11, plan_parto=None)
     _iniciar_sesion_falsa(client, monkeypatch, "usuario")
@@ -919,7 +919,7 @@ def test_plan_parto_rechaza_transporte_invalido(client, monkeypatch):
 def test_plan_parto_rechaza_centro_invalido_sin_error_500(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     embarazo = SimpleNamespace(id=11, plan_parto=None)
     _iniciar_sesion_falsa(client, monkeypatch, "usuario")
@@ -938,7 +938,7 @@ def test_plan_parto_rechaza_centro_invalido_sin_error_500(client, monkeypatch):
 
 def test_plan_parto_resumen_elementos_tactiles_y_preparativos(client, monkeypatch):
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
 
     plan = SimpleNamespace(
         centro_atencion=SimpleNamespace(nombre="Centro de Salud Demo"),
@@ -977,7 +977,7 @@ def test_imprimir_plan_parto_muestra_ficha_familiar(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     plan = SimpleNamespace(
         centro_atencion=SimpleNamespace(nombre="Hospital Demo"),
@@ -1015,7 +1015,7 @@ def test_imprimir_plan_parto_muestra_ficha_familiar(client, monkeypatch):
 def test_imprimir_plan_parto_sin_plan_redirige(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     embarazo = SimpleNamespace(id=11, plan_parto=None, fum=None, fpp=None)
     _iniciar_sesion_falsa(client, monkeypatch, "usuario")
@@ -1044,7 +1044,7 @@ def test_red_comunitaria_requiere_autenticacion_y_rol_gestante(client, monkeypat
 def test_red_comunitaria_renderiza_solo_contactos_confirmados(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     contactos = [
         SimpleNamespace(
@@ -1078,7 +1078,7 @@ def test_red_comunitaria_renderiza_solo_contactos_confirmados(client, monkeypatc
 def test_red_comunitaria_estado_vacio_guia_a_registrar(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     perfil = SimpleNamespace(id=5, contactos_comunitarios=[])
     _iniciar_sesion_falsa(client, monkeypatch, "usuario")
@@ -1093,7 +1093,7 @@ def test_red_comunitaria_estado_vacio_guia_a_registrar(client, monkeypatch):
 def test_crear_contacto_comunitario_exitoso(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     perfil = SimpleNamespace(id=5)
@@ -1129,7 +1129,7 @@ def test_crear_contacto_comunitario_exitoso(client, monkeypatch):
 def test_crear_contacto_comunitario_valida_campos(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     perfil = SimpleNamespace(id=5)
@@ -1160,7 +1160,7 @@ def test_crear_contacto_comunitario_valida_campos(client, monkeypatch):
 def test_editar_contacto_comunitario_propio(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     contacto = SimpleNamespace(
@@ -1200,7 +1200,7 @@ def test_editar_contacto_comunitario_propio(client, monkeypatch):
 def test_editar_contacto_de_otra_cuenta_da_404(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     perfil = SimpleNamespace(id=5)
@@ -1224,7 +1224,7 @@ def test_editar_contacto_de_otra_cuenta_da_404(client, monkeypatch):
 def test_eliminar_contacto_comunitario(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     contacto = SimpleNamespace(id=3, nombre="Doña Silvia")
@@ -1246,7 +1246,7 @@ def test_eliminar_contacto_comunitario(client, monkeypatch):
 def test_eliminar_contacto_de_otra_cuenta_da_404(client, monkeypatch):
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     perfil = SimpleNamespace(id=5)
@@ -1263,7 +1263,7 @@ def test_ficha_impreso_incluye_contactos_comunitarios(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     plan = SimpleNamespace(
         centro_atencion=None,
@@ -1306,7 +1306,7 @@ def test_ficha_impresa_sin_contactos_no_muestra_red_de_apoyo(client, monkeypatch
     from datetime import date
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     plan = SimpleNamespace(
         centro_atencion=None,
@@ -1341,7 +1341,7 @@ def test_embarazo_vista_refactorizada_ui(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
 
-    from controllers import routes
+    from controllers import gestante as routes
 
     perfil = SimpleNamespace(id=1, contactos_comunitarios=[])
     embarazo = SimpleNamespace(
@@ -1399,7 +1399,7 @@ def test_embarazo_vista_refactorizada_ui(client, monkeypatch):
 def test_perfil_vista_refactorizada_ui(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
 
     perfil = SimpleNamespace(
         id=1,
@@ -1478,7 +1478,7 @@ def test_logout_en_perfil_usa_post_con_csrf(client, monkeypatch):
 def test_nuevo_control_vista_refactorizada_ui(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
 
     embarazo = SimpleNamespace(
         id=11,
@@ -1522,7 +1522,7 @@ def test_nuevo_control_vista_refactorizada_ui(client, monkeypatch):
 def test_nuevo_control_creacion_automatiza_numero_y_edad(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     embarazo = SimpleNamespace(
@@ -1563,7 +1563,7 @@ def test_nuevo_control_creacion_automatiza_numero_y_edad(client, monkeypatch):
 def test_editar_control_muestra_notas_post_consulta_solo_si_realizado(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
 
     embarazo = SimpleNamespace(id=11, fum=date(2026, 4, 1), fpp=date(2027, 1, 6), metodo_fpp="fum")
     _iniciar_sesion_falsa(client, monkeypatch, "usuario")
@@ -1615,7 +1615,7 @@ def test_editar_control_muestra_notas_post_consulta_solo_si_realizado(client, mo
 def test_nuevo_control_datalist_centros_ui(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
 
     perfil = SimpleNamespace(id=1, departamento="Matagalpa", municipio="Matagalpa")
     embarazo = SimpleNamespace(id=11, fum=date(2026, 4, 1), fpp=date(2027, 1, 6), metodo_fpp="fum")
@@ -1657,7 +1657,7 @@ def test_nuevo_control_datalist_centros_ui(client, monkeypatch):
 def test_nuevo_control_guarda_centro_registrado_por_nombre(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     embarazo = SimpleNamespace(id=11, fum=date(2026, 4, 1), fpp=date(2027, 1, 6), metodo_fpp="fum")
@@ -1694,7 +1694,7 @@ def test_nuevo_control_guarda_centro_registrado_por_nombre(client, monkeypatch):
 def test_nuevo_control_guardar_puesto_comunitario_libre(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
 
     embarazo = SimpleNamespace(id=11, fum=date(2026, 4, 1), fpp=date(2027, 1, 6), metodo_fpp="fum")
@@ -1730,7 +1730,7 @@ def test_nuevo_control_guardar_puesto_comunitario_libre(client, monkeypatch):
 def test_editar_control_con_puesto_comunitario_prellena_input_y_limpia_textarea(client, monkeypatch):
     from datetime import date
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
     from extensions import db
     from models.seguimiento import ControlPrenatal
 
@@ -1769,7 +1769,7 @@ def test_editar_control_con_puesto_comunitario_prellena_input_y_limpia_textarea(
 def test_red_apoyo_refactor_ui_ux(client, monkeypatch):
     """Verifica el rediseño accesible y ergonómico de Red de apoyo."""
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
 
     contactos = [
         SimpleNamespace(
@@ -1822,7 +1822,7 @@ def test_mis_controles_refactor_ui_ux(client, monkeypatch):
     """Verifica el rediseño y reorganización lógica de Mis controles."""
     from datetime import date, time
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
 
     embarazo = SimpleNamespace(
         id=12,
@@ -1899,7 +1899,7 @@ def test_mis_controles_estado_vacio_historial(client, monkeypatch):
     """Verifica el estado vacío sobrio de controles anteriores y próximo control."""
     from datetime import date
     from types import SimpleNamespace
-    from controllers import routes
+    from controllers import gestante as routes
 
     embarazo = SimpleNamespace(
         id=12,

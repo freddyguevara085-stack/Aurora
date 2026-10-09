@@ -1,131 +1,43 @@
+"""Rutas de los flujos de la gestante (embarazo, controles, apoyo y perfil).
+
+Controlador delgado: recibe la petición, delega las reglas de negocio en
+``services/gestacion.py`` y devuelve la plantilla correspondiente.
+"""
+
 from datetime import date, datetime, time, timedelta
 import re
 
-from flask import Blueprint, abort, current_app, flash, redirect, render_template, request, send_from_directory, url_for
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.security import generate_password_hash
 
-from controllers.admin import admin_required
-from demo_nicaragua import BORRADORES, CONTEXTO, CUENTAS_DEMO_EMAILS, FECHA_CONSULTA, FUENTES
-from services.home import calcular_semana_gestacional, construir_inicio, fecha_inicio_gestacion
-from services.mvp import centros_activos, centro_activo, contenidos_publicados, controles_activos, perfil_y_embarazo, recordatorios_pendientes, servicios_disponibles
+from controllers.blueprints import main_bp
+from controllers.decorators import usuario_gestante as _usuario_gestante
 from extensions import db
 from models.gestacion import ContactoComunitario, Embarazo, PerfilGestante, PlanParto
 from models.seguimiento import ControlPrenatal, PreguntaConsulta, Recordatorio
-
-main_bp = Blueprint('main', __name__)
-
-# Ruta principal (la vista HTML)
-@main_bp.route('/')
-def index():
-    if not current_user.is_authenticated:
-        return render_template('public_home.html')
-    home_data = construir_inicio(current_user.id)
-    return render_template('index.html', home=home_data)
-
-
-def _usuario_gestante():
-    return current_user.rol and current_user.rol.nombre == "usuario"
-
-
-def _es_cuenta_demo():
-    """True solo para la cuenta ficticia de demostración con DEMO_MODE activo."""
-    return (
-        current_user.is_authenticated
-        and current_app.config.get("DEMO_MODE")
-        and (
-            getattr(current_user, "email", None) in CUENTAS_DEMO_EMAILS
-            or (getattr(current_user, "rol", None) and getattr(current_user.rol, "nombre", None) == "administrador")
-        )
-    )
-
-
-def validar_fechas_embarazo(
-    fum_raw: str | None,
-    fpp_raw: str | None,
-    metodo: str | None,
-) -> tuple[date | None, date | None, str | None]:
-    """Valida fechas de un embarazo activo con un límite visual de 42 semanas."""
-    try:
-        fum = date.fromisoformat(fum_raw) if fum_raw else None
-        fpp = date.fromisoformat(fpp_raw) if fpp_raw else None
-    except ValueError:
-        return None, None, "Revisa el formato de las fechas."
-    if not fum and not fpp:
-        return None, None, "Indica la fecha de última menstruación o la fecha probable de parto."
-    hoy = date.today()
-    if metodo is None:
-        metodo = "fum" if fum else "otro"
-    if fum and fum > hoy:
-        return None, None, "La fecha de última menstruación no puede estar en el futuro."
-    if fum and (hoy - fum).days > 42 * 7:
-        return None, None, "La FUM corresponde a más de 42 semanas; revisa la fecha del embarazo activo."
-    if fpp and fpp < hoy - timedelta(days=14):
-        return None, None, "La FPP corresponde a más de 42 semanas; revisa la fecha del embarazo activo."
-    if fpp and fpp > hoy + timedelta(days=280):
-        return None, None, "La FPP está a más de 40 semanas desde hoy; revisa la fecha."
-    if metodo == "fum" and not fum:
-        return None, None, "Indica la FUM o selecciona el método con el que se estimó la FPP."
-    if metodo in {"ecografia", "profesional", "otro"} and not fpp:
-        return None, None, "Indica la FPP según el método de estimación seleccionado."
-    if fum and fpp:
-        dias = (fpp - fum).days
-        if dias < 1 or dias > 322:
-            return None, None, "La relación entre las fechas no parece coherente."
-    if metodo == "fum" and fum:
-        calculada = fum + timedelta(days=280)
-        if fpp and fpp != calculada:
-            return None, None, "Con método FUM, la FPP se calcula a 280 días de esa fecha. Revisa las fechas o selecciona el método utilizado por tu profesional."
-        return fum, calculada, None
-    return fum, fpp, None
-
-
-def fechas_embarazo_desde_edad_gestacional(
-    semanas_raw: str | None,
-    dias_raw: str | None,
-    fecha_raw: str | None,
-    hoy: date | None = None,
-) -> tuple[date | None, date | None, str | None]:
-    """Deriva una fecha probable de parto desde semanas indicadas y su fecha de referencia."""
-    if not semanas_raw and not dias_raw:
-        return None, None, None
-    hoy = hoy or date.today()
-    try:
-        semanas = int(semanas_raw or 0)
-        dias = int(dias_raw or 0)
-        referencia = date.fromisoformat(fecha_raw) if fecha_raw else hoy
-    except ValueError:
-        return None, None, "Revisa las semanas, los días y la fecha en que te indicaron la edad gestacional."
-    if not semanas_raw and dias:
-        return None, None, "Ingresa primero las semanas completas."
-    if semanas < 0 or semanas > 42 or dias < 0 or dias > 6 or (semanas == 42 and dias):
-        return None, None, "La edad gestacional debe estar entre 0 y 42 semanas y 0 a 6 días."
-    if referencia > hoy:
-        return None, None, "La fecha de referencia no puede estar en el futuro."
-    if (hoy - referencia).days + semanas * 7 + dias > 42 * 7:
-        return None, None, "La fecha y la edad gestacional superan las 42 semanas; revisa los datos."
-    inicio_estimado = referencia - timedelta(days=semanas * 7 + dias)
-    return None, inicio_estimado + timedelta(days=280), None
-
-
-def validar_fecha_control(
-    fecha_control: date,
-    inicio_gestacion: date | None,
-    estado: str,
-    hoy: date | None = None,
-) -> str | None:
-    """Evita citas programadas pasadas o fuera de la gestación estimada."""
-    hoy = hoy or date.today()
-    if estado in {"programado", "reprogramado"} and fecha_control < hoy:
-        return "La fecha de una cita programada no puede estar en el pasado."
-    if inicio_gestacion:
-        dias = (fecha_control - inicio_gestacion).days
-        if dias < 0:
-            return "La fecha del control es anterior al inicio estimado del embarazo; revisa ambas fechas."
-        if dias > 42 * 7:
-            return "La fecha del control supera las 42 semanas estimadas; revisa los datos con tu profesional de salud."
-    return None
+from services.gestacion import (
+    PLAN_PARTO_TRANSPORTES,
+    PREGUNTA_MAX_CARACTERES,
+    ROLES_COMUNITARIOS,
+    contacto_propio,
+    construir_indicaciones,
+    fechas_embarazo_desde_edad_gestacional,
+    ordenar_centros_por_zona,
+    resolver_centro_input,
+    validar_contacto_comunitario,
+    validar_fecha_control,
+    validar_fechas_embarazo,
+)
+from services.home import calcular_semana_gestacional, construir_inicio, fecha_inicio_gestacion
+from services.mvp import (
+    centros_activos,
+    centro_activo,
+    controles_activos,
+    perfil_y_embarazo,
+    recordatorios_pendientes,
+)
 
 
 @main_bp.route('/embarazo', methods=['GET', 'POST'])
@@ -201,57 +113,6 @@ def controles():
     return render_template('controles.html', embarazo=activo, controles=controles, proximo=proximo, anteriores=anteriores, dias_para_proximo=dias_para_proximo)
 
 
-def _resolver_centro_input(texto, centros):
-    """Resuelve un centro a partir del texto ingresado con datalist o texto libre.
-
-    Retorna (centro_id, nombre_personalizado):
-    - Coincide con centro registrado: (centro.id, None)
-    - Puesto libre o comunitario: (None, texto_limpio)
-    - Vacío: (None, None)
-    """
-    if not texto:
-        return None, None
-    raw = texto.strip()
-    if not raw:
-        return None, None
-
-    # Compatibilidad con envíos directos de id numérico
-    if raw.isdigit():
-        cid = int(raw)
-        for c in centros:
-            if getattr(c, 'id', None) == cid:
-                return cid, None
-        if centro_activo(cid):
-            return cid, None
-
-    raw_lower = raw.lower()
-    for c in centros:
-        c_nom = (getattr(c, 'nombre', None) or '').strip()
-        c_mun = (getattr(c, 'municipio', None) or '').strip()
-        c_completo = f"{c_nom} ({c_mun})".lower() if c_mun else c_nom.lower()
-        if raw_lower == c_nom.lower() or raw_lower == c_completo:
-            return getattr(c, 'id', None), None
-
-    return None, raw[:150]
-
-
-def _ordenar_centros_por_zona(centros, perfil):
-    """Ordena los centros priorizando el municipio y departamento de la gestante."""
-    if not perfil or (not perfil.departamento and not perfil.municipio):
-        return list(centros)
-    dep_u = (perfil.departamento or '').strip().lower()
-    mun_u = (perfil.municipio or '').strip().lower()
-    return sorted(
-        centros,
-        key=lambda c: (
-            0 if mun_u and (getattr(c, 'municipio', None) or '').strip().lower() == mun_u else (
-                1 if dep_u and (getattr(c, 'departamento', None) or '').strip().lower() == dep_u else 2
-            ),
-            getattr(c, 'nombre', ''),
-        ),
-    )
-
-
 @main_bp.route('/controles/nuevo', methods=['GET', 'POST'])
 @login_required
 def nuevo_control():
@@ -261,7 +122,7 @@ def nuevo_control():
     if not activo:
         flash('Necesitas un embarazo activo para registrar un control.', 'error')
         return redirect(url_for('main.controles'))
-    centros = _ordenar_centros_por_zona(centros_activos(), perfil)
+    centros = ordenar_centros_por_zona(centros_activos(), perfil)
 
     ultimo_numero = db.session.scalar(
         db.select(db.func.max(ControlPrenatal.numero_control)).where(ControlPrenatal.embarazo_id == activo.id)
@@ -288,7 +149,7 @@ def nuevo_control():
             if centro_input_raw == 'otro':
                 centro_input_raw = (request.form.get('centro_otro_nombre') or '').strip() or 'Puesto de salud comunitario'
 
-            centro_id, centro_personalizado = _resolver_centro_input(centro_input_raw, centros)
+            centro_id, centro_personalizado = resolver_centro_input(centro_input_raw, centros)
             estado = 'programado'
             error_fecha_control = validar_fecha_control(fecha_control, inicio_gestacion, estado, hoy)
             if error_fecha_control:
@@ -305,15 +166,7 @@ def nuevo_control():
             tipo_control = (request.form.get('tipo_control') or '').strip()
             indicaciones_texto = (request.form.get('indicaciones') or '').strip()
 
-            partes_indicaciones = []
-            if tipo_control and tipo_control != 'Control prenatal regular':
-                partes_indicaciones.append(f"[{tipo_control}]")
-            if centro_personalizado:
-                partes_indicaciones.append(f"[Centro: {centro_personalizado}]")
-            if indicaciones_texto:
-                partes_indicaciones.append(indicaciones_texto)
-
-            indicaciones_final = " ".join(partes_indicaciones).strip() or None
+            indicaciones_final = construir_indicaciones(tipo_control, centro_personalizado, indicaciones_texto)
             notas_final = (request.form.get('notas') or '').strip() or None
 
             if numero < 1 or (edad is not None and not 0 <= edad <= 42):
@@ -372,7 +225,7 @@ def editar_control(control_id):
     if not control:
         abort(404)
 
-    centros = _ordenar_centros_por_zona(centros_activos(), perfil)
+    centros = ordenar_centros_por_zona(centros_activos(), perfil)
     semana_actual = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
 
     inicio_gestacion = fecha_inicio_gestacion(
@@ -413,7 +266,7 @@ def editar_control(control_id):
             if centro_input_raw == 'otro':
                 centro_input_raw = (request.form.get('centro_otro_nombre') or '').strip() or 'Puesto de salud comunitario'
 
-            centro_id, centro_personalizado = _resolver_centro_input(centro_input_raw, centros)
+            centro_id, centro_personalizado = resolver_centro_input(centro_input_raw, centros)
             if estado not in {'programado', 'realizado', 'reprogramado', 'cancelado'}:
                 raise ValueError
             error_fecha_control = validar_fecha_control(fecha_control, inicio_gestacion, estado, hoy)
@@ -423,15 +276,7 @@ def editar_control(control_id):
             tipo_control = (request.form.get('tipo_control') or '').strip()
             indicaciones_texto = (request.form.get('indicaciones') or '').strip()
 
-            partes_indicaciones = []
-            if tipo_control and tipo_control != 'Control prenatal regular':
-                partes_indicaciones.append(f"[{tipo_control}]")
-            if centro_personalizado:
-                partes_indicaciones.append(f"[Centro: {centro_personalizado}]")
-            if indicaciones_texto:
-                partes_indicaciones.append(indicaciones_texto)
-
-            indicaciones_final = " ".join(partes_indicaciones).strip() or None
+            indicaciones_final = construir_indicaciones(tipo_control, centro_personalizado, indicaciones_texto)
 
             control.fecha_control = fecha_control
             control.hora_control = time.fromisoformat(hora_raw) if hora_raw else None
@@ -524,16 +369,6 @@ def detalle_consulta():
         flash('No tienes una próxima consulta para preparar.', 'error')
         return redirect(url_for('main.index'))
     return render_template('consulta_detalle.html', control=control)
-
-
-PLAN_PARTO_TRANSPORTES = {
-    'propio': 'Vehículo propio',
-    'familiar_vecino': 'Apoyo de familiar o vecino',
-    'publico_colectivo': 'Transporte público / bus / panga',
-    'caponera_taxi': 'Taxi o caponera local',
-    'ambulancia_minsa': 'Coordinación con ambulancia del MINSA',
-    'otro': 'Otro medio acordado',
-}
 
 
 @main_bp.route('/plan-parto', methods=['GET', 'POST'])
@@ -636,50 +471,6 @@ def imprimir_plan_parto():
     )
 
 
-ROLES_COMUNITARIOS = {
-    'brigadista': 'Contacto comunitario',
-    'partera': 'Acompañante de confianza',
-    'promotor_salud': 'Persona de apoyo',
-    'traslado_local': 'Transporte',
-    'lider_comunitario': 'Referente comunitario',
-    'vecino_apoyo': 'Familiar, vecina o vecino',
-    'otro': 'Otro contacto',
-}
-
-
-def _validar_contacto_comunitario(form):
-    """Normaliza y valida los campos de un contacto de la red de apoyo."""
-    datos = {
-        'nombre': (form.get('nombre') or '').strip(),
-        'rol': (form.get('rol') or '').strip(),
-        'telefono': (form.get('telefono') or '').strip(),
-        'comunidad_barrio': (form.get('comunidad_barrio') or '').strip(),
-        'notas': (form.get('notas') or '').strip(),
-    }
-    if (
-        not datos['nombre']
-        or len(datos['nombre']) > 150
-        or datos['rol'] not in ROLES_COMUNITARIOS
-        or len(datos['telefono']) > 30
-        or len(datos['comunidad_barrio']) > 150
-        or len(datos['notas']) > 255
-    ):
-        return None, 'Revisa el nombre, el rol y la longitud de los campos del contacto.'
-    for campo in ('telefono', 'comunidad_barrio', 'notas'):
-        datos[campo] = datos[campo] or None
-    return datos, None
-
-
-def _contacto_propio(contacto_id, perfil):
-    """Busca un contacto verificando que pertenezca al perfil autenticado."""
-    return db.session.scalar(
-        db.select(ContactoComunitario).where(
-            ContactoComunitario.id == contacto_id,
-            ContactoComunitario.perfil_gestante_id == (perfil.id if perfil else None),
-        )
-    )
-
-
 @main_bp.get('/red-comunitaria')
 @login_required
 def red_comunitaria():
@@ -707,7 +498,7 @@ def nuevo_contacto_comunitario():
         flash('Necesitas un perfil gestante para registrar tu red de apoyo.', 'error')
         return redirect(url_for('main.embarazo'))
     if request.method == 'POST':
-        datos, error = _validar_contacto_comunitario(request.form)
+        datos, error = validar_contacto_comunitario(request.form)
         if error:
             flash(error, 'error')
         else:
@@ -733,11 +524,11 @@ def editar_contacto_comunitario(contacto_id):
     if not _usuario_gestante():
         abort(403)
     perfil, _ = perfil_y_embarazo(current_user.id)
-    contacto = _contacto_propio(contacto_id, perfil)
+    contacto = contacto_propio(contacto_id, perfil)
     if not contacto:
         abort(404)
     if request.method == 'POST':
-        datos, error = _validar_contacto_comunitario(request.form)
+        datos, error = validar_contacto_comunitario(request.form)
         if error:
             flash(error, 'error')
         else:
@@ -767,7 +558,7 @@ def eliminar_contacto_comunitario(contacto_id):
     if not _usuario_gestante():
         abort(403)
     perfil, _ = perfil_y_embarazo(current_user.id)
-    contacto = _contacto_propio(contacto_id, perfil)
+    contacto = contacto_propio(contacto_id, perfil)
     if not contacto:
         abort(404)
     try:
@@ -778,9 +569,6 @@ def eliminar_contacto_comunitario(contacto_id):
         db.session.rollback()
         flash('No fue posible eliminar el contacto.', 'error')
     return redirect(url_for('main.red_comunitaria'))
-
-
-PREGUNTA_MAX_CARACTERES = 500
 
 
 def _renderizar_preguntas(pregunta_borrador="", editar_id=None, error=None, status=200, preguntas=None):
@@ -961,108 +749,6 @@ def nuevo_recordatorio():
     return render_template('recordatorio_form.html', controles=controles, form_data=request.form if request.method == 'POST' else None)
 
 
-@main_bp.route('/guia')
-def guia():
-    activo = None
-    if current_user.is_authenticated:
-        _, activo = perfil_y_embarazo(current_user.id)
-    semana = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
-
-    publicados = contenidos_publicados()
-    orientaciones = [
-        {
-            "id": f"pub-{c.id}",
-            "titulo": c.titulo,
-            "resumen": c.resumen or "",
-            "cuerpo": c.contenido,
-            "categoria": c.categoria,
-            "trimestre": c.trimestre,
-            "fuente_nombre": c.fuente_nombre,
-            "fuente_url": c.fuente_url,
-            "fecha_revision": c.fecha_revision.strftime('%d/%m/%Y') if c.fecha_revision else None,
-            "es_borrador": False,
-        }
-        for c in publicados
-    ]
-
-    borradores = []
-    if _es_cuenta_demo():
-        borradores = [
-            {
-                **item,
-                "fuente_nombre": FUENTES.get(item["fuente"], {}).get("nombre", "Fuente sin registrar"),
-                "fuente_url": FUENTES.get(item["fuente"], {}).get("url", "#"),
-            }
-            for item in BORRADORES
-        ]
-        for item in borradores:
-            orientaciones.append({
-                "id": f"demo-{item['id']}",
-                "titulo": item["titulo"],
-                "resumen": item["texto"][:120] + ("…" if len(item["texto"]) > 120 else ""),
-                "cuerpo": item["texto"],
-                "categoria": item["categoria"].capitalize(),
-                "trimestre": item.get("trimestre"),
-                "fuente_nombre": item["fuente_nombre"],
-                "fuente_url": item["fuente_url"],
-                "fecha_revision": f"consultada {FECHA_CONSULTA}",
-                "es_borrador": True,
-            })
-
-    return render_template(
-        'guia.html',
-        orientaciones=orientaciones,
-        contenidos=publicados,
-        borradores=borradores,
-        fecha_consulta=FECHA_CONSULTA,
-        semana=semana,
-    )
-
-
-@main_bp.route('/guia/<int:contenido_id>')
-def detalle_guia(contenido_id):
-    abort(404)
-
-
-@main_bp.route('/alertas')
-def alertas():
-    senales = []
-    if _es_cuenta_demo():
-        from demo_nicaragua import SENALES_ALERTA
-        senales = SENALES_ALERTA
-    return render_template('alertas.html', senales=senales)
-
-
-@main_bp.route('/centros')
-def centros():
-    centros = centros_activos()
-    departamentos = sorted(list(set(c.departamento for c in centros if getattr(c, "departamento", None))))
-
-    departamento_usuario = None
-    if current_user.is_authenticated:
-        perfil, _ = perfil_y_embarazo(current_user.id)
-        if perfil and perfil.departamento:
-            departamento_usuario = perfil.departamento
-
-    return render_template(
-        'centros.html',
-        centros=centros,
-        departamentos=departamentos,
-        departamento_usuario=departamento_usuario,
-        es_demo=_es_cuenta_demo(),
-        q=(request.args.get('q') or '').strip()[:80],
-        tipo=(request.args.get('tipo') or '').strip(),
-        departamento=(request.args.get('departamento') or '').strip()[:100],
-    )
-
-
-@main_bp.route('/centros/<int:centro_id>')
-def detalle_centro(centro_id):
-    centro = centro_activo(centro_id)
-    if not centro: abort(404)
-    return render_template('centro_detalle.html', centro=centro, servicios=servicios_disponibles(centro.id))
-
-
 @main_bp.route('/perfil', methods=['GET', 'POST'])
 @login_required
 def perfil():
@@ -1138,6 +824,7 @@ def perfil():
         date=date.today(),
     )
 
+
 @main_bp.post('/perfil/cambiar-password')
 @login_required
 def cambiar_password():
@@ -1157,77 +844,3 @@ def cambiar_password():
             db.session.rollback()
             flash('No fue posible actualizar la contraseña.', 'error')
     return redirect(url_for('main.perfil'))
-
-
-# Ruta para que la PWA encuentre el Service Worker
-@main_bp.route('/service-worker.js')
-def service_worker():
-    return send_from_directory('static', 'service-worker.js')
-
-# Ruta para que la PWA encuentre el Manifest
-@main_bp.route('/manifest.json')
-def manifest():
-    return send_from_directory('static', 'manifest.json')
-
-
-@main_bp.route('/offline.html')
-def offline():
-    return send_from_directory('static', 'offline.html')
-
-
-@main_bp.route('/fuentes')
-def fuentes():
-    return render_template(
-        'informacion.html',
-        titulo='Fuentes de información',
-        icono='menu_book',
-        contenido=[
-            'Aurora organiza información de acompañamiento prenatal para fines educativos.',
-            'Las señales de alerta y recomendaciones deben revisarse con profesionales de la salud antes de usarse en un contexto real.',
-            'El contenido publicado incluye la fuente y la fecha de revisión registrada por el equipo administrador.',
-        ],
-        contexto=CONTEXTO,
-        fuentes=FUENTES,
-        fecha_consulta=FECHA_CONSULTA,
-    )
-
-
-@main_bp.route('/privacidad')
-def privacidad():
-    return render_template(
-        'informacion.html',
-        titulo='Privacidad',
-        icono='shield',
-        contenido=[
-            'Aurora utiliza los datos del perfil y del embarazo para mostrar el seguimiento de la cuenta autenticada.',
-            'No compartas datos clínicos reales en esta versión de demostración.',
-            'Antes de un uso real deben definirse la política de privacidad, la retención y la eliminación de datos.',
-        ],
-    )
-
-
-@main_bp.route('/acerca')
-def acerca():
-    return render_template(
-        'informacion.html',
-        titulo='Acerca de Aurora',
-        icono='help',
-        contenido=[
-            'Aurora es un puente organizativo entre la vida diaria de una gestante y su atención prenatal.',
-            'Ayuda a recordar controles, preparar preguntas y coordinar el traslado y las personas de apoyo elegidas por la usuaria.',
-            'No interpreta síntomas, diagnostica, prescribe, recomienda tratamientos ni reemplaza al personal o a los servicios de salud.',
-            'Es una demostración para validar si estas tareas simples ayudan a llegar mejor preparada y acompañada a la atención profesional.',
-        ],
-    )
-
-
-@main_bp.route('/demo/revision-clinica')
-@admin_required
-def revision_clinica():
-    return render_template(
-        'revision_clinica.html',
-        fuentes=FUENTES,
-        borradores=BORRADORES,
-        contexto=CONTEXTO,
-        fecha_consulta=FECHA_CONSULTA,
-    )

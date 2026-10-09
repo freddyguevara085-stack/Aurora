@@ -1,8 +1,22 @@
 from datetime import date, timedelta
 
-from controllers.routes import fechas_embarazo_desde_edad_gestacional, validar_fecha_control, validar_fechas_embarazo
+from services.gestacion import (
+    construir_indicaciones,
+    fechas_embarazo_desde_edad_gestacional,
+    validar_fecha_control,
+    validar_fechas_embarazo,
+)
 from demo_nicaragua import BORRADORES, CENTROS, FUENTES, SENALES_ALERTA
 from services.home import calcular_semana_gestacional
+
+
+def test_construir_indicaciones_compone_prefijos_y_texto_libre():
+    assert construir_indicaciones("Control prenatal regular", None, "") is None
+    assert construir_indicaciones("Ultrasonido / Ecografía", "Puesto El Chile", "Revisar") == (
+        "[Ultrasonido / Ecografía] [Centro: Puesto El Chile] Revisar"
+    )
+    assert construir_indicaciones("Control prenatal regular", None, "  Nota  ") == "Nota"
+
 
 
 def test_calcular_semana_desde_fum_y_limita_a_42():

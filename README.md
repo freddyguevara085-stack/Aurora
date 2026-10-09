@@ -218,6 +218,7 @@ La suite de Python y las pruebas de JavaScript nativo cubren:
 - Fichas imprimibles offline y disparador nativo de impresión.
 - Protección del panel administrativo y roles de acceso.
 - Registro, recuperación de contraseña y cabeceras HTTP de seguridad.
+- Fábrica de aplicación (`create_app`) y registro de rutas (`tests/test_arquitectura.py`).
 
 ## Despliegue
 
@@ -239,22 +240,62 @@ python wsgi.py
 
 Coloca HTTPS delante de Waitress mediante un proxy o balanceador, configura copias de seguridad de MySQL y verifica la restauración antes de aceptar datos reales.
 
+### Despliegue en Microsoft Azure App Service
+
+Aurora queda preparada para App Service sin cambiar su código. Pasos recomendados
+(verifícalos primero en local; este repositorio no crea recursos de Azure):
+
+1. **Runtime:** App Service con Python 3.10–3.12 (Linux o Windows).
+2. **Comando de inicio:** en Linux usa un servidor WSGI, por ejemplo
+   `gunicorn --bind=0.0.0.0:8000 wsgi:app`; en Windows usa `python wsgi.py`
+   (Waitress, ya incluido en `requirements.txt`).
+3. **Variables de entorno** (Configuración → Variables de aplicación):
+   `SECRET_KEY`, `AURORA_ENV=production`, `AURORA_DEBUG=0`,
+   `SESSION_COOKIE_SECURE=1`, `PORT=8000` y las credenciales `MYSQL_*` del
+   servidor de Azure Database for MySQL. No subas nunca el archivo `.env`.
+4. **Base de datos:** Azure Database for MySQL; aplica `Aurora_BD.sql` y las
+   migraciones `database/migrations/*.sql`. La app no crea ni inicializa el
+   esquema por sí sola.
+5. **HTTPS:** actívalo en App Service; `SESSION_COOKIE_SECURE=1` añade HSTS.
+6. **Diagnóstico:** App Service recoge `stdout`/`stderr`; los errores 500 se
+   registran con `app.logger.exception` sin exponer datos sensibles al usuario.
+
+> `gunicorn` no se ejecuta en Windows; para desarrollo y producción en Windows
+> se mantiene Waitress (`wsgi.py`).
+
 ## Estructura
+
+Aurora sigue una organización **MVC** adaptada a Flask:
+
+- **Modelo (`models/`)** — entidades SQLAlchemy y reglas de integridad.
+- **Vista (`templates/` + `static/`)** — plantillas Jinja2, estilos, JavaScript y PWA.
+- **Controlador (`controllers/`)** — recibe la petición, valida y coordina; no concentra la lógica de negocio.
+- **Servicios (`services/`)** — reglas de negocio reutilizables (cálculos de gestación, consultas, auditoría).
+- **Decoradores (`controllers/decorators.py`)** — control de acceso por rol compartido.
 
 ```text
 Aurora/
-├── app.py                         # Inicialización Flask y registro de extensiones
-├── wsgi.py                        # Entrada WSGI con Waitress
-├── config.py                      # Configuración desde variables de entorno
+├── app.py                         # Fábrica create_app() y arranque de desarrollo
+├── wsgi.py                        # Entrada WSGI con Waitress (producción)
+├── config.py                      # Config por entorno (development/testing/production)
 ├── extensions.py                  # Base de datos, login y CSRF
 ├── commands.py                    # Comandos CLI de Flask
 ├── README.md                      # Guía de instalación, uso y despliegue
+├── ARQUITECTURA_MVC.md            # Explicación didáctica de la arquitectura
 ├── controllers/
+│   ├── blueprints.py              # Blueprint principal compartido
+│   ├── decorators.py              # admin_required y helpers de rol
 │   ├── auth.py                    # Login, registro y recuperación
-│   ├── routes.py                  # Flujos de gestante y PWA
-│   └── admin.py                   # Panel administrativo
+│   ├── gestante.py                # Flujos de la gestante (embarazo, controles, apoyo, perfil)
+│   ├── publicas.py                # Inicio, guía, centros, alertas, información y PWA
+│   └── admin/                     # Panel administrativo por recurso
+│       ├── dashboard.py
+│       ├── contenidos.py
+│       ├── senales.py
+│       ├── centros.py
+│       └── servicios.py
 ├── models/                        # Modelos SQLAlchemy
-├── services/                      # Consultas y servicios de negocio
+├── services/                      # Lógica de negocio (home, mvp, gestacion, auditoria)
 ├── templates/                     # Vistas Jinja2
 ├── static/                        # CSS, JavaScript, fuentes, assets y PWA
 ├── tests/                         # Pruebas pytest
@@ -265,6 +306,10 @@ Aurora/
 ├── requirements.txt               # Dependencias
 └── run.bat                        # Arranque local o producción en Windows
 ```
+
+La configuración se selecciona con `AURORA_ENV` (`development`, `testing` o
+`production`). Cada controlador importa solo lo que necesita y la lógica
+compartida vive en `services/`, evitando dependencias entre controladores.
 
 ## Roles
 

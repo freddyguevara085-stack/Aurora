@@ -1,6 +1,6 @@
 import pytest
 
-from controllers import routes as routes_mod
+from controllers import gestante as gestante_mod, publicas as publicas_mod
 from test_routes import _iniciar_sesion_falsa
 
 
@@ -31,12 +31,15 @@ def gestante(client, monkeypatch):
     usuario = _iniciar_sesion_falsa(client, monkeypatch, "usuario")
     usuario.nombres = "Ana"
     usuario.apellidos = "Ruiz"
-    monkeypatch.setattr(routes_mod, "perfil_y_embarazo", lambda _id: (None, None))
-    monkeypatch.setattr(routes_mod, "construir_inicio", lambda _id: {"control": None})
-    monkeypatch.setattr(routes_mod, "contenidos_publicados", lambda *_a, **_k: [])
-    monkeypatch.setattr(routes_mod, "centros_activos", lambda *_a, **_k: [])
-    monkeypatch.setattr(routes_mod, "controles_activos", lambda *_a, **_k: [])
-    monkeypatch.setattr(routes_mod, "recordatorios_pendientes", lambda *_a, **_k: [])
+    monkeypatch.setattr(gestante_mod, "perfil_y_embarazo", lambda _id: (None, None))
+    monkeypatch.setattr(gestante_mod, "construir_inicio", lambda _id: {"control": None})
+    monkeypatch.setattr(gestante_mod, "centros_activos", lambda *_a, **_k: [])
+    monkeypatch.setattr(gestante_mod, "controles_activos", lambda *_a, **_k: [])
+    monkeypatch.setattr(gestante_mod, "recordatorios_pendientes", lambda *_a, **_k: [])
+    monkeypatch.setattr(publicas_mod, "perfil_y_embarazo", lambda _id: (None, None))
+    monkeypatch.setattr(publicas_mod, "construir_inicio", lambda _id: {"control": None})
+    monkeypatch.setattr(publicas_mod, "contenidos_publicados", lambda *_a, **_k: [])
+    monkeypatch.setattr(publicas_mod, "centros_activos", lambda *_a, **_k: [])
     return client
 
 
