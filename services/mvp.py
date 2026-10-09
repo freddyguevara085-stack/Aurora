@@ -18,6 +18,21 @@ def perfil_y_embarazo(usuario_id):
     return perfil, embarazo
 
 
+def ultimo_embarazo_con_nacimiento(perfil_id):
+    """Obtiene el último embarazo finalizado con nacimiento registrado del perfil."""
+    if not perfil_id:
+        return None
+    return db.session.scalar(
+        select(Embarazo)
+        .where(
+            Embarazo.perfil_gestante_id == perfil_id,
+            Embarazo.fecha_nacimiento_real.is_not(None),
+        )
+        .order_by(Embarazo.fecha_nacimiento_real.desc(), Embarazo.id.desc())
+        .limit(1)
+    )
+
+
 def controles_activos(embarazo):
     if not embarazo:
         return []

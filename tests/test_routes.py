@@ -1394,6 +1394,36 @@ def test_embarazo_vista_refactorizada_ui(client, monkeypatch):
     html_edit = respuesta_edit.get_data(as_text=True)
     assert "arrow_back" in html_edit
     assert "Editar embarazo" in html_edit
+    assert 'name="fpp"' not in html_edit
+    assert "La estimación no se edita manualmente" in html_edit
+
+
+def test_registrar_nacimiento_guarda_fecha_real_sin_cambiar_fpp(client, monkeypatch):
+    from datetime import date
+    from types import SimpleNamespace
+
+    from controllers import gestante as routes
+    from extensions import db
+
+    perfil = SimpleNamespace(id=1)
+    embarazo = SimpleNamespace(
+        id=11,
+        fpp=date(2026, 10, 8),
+        fecha_nacimiento_real=None,
+        fecha_fin=None,
+        estado="activo",
+    )
+    _iniciar_sesion_falsa(client, monkeypatch, "usuario")
+    monkeypatch.setattr(routes, "perfil_y_embarazo", lambda _usuario_id: (perfil, embarazo))
+    monkeypatch.setattr(db.session, "commit", lambda: None)
+
+    respuesta = client.post("/embarazo/nacimiento", data={"fecha_nacimiento_real": "2026-10-08"})
+
+    assert respuesta.status_code == 302
+    assert embarazo.fpp == date(2026, 10, 8)
+    assert embarazo.fecha_nacimiento_real == date(2026, 10, 8)
+    assert embarazo.fecha_fin == date(2026, 10, 8)
+    assert embarazo.estado == "finalizado"
 
 
 def test_perfil_vista_refactorizada_ui(client, monkeypatch):

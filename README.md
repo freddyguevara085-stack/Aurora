@@ -111,6 +111,7 @@ Aurora usa MySQL y distribuye su esquema maestro y scripts de migración:
 - [database/migrations/20260925_preguntas_consulta.sql](database/migrations/20260925_preguntas_consulta.sql): agrega el hilo de preguntas a bases existentes.
 - [database/migrations/20260926_plan_parto.sql](database/migrations/20260926_plan_parto.sql): tabla `planes_parto` para la logística de traslado y apoyo.
 - [database/migrations/20260926_red_comunitaria.sql](database/migrations/20260926_red_comunitaria.sql): tabla `contactos_comunitarios` para los contactos personales de apoyo.
+- [database/migrations/20261008_seguimiento_nacimiento.sql](database/migrations/20261008_seguimiento_nacimiento.sql): agrega la fecha real del nacimiento al seguimiento del embarazo.
 
 Desde CMD:
 
@@ -120,6 +121,7 @@ mysql -u root -p aurora < database\Aurora_MVP_seed.sql
 mysql -u root -p aurora < database\migrations\20260925_preguntas_consulta.sql
 mysql -u root -p aurora < database\migrations\20260926_plan_parto.sql
 mysql -u root -p aurora < database\migrations\20260926_red_comunitaria.sql
+mysql -u root -p aurora < database\migrations\20261008_seguimiento_nacimiento.sql
 ```
 
 Desde PowerShell:
@@ -130,6 +132,7 @@ Get-Content database\Aurora_MVP_seed.sql | mysql -u root -p aurora
 Get-Content database\migrations\20260925_preguntas_consulta.sql | mysql -u root -p aurora
 Get-Content database\migrations\20260926_plan_parto.sql | mysql -u root -p aurora
 Get-Content database\migrations\20260926_red_comunitaria.sql | mysql -u root -p aurora
+Get-Content database\migrations\20261008_seguimiento_nacimiento.sql | mysql -u root -p aurora
 ```
 
 Para producción, utiliza un usuario MySQL dedicado con privilegios mínimos. No uses `root` ni una contraseña vacía.

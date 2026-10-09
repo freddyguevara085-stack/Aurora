@@ -26,8 +26,10 @@ from services.gestacion import (
     fechas_embarazo_desde_edad_gestacional,
     ordenar_centros_por_zona,
     resolver_centro_input,
+    seguimiento_fecha_parto,
     validar_contacto_comunitario,
     validar_fecha_control,
+    validar_fecha_nacimiento_real,
     validar_fechas_embarazo,
 )
 from services.home import calcular_semana_gestacional, construir_inicio, fecha_inicio_gestacion
@@ -35,6 +37,7 @@ from services.mvp import (
     centros_activos,
     centro_activo,
     controles_activos,
+    ultimo_embarazo_con_nacimiento,
     perfil_y_embarazo,
     recordatorios_pendientes,
 )
@@ -51,8 +54,6 @@ def embarazo():
             abort(403)
         form_data = request.form
         fum = request.form.get('fum') or None
-        fpp = request.form.get('fpp') or None
-        metodo = request.form.get('metodo_fpp') or ('fum' if fum else None)
         semanas_raw = request.form.get('semanas_gestacion') or None
         dias_raw = request.form.get('dias_gestacion') or None
         edad_ingresada = semanas_raw is not None or (dias_raw is not None and dias_raw != '0')
@@ -64,10 +65,12 @@ def embarazo():
             metodo = 'profesional'
             if error:
                 flash(error, 'error')
-        elif metodo and metodo not in {'fum', 'ecografia', 'profesional', 'otro'}:
-            flash('Método no válido.', 'error')
         else:
-            fum_fecha, fpp_fecha, error = validar_fechas_embarazo(fum, fpp, metodo)
+            # La FPP no proviene del formulario: se calcula desde la FUM o se
+            # conserva si ya fue registrada mediante otro método de estimación.
+            metodo = activo.metodo_fpp if activo and activo.metodo_fpp else ('fum' if fum else None)
+            fpp_existente = activo.fpp if activo and activo.metodo_fpp != 'fum' else None
+            fum_fecha, fpp_fecha, error = validar_fechas_embarazo(fum, fpp_existente, metodo)
             if error:
                 flash(error, 'error')
         if fum_fecha is not None or fpp_fecha is not None:
@@ -81,13 +84,14 @@ def embarazo():
             except SQLAlchemyError:
                 db.session.rollback()
                 flash('No fue posible guardar la información del embarazo.', 'error')
+    embarazo_mostrado = activo or (ultimo_embarazo_con_nacimiento(perfil.id) if perfil else None)
     controles = controles_activos(activo)
     semana = calcular_semana_gestacional(activo.fum, activo.fpp, metodo_fpp=activo.metodo_fpp) if activo else None
     proximo = next((control for control in controles if control.fecha_control >= date.today() and control.estado in {'programado', 'reprogramado'}), None)
     return render_template(
         'embarazo.html',
         perfil=perfil,
-        embarazo=activo,
+        embarazo=embarazo_mostrado,
         controles=controles,
         proximo=proximo,
         semana=semana,
@@ -97,6 +101,48 @@ def embarazo():
         min_fum=(date.today() - timedelta(days=42 * 7)).isoformat(),
         min_fpp=(date.today() - timedelta(days=14)).isoformat(),
         max_fpp=(date.today() + timedelta(days=280)).isoformat(),
+        seguimiento=seguimiento_fecha_parto(
+            embarazo_mostrado.fpp if embarazo_mostrado else None,
+            getattr(embarazo_mostrado, 'fecha_nacimiento_real', None),
+        ) if embarazo_mostrado else None,
+    )
+
+
+@main_bp.route('/embarazo/nacimiento', methods=['GET', 'POST'])
+@login_required
+def registrar_nacimiento():
+    """Registra o corrige la fecha real sin modificar la FPP estimada."""
+    perfil, activo = perfil_y_embarazo(current_user.id)
+    embarazo = activo or (ultimo_embarazo_con_nacimiento(perfil.id) if perfil else None)
+    if not perfil or not embarazo:
+        flash('Necesitas un embarazo registrado para anotar el nacimiento.', 'error')
+        return redirect(url_for('main.embarazo'))
+    if request.method == 'POST':
+        if not _usuario_gestante():
+            abort(403)
+        fecha_real, error = validar_fecha_nacimiento_real(request.form.get('fecha_nacimiento_real'))
+        if error:
+            flash(error, 'error')
+        else:
+            try:
+                embarazo.fecha_nacimiento_real = fecha_real
+                embarazo.fecha_fin = fecha_real
+                embarazo.estado = 'finalizado'
+                db.session.commit()
+                flash('La fecha real del nacimiento fue guardada. La fecha probable se conserva como estimación.', 'success')
+                return redirect(url_for('main.embarazo'))
+            except SQLAlchemyError:
+                db.session.rollback()
+                flash('No fue posible guardar la fecha real del nacimiento.', 'error')
+    return render_template(
+        'nacimiento_form.html',
+        embarazo=embarazo,
+        seguimiento=seguimiento_fecha_parto(
+            embarazo.fpp,
+            getattr(embarazo, 'fecha_nacimiento_real', None),
+        ),
+        form_data=request.form if request.method == 'POST' else None,
+        date=date.today(),
     )
 
 

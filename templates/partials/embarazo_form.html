@@ -1,19 +1,14 @@
 {% set fum_value = form_data.get('fum') if form_data is not none else (embarazo.fum.isoformat() if embarazo and embarazo.fum else '') %}
-{% set fpp_value = form_data.get('fpp') if form_data is not none else (embarazo.fpp.isoformat() if embarazo and embarazo.fpp else '') %}
-{% set metodo_value = form_data.get('metodo_fpp') if form_data is not none else (embarazo.metodo_fpp if embarazo else '') %}
 {% set referencia_value = form_data.get('fecha_referencia_gestacion') if form_data is not none else date.isoformat() %}
-{% if not metodo_value and fum_value %}{% set metodo_value = 'fum' %}{% endif %}
 <form method="post" class="stack-form" action="{{ url_for('main.embarazo', editar=1) if editar else url_for('main.embarazo') }}">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
   <fieldset>
     <legend>Fechas del embarazo</legend>
-    <p class="form-help">Completa las fechas que conozcas. Si también ingresas semanas indicadas por un profesional o ecografía, Aurora usará esas semanas.</p>
+    <p class="form-help">La fecha probable de parto se calcula como una estimación. Si cuentas con semanas indicadas por un profesional, Aurora las usará para calcularla.</p>
     <label for="fum">FUM — Fecha de última menstruación</label>
     <input id="fum" name="fum" type="date" min="{{ min_fum }}" max="{{ date.isoformat() }}" value="{{ fum_value or '' }}" aria-describedby="fum-ayuda">
     <small id="fum-ayuda">Indica el primer día. Para un embarazo activo, la fecha debe estar dentro de las últimas 42 semanas.</small>
-    <label for="fpp">FPP — Fecha probable de parto</label>
-    <input id="fpp" name="fpp" type="date" min="{{ min_fpp }}" max="{{ max_fpp }}" value="{{ fpp_value or '' }}" aria-describedby="fpp-ayuda">
-    <small id="fpp-ayuda">Con método FUM se calcula a 280 días de la FUM. Si la fecha viene de ecografía o profesional, selecciona ese método.</small>
+    <small>Con FUM, Aurora estima la fecha probable a 280 días. La estimación no se edita manualmente.</small>
   </fieldset>
   <fieldset>
     <legend>¿Ya te indicaron cuántas semanas tienes?</legend>
@@ -24,15 +19,6 @@
     <label for="fecha_referencia_gestacion">Fecha en que te indicaron esas semanas</label>
     <input id="fecha_referencia_gestacion" name="fecha_referencia_gestacion" type="date" max="{{ date.isoformat() }}" value="{{ referencia_value }}" aria-describedby="edad-gestacional-ayuda">
     <small id="edad-gestacional-ayuda">Aurora usará esta fecha para calcular tu semana actual y su avance automático.</small>
-  </fieldset>
-  <fieldset>
-    <legend>Método de estimación</legend>
-    <select name="metodo_fpp">
-      <option value="">No especificado</option>
-      {% for valor, texto in [('fum','Fecha de última menstruación'),('ecografia','Ecografía'),('profesional','Profesional'),('otro','Otro')] %}
-      <option value="{{ valor }}" {% if metodo_value == valor %}selected{% endif %}>{{ texto }}</option>
-      {% endfor %}
-    </select>
   </fieldset>
   <div class="pregnancy-form-actions">
     <button class="button button--primary button--wide" type="submit">{{ 'Guardar cambios' if editar else 'Registrar embarazo' }}</button>

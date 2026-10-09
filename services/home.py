@@ -7,7 +7,8 @@ from sqlalchemy import select
 from extensions import db
 from models.seguimiento import ControlPrenatal
 from models.usuario import Usuario
-from services.mvp import perfil_y_embarazo
+from services.gestacion import seguimiento_fecha_parto
+from services.mvp import perfil_y_embarazo, ultimo_embarazo_con_nacimiento
 
 
 def calcular_semana_gestacional(
@@ -49,6 +50,7 @@ def construir_inicio(usuario_id: int) -> dict:
     """Obtiene solo los datos de Inicio asociados al usuario autenticado."""
     usuario = db.session.get(Usuario, usuario_id)
     perfil, embarazo = perfil_y_embarazo(usuario_id)
+    nacimiento = ultimo_embarazo_con_nacimiento(perfil.id) if perfil and not embarazo else None
 
     semana = calcular_semana_gestacional(
         embarazo.fum if embarazo else None,
@@ -83,5 +85,10 @@ def construir_inicio(usuario_id: int) -> dict:
         "contenidos": contenidos,
         "senales": senales,
         "consentimiento_pendiente": bool(perfil and not perfil.consentimiento_datos),
-        "empty_message": "No hay un embarazo activo asociado a esta cuenta." if not embarazo else None,
+        "seguimiento_parto": seguimiento_fecha_parto(
+            embarazo.fpp if embarazo else (nacimiento.fpp if nacimiento else None),
+            getattr(nacimiento, "fecha_nacimiento_real", None),
+        ) if (embarazo or nacimiento) else None,
+        "nacimiento": nacimiento,
+        "empty_message": "No hay un embarazo activo asociado a esta cuenta." if not embarazo and not nacimiento else None,
     }

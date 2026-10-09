@@ -21,11 +21,33 @@
 
   {% include 'partials/flash.html' %}
 
-  {% if embarazo and editar %}
+  {% if embarazo and seguimiento and seguimiento.estado == 'nacimiento_registrado' %}
+    <section class="card-surface birth-followup-card" aria-labelledby="birth-followup-title">
+      <header class="card-header-stacked">
+        <h2 id="birth-followup-title" class="card-header__title aurora-card-title"><span class="material-symbols-outlined" aria-hidden="true">child_friendly</span><span>Nacimiento registrado</span></h2>
+        <p class="card-header__meta">Seguimiento informativo de tus fechas registradas.</p>
+      </header>
+      <dl class="birth-date-list">
+        <div><dt>Fecha probable de parto (estimada)</dt><dd>{{ embarazo.fpp.strftime('%d/%m/%Y') if embarazo.fpp else 'No registrada' }}</dd></div>
+        <div><dt>Fecha real del nacimiento</dt><dd>{{ embarazo.fecha_nacimiento_real.strftime('%d/%m/%Y') }}</dd></div>
+        <div><dt>Resultado del seguimiento</dt><dd>{{ seguimiento.resultado }}</dd></div>
+      </dl>
+      {% if seguimiento.nota_destacada %}<p class="birth-followup-note"><span class="material-symbols-outlined" aria-hidden="true">info</span>La fecha registrada está a más de 30 días de la fecha estimada. Esta diferencia es informativa y no representa una evaluación de salud.</p>{% endif %}
+      <p class="form-help">La fecha probable es una estimación. Sigue las indicaciones de tu personal de salud.</p>
+      <a class="button button--secondary button--wide" href="{{ url_for('main.registrar_nacimiento') }}">Corregir fecha real</a>
+    </section>
+  {% elif embarazo and editar %}
     <section class="card-surface setup-card pregnancy-edit-card">
       <p class="form-help">La fecha probable de parto es una estimación y puede ajustarse con orientación profesional.</p>
       {% include 'partials/embarazo_form.html' %}
     </section>
+
+    {% if seguimiento %}
+    <section class="birth-followup-card birth-followup-card--{{ seguimiento.estado }}" aria-live="polite">
+      <span class="material-symbols-outlined" aria-hidden="true">event_note</span>
+      <div><strong>{{ seguimiento.titulo }}</strong><p>{{ seguimiento.mensaje }}</p></div>
+    </section>
+    {% endif %}
   {% elif embarazo %}
     {% set trimester = 1 if semana and semana <= 13 else (2 if semana and semana <= 27 else 3) %}
     {% set safe_week = (semana or 0) %}
@@ -152,12 +174,20 @@
         <div class="status-row">
           <span class="material-symbols-outlined status-row__icon" aria-hidden="true">child_care</span>
           <div class="status-row__text">
-            <small>Fecha probable de parto</small>
-            <strong>{{ embarazo.fpp.strftime('%d/%m/%Y') if embarazo.fpp else 'No registrada' }}</strong>
+             <small>Fecha probable de parto (estimada)</small>
+             <strong>{{ embarazo.fpp.strftime('%d/%m/%Y') if embarazo.fpp else 'No registrada' }}</strong>
           </div>
         </div>
       </div>
     </a>
+
+    <section class="card-surface birth-record-card">
+      <header class="card-header-stacked">
+        <h3 class="card-header__title aurora-card-title"><span class="material-symbols-outlined" aria-hidden="true">child_friendly</span><span>Cuando ocurra el nacimiento</span></h3>
+        <p class="card-header__meta">Puedes registrar la fecha real sin cambiar la fecha estimada.</p>
+      </header>
+      <a class="button button--secondary button--wide" href="{{ url_for('main.registrar_nacimiento') }}">Registrar fecha real del nacimiento</a>
+    </section>
 
     {# ── FASE 3.2: Tarjeta: Mis controles prenatales ── #}
     <section class="prenatal-controls card-surface aurora-card" aria-label="Historial de controles prenatales">

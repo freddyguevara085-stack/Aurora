@@ -139,6 +139,8 @@ class Embarazo(db.Model):
     )
     fum = db.Column(db.Date, nullable=True)
     fpp = db.Column(db.Date, nullable=True)
+    # Se conserva separada de la FPP: esta última siempre es una estimación.
+    fecha_nacimiento_real = db.Column(db.Date, nullable=True)
     metodo_fpp = db.Column(
         ENUM("fum", "ecografia", "profesional", "otro"),
         nullable=True,

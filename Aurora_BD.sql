@@ -228,6 +228,7 @@ create table if not exists embarazos (
   perfil_gestante_id int unsigned not null,
   fum date null,
   fpp date null,
+  fecha_nacimiento_real date null,
   metodo_fpp enum('fum', 'ecografia', 'profesional', 'otro') null,
   estado enum('activo', 'finalizado', 'archivado')
     not null default 'activo',

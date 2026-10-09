@@ -1,0 +1,35 @@
+{% extends 'layouts/base.html' %}
+{% block title %}{{ 'Corregir fecha de nacimiento' if embarazo.fecha_nacimiento_real else 'Registrar nacimiento' }} | Aurora{% endblock %}
+{% block content %}
+<main id="main" tabindex="-1" class="app-shell section-shell pregnancy-page aurora-page-container">
+  {% set back_url = url_for('main.embarazo') %}
+  {% set back_label = 'Volver a Mi embarazo' %}
+  {% set page_title = 'Corregir fecha real del nacimiento' if embarazo.fecha_nacimiento_real else 'Registrar nacimiento' %}
+  {% include 'partials/page_header.html' %}
+  {% include 'partials/flash.html' %}
+
+  <section class="card-surface birth-followup-card">
+    <h2>Seguimiento de fechas</h2>
+    <dl class="birth-date-list">
+      <div><dt>Fecha probable de parto (estimada)</dt><dd>{{ embarazo.fpp.strftime('%d/%m/%Y') if embarazo.fpp else 'No registrada' }}</dd></div>
+      {% if embarazo.fecha_nacimiento_real %}
+      <div><dt>Fecha real registrada</dt><dd>{{ embarazo.fecha_nacimiento_real.strftime('%d/%m/%Y') }}</dd></div>
+      {% endif %}
+    </dl>
+    <p class="form-help">Registrar o corregir la fecha real no modifica la fecha probable, que es solo una estimación.</p>
+  </section>
+
+  <section class="card-surface setup-card">
+    <form method="post" class="stack-form" data-confirm="¿Confirmas que deseas guardar esta fecha real del nacimiento?" data-confirm-ok="Guardar fecha">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="fecha_nacimiento_real">Fecha real del nacimiento</label>
+      <input id="fecha_nacimiento_real" name="fecha_nacimiento_real" type="date" max="{{ date.isoformat() }}" required value="{{ form_data.get('fecha_nacimiento_real') if form_data is not none else (embarazo.fecha_nacimiento_real.isoformat() if embarazo.fecha_nacimiento_real else '') }}" aria-describedby="fecha-real-ayuda">
+      <small id="fecha-real-ayuda">No puede ser una fecha futura. Confirma la fecha antes de guardarla.</small>
+      <div class="pregnancy-form-actions">
+        <button class="button button--primary button--wide" type="submit">{{ 'Guardar corrección' if embarazo.fecha_nacimiento_real else 'Guardar fecha real' }}</button>
+        <a class="button button--secondary button--wide" href="{{ url_for('main.embarazo') }}">Cancelar</a>
+      </div>
+    </form>
+  </section>
+</main>
+{% endblock %}

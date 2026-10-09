@@ -7,6 +7,7 @@ ENDPOINTS_ESPERADOS = {
     # Gestante
     "main.index",
     "main.embarazo",
+    "main.registrar_nacimiento",
     "main.controles",
     "main.nuevo_control",
     "main.editar_control",

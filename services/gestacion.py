@@ -34,6 +34,67 @@ ROLES_COMUNITARIOS = {
 PREGUNTA_MAX_CARACTERES = 500
 
 
+def seguimiento_fecha_parto(
+    fpp: date | None,
+    fecha_nacimiento_real: date | None = None,
+    hoy: date | None = None,
+) -> dict:
+    """Resume el seguimiento informativo de una FPP sin valoraciones clínicas."""
+    hoy = hoy or date.today()
+    if not fpp:
+        return {
+            "estado": "sin_fecha_probable", "titulo": "Fecha probable pendiente",
+            "mensaje": "Registra una fecha de referencia para mostrar el seguimiento estimado.",
+            "dias": None, "resultado": None, "nota_destacada": False,
+        }
+    if fecha_nacimiento_real:
+        diferencia = (fecha_nacimiento_real - fpp).days
+        resultado = (
+            "Antes de la fecha estimada" if diferencia < -7 else
+            "Después de la fecha estimada" if diferencia > 7 else
+            "Cerca de la fecha estimada"
+        )
+        return {
+            "estado": "nacimiento_registrado", "titulo": "Nacimiento registrado",
+            "mensaje": "La fecha probable de parto se conserva como una estimación para tu seguimiento.",
+            "dias": diferencia, "resultado": resultado,
+            "nota_destacada": abs(diferencia) > 30,
+        }
+    dias = (hoy - fpp).days
+    if dias < 0:
+        return {
+            "estado": "antes_fecha_probable", "titulo": "Seguimiento de la fecha estimada",
+            "mensaje": "La fecha probable de parto es una estimación. Sigue las indicaciones de tu personal de salud.",
+            "dias": dias, "resultado": None, "nota_destacada": False,
+        }
+    if dias == 0:
+        return {
+            "estado": "fecha_probable_alcanzada", "titulo": "Hoy es la fecha probable de parto",
+            "mensaje": "Esta fecha es una estimación. Sigue las indicaciones de tu personal de salud.",
+            "dias": 0, "resultado": None, "nota_destacada": False,
+        }
+    return {
+        "estado": "despues_fecha_probable", "titulo": "Seguimiento después de la fecha probable",
+        "mensaje": f"Han transcurrido {dias} {'día' if dias == 1 else 'días'} desde la fecha probable. Es una estimación; sigue las indicaciones de tu personal de salud.",
+        "dias": dias, "resultado": None, "nota_destacada": False,
+    }
+
+
+def validar_fecha_nacimiento_real(
+    fecha_raw: str | None, hoy: date | None = None,
+) -> tuple[date | None, str | None]:
+    """Valida una fecha de nacimiento registrada por la usuaria."""
+    if not fecha_raw:
+        return None, "Indica la fecha real del nacimiento."
+    try:
+        fecha = date.fromisoformat(fecha_raw)
+    except ValueError:
+        return None, "La fecha real del nacimiento no es válida."
+    if fecha > (hoy or date.today()):
+        return None, "La fecha real del nacimiento no puede estar en el futuro."
+    return fecha, None
+
+
 def validar_fechas_embarazo(
     fum_raw: str | None,
     fpp_raw: str | None,

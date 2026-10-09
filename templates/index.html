@@ -22,7 +22,18 @@
   </a>
   {% endif %}
 
-  {% if home.empty_message %}
+  {% if home.nacimiento %}
+    <section class="birth-followup-card birth-followup-card--nacimiento_registrado" aria-labelledby="home-birth-title">
+      <span class="material-symbols-outlined" aria-hidden="true">child_friendly</span>
+      <div>
+        <strong id="home-birth-title">Nacimiento registrado</strong>
+        <p>Fecha probable (estimada): {{ home.nacimiento.fpp.strftime('%d/%m/%Y') if home.nacimiento.fpp else 'No registrada' }} · Fecha real: {{ home.nacimiento.fecha_nacimiento_real.strftime('%d/%m/%Y') }}</p>
+        <p>{{ home.seguimiento_parto.resultado }}. La fecha probable es una estimación; sigue las indicaciones de tu personal de salud.</p>
+        {% if home.seguimiento_parto.nota_destacada %}<p class="birth-followup-note">La diferencia supera 30 días y se muestra solo como información, no como evaluación de salud.</p>{% endif %}
+        <a class="button button--secondary" href="{{ url_for('main.embarazo') }}">Ver seguimiento</a>
+      </div>
+    </section>
+  {% elif home.empty_message %}
     {% set empty_title = 'Sin embarazo activo' %}
     {% set empty_text = home.empty_message %}
     {% set empty_url = url_for('main.embarazo') %}

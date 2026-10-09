@@ -3,7 +3,9 @@ from datetime import date, timedelta
 from services.gestacion import (
     construir_indicaciones,
     fechas_embarazo_desde_edad_gestacional,
+    seguimiento_fecha_parto,
     validar_fecha_control,
+    validar_fecha_nacimiento_real,
     validar_fechas_embarazo,
 )
 from demo_nicaragua import BORRADORES, CENTROS, FUENTES, SENALES_ALERTA
@@ -108,6 +110,30 @@ def test_validar_fecha_control_restringe_pasado_y_fuera_de_gestacion():
     assert "42 semanas" in validar_fecha_control(inicio + timedelta(days=295), inicio, "programado", hoy)
     assert validar_fecha_control(hoy + timedelta(days=2), inicio, "programado", hoy) is None
     assert validar_fecha_control(hoy - timedelta(days=7), inicio, "realizado", hoy) is None
+
+
+def test_seguimiento_fecha_parto_muestra_estados_sin_valoracion_clinica():
+    fpp = date(2026, 10, 8)
+    assert seguimiento_fecha_parto(fpp, hoy=fpp - timedelta(days=1))["estado"] == "antes_fecha_probable"
+    assert seguimiento_fecha_parto(fpp, hoy=fpp)["estado"] == "fecha_probable_alcanzada"
+    despues = seguimiento_fecha_parto(fpp, hoy=fpp + timedelta(days=3))
+    assert despues["estado"] == "despues_fecha_probable"
+    assert despues["dias"] == 3
+
+
+def test_seguimiento_fecha_parto_clasifica_nacimiento_y_destaca_diferencias_mayores_a_30_dias():
+    fpp = date(2026, 10, 8)
+    assert seguimiento_fecha_parto(fpp, fpp - timedelta(days=7))["resultado"] == "Cerca de la fecha estimada"
+    assert seguimiento_fecha_parto(fpp, fpp - timedelta(days=8))["resultado"] == "Antes de la fecha estimada"
+    assert seguimiento_fecha_parto(fpp, fpp + timedelta(days=8))["resultado"] == "Después de la fecha estimada"
+    lejano = seguimiento_fecha_parto(fpp, fpp + timedelta(days=31))
+    assert lejano["nota_destacada"] is True
+
+
+def test_validar_fecha_nacimiento_real_rechaza_fechas_futuras_y_acepta_hoy():
+    hoy = date(2026, 10, 8)
+    assert validar_fecha_nacimiento_real((hoy + timedelta(days=1)).isoformat(), hoy)[1]
+    assert validar_fecha_nacimiento_real(hoy.isoformat(), hoy) == (hoy, None)
 
 
 def test_guia_demo_cubre_filtros_y_directorio_solo_tiene_fuentes_minsa():

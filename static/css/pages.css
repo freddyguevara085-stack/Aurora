@@ -2303,6 +2303,20 @@
   color: #2D1F3F;
 }
 
+.birth-followup-card{display:flex;align-items:flex-start;gap:12px;margin:0 0 18px;padding:16px;border:1px solid var(--aurora-divider);border-radius:14px;background:var(--aurora-surface-soft);color:var(--color-text-main)}
+.birth-followup-card>.material-symbols-outlined{color:var(--color-primary);font-size:24px}
+.birth-followup-card strong{display:block;font-size:15px}
+.birth-followup-card p{margin:4px 0 0;font-size:13px;line-height:1.5}
+.birth-followup-card--fecha_probable_alcanzada{background:#fff8e7;border-color:#f2d185}
+.birth-followup-card--despues_fecha_probable{background:#f4eefa;border-color:#d8c9eb}
+.birth-date-list{display:grid;gap:12px;margin:16px 0}
+.birth-date-list div{padding:10px 12px;border-radius:10px;background:var(--aurora-surface-soft)}
+.birth-date-list dt{color:var(--color-text-muted);font-size:13px}
+.birth-date-list dd{margin:2px 0 0;font-weight:600}
+.birth-followup-note{display:flex;gap:8px;margin:12px 0;padding:10px 12px;border-radius:10px;background:#fff8e7;color:#654b13;font-size:13px;line-height:1.45}
+.birth-followup-note .material-symbols-outlined{font-size:18px;flex:0 0 auto}
+.birth-record-card{display:flex;flex-direction:column;gap:14px}
+
 
 /* FASE 4: Botones con eliminación de Pill Overload (12px radius, min 48px height) */
 .pregnancy-page .button--primary,
