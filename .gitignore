@@ -1,13 +1,36 @@
+# Entornos virtuales
 venv/
 env/
 .venv/
+
+# Secretos y configuración local (nunca versionar)
 .env
+.env.*
+!.env.example
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
 .pytest_cache/
+
+# Bases de datos locales
 instance/
 *.db
 *.sqlite3
+
+# Editores y sistema operativo
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Registros
+*.log
+
+# Archivos pesados de presentación (se mantienen fuera del repositorio)
 presentacion/*.mp4
 presentacion/clips/
 presentacion/app-icon.png
