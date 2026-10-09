@@ -8,7 +8,7 @@
   {% include 'partials/page_header.html' %}
   {% include 'partials/flash.html' %}
 
-  <section class="card-surface birth-followup-card">
+  <section class="card-surface birth-followup-card birth-followup-card--summary">
     <h2>Seguimiento de fechas</h2>
     <dl class="birth-date-list">
       <div><dt>Fecha probable de parto (estimada)</dt><dd>{{ embarazo.fpp.strftime('%d/%m/%Y') if embarazo.fpp else 'No registrada' }}</dd></div>

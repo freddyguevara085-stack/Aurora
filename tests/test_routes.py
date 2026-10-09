@@ -1472,6 +1472,7 @@ def test_formulario_nacimiento_se_muestra_y_permite_corregir_fecha(client, monke
     assert respuesta.status_code == 200
     assert b'name="fecha_nacimiento_real"' in respuesta.data
     assert b'birth-form__date-input' in respuesta.data
+    assert b'birth-followup-card--summary' in respuesta.data
     assert b"Corregir fecha real del nacimiento" in respuesta.data
     assert b"2026-10-07" in respuesta.data
 
