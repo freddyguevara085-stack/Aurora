@@ -842,9 +842,12 @@ def test_confirmacion_eliminar_usa_dialogo_accesible():
     from pathlib import Path
 
     raiz = Path(__file__).resolve().parent.parent
-    base = (raiz / "templates" / "admin" / "base_admin.html").read_text(encoding="utf-8")
+    base = (raiz / "templates" / "layouts" / "base.html").read_text(encoding="utf-8")
+    base_admin = (raiz / "templates" / "admin" / "base_admin.html").read_text(encoding="utf-8")
     assert "<dialog" in base
     assert 'id="aurora-confirm"' in base
+    assert 'id="aurora-confirm"' not in base_admin
+    assert "static', filename='js/app.js'" not in base_admin
     for nombre in ("centros", "contenidos", "senales", "servicios"):
         html = (raiz / "templates" / "admin" / nombre / "index.html").read_text(encoding="utf-8")
         assert "confirm(" not in html, nombre
