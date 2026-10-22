@@ -5,7 +5,7 @@ from flask_login import current_user
 
 from controllers import gestante
 from controllers.blueprints import main_bp
-from services.catalogo_minsa import FECHA_CONSULTA, FUENTES
+from services.catalogo_minsa import FECHA_CONSULTA, FUENTES, referencia_centro
 from services.exploracion import filtrar_centros, organizar_guia
 from services.home import (
     calcular_semana_gestacional,
@@ -103,6 +103,7 @@ def detalle_centro(centro_id):
     return render_template(
         'centro_detalle.html',
         centro=centro,
+        referencia=referencia_centro(centro),
         servicios=servicios_disponibles(centro.id),
     )
 

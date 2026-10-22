@@ -21,6 +21,19 @@ FECHA_CONSULTA = "2026-10-06"
 FUENTES: dict[str, dict[str, str]] = _cargar_json("fuentes_minsa.json")
 CENTROS: list[dict] = _cargar_json("centros_minsa.json")
 
+
+def referencia_centro(centro):
+    """Procedencia documental del catálogo; no equivale a verificación institucional."""
+    from services.exploracion import normalizar
+    for item in CENTROS:
+        if (normalizar(item['nombre']) == normalizar(centro.nombre)
+                and normalizar(item['municipio']) == normalizar(centro.municipio)
+                and item['departamento'] == centro.departamento):
+            fuente = FUENTES[item['fuente']]
+            return {'nombre': fuente['nombre'], 'url': item.get('fuente_url', fuente['url']),
+                    'fecha_consulta': item.get('fecha_consulta', FECHA_CONSULTA)}
+    return None
+
 __all__ = [
     "CENTROS",
     "FECHA_CONSULTA",

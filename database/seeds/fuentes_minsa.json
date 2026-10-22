@@ -38,5 +38,9 @@
   "minsa_sip_plus_2022": {
     "nombre": "MINSA - Normativa 078, Sistema de Información Perinatal Plus, segunda edición (2021; publicada en 2022)",
     "url": "https://www.minsa.gob.ni/sites/default/files/publicaciones/Normativa%20078%20final%2019092022.pdf"
+  },
+  "minsa_red_madriz": {
+    "nombre": "MINSA - Red de Salud de Madriz (consulta documental: 21/10/2026)",
+    "url": "https://www.minsa.gob.ni/red-de-salud?field_departamento_target_id=273&items_per_page=100"
   }
 }

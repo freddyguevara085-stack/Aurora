@@ -1,0 +1,38 @@
+[
+  {
+    "titulo": "Encontrar un centro de atención en Madriz",
+    "resumen": "Ubica hospitales, centros de salud, casas maternas y una clínica previsional en el directorio del MINSA.",
+    "categoria": "Preparación y apoyo",
+    "contenido": "El directorio del MINSA registra en Madriz hospitales, centros de salud, casas maternas y la CMP Somoto. Entre los hospitales están el Juan Antonio Brenes, en Somoto, y el Luis Felipe Moncada, en San Juan de Río Coco.\nEn Aurora, abre Centros de salud, elige Madriz y después tu municipio. Puedes filtrar por tipo de establecimiento. Abre una ficha para consultar su dirección y el enlace oficial.\nAntes de organizar el viaje, pregunta al centro por el servicio que necesitas, el horario y los requisitos. El directorio no confirma citas ni disponibilidad en tiempo real. Puedes anotar lo que te indiquen en Mis preguntas y en tu plan de traslado.",
+    "fuente_nombre": "MINSA Nicaragua · Red de Salud de Madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud?field_departamento_target_id=273&items_per_page=100",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Casas maternas: organiza tu acceso con el centro de salud",
+    "resumen": "Conoce su propósito y prepara las preguntas para coordinar una estancia.",
+    "categoria": "Preparación para el parto",
+    "contenido": "El MINSA describe las casas maternas como una red de alojamiento y apoyo para embarazadas, especialmente de comunidades rurales.\nSi el traslado desde tu comunidad es difícil, pregunta en tu centro de salud si una casa materna puede formar parte de tu preparación para el parto. Consulta cómo se coordina el ingreso, si hay cupo, qué debes llevar y cómo se organiza el acompañamiento. Estas condiciones deben confirmarse con el equipo local.\nEn Centros de salud puedes elegir Madriz y el tipo Casas maternas para localizar las unidades registradas. Guarda la información que recibas en tu plan de traslado y apoyo. Esta lectura es orientación organizativa y no indica una fecha de ingreso ni sustituye la evaluación profesional.",
+    "fuente_nombre": "MINSA Nicaragua · Red de Casas Maternas",
+    "fuente_url": "https://www.minsa.gob.ni/index.php/centro-de-medios/noticias/casas-maternas-centros-de-vida-y-esperanza-para-las-madres-nicaraguenses",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "CMP Somoto: confirma tu cobertura antes de acudir",
+    "resumen": "Las clínicas previsionales tienen condiciones de acceso vinculadas a los convenios del INSS.",
+    "categoria": "Preparación y apoyo",
+    "contenido": "El MINSA explica que sus Clínicas Médicas Previsionales atienden a personas aseguradas, jubiladas y beneficiarias conforme a los convenios con el INSS. La red incluye la CMP Somoto.\nSi estás considerando esta unidad, confirma directamente si tu cobertura permite recibir el servicio que buscas. Pregunta qué documentos se requieren, cómo solicitar una cita y cuál es el horario de atención.\nQue una clínica aparezca en Aurora no significa que todas las usuarias tengan acceso automático o que todos los servicios estén disponibles. La ficha del directorio permite consultar la ubicación y la fuente oficial; la cobertura individual debe confirmarla la clínica.",
+    "fuente_nombre": "MINSA Nicaragua · Clínicas Médicas Previsionales",
+    "fuente_url": "https://www.minsa.gob.ni/index.php/centros-e-institutos/clinicas-medicas-previsionales-del-ministerio-de-salud-cmp-minsa",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Tus controles: un espacio para recibir atención y resolver dudas",
+    "resumen": "La OMS destaca la atención, el apoyo y la comunicación durante el embarazo.",
+    "categoria": "Controles prenatales",
+    "contenido": "Para la Organización Mundial de la Salud, la atención prenatal reúne seguimiento profesional, información y apoyo durante el embarazo. También es una oportunidad para conversar sobre alimentación, bienestar y otras dudas con el personal de salud.\nEn Aurora puedes registrar las citas que tu equipo te indique y preparar tus preguntas antes de acudir. Anota lo que quieras comprender, por ejemplo: cómo se organizarán las próximas consultas y con quién puedes comunicarte para confirmar una cita.\nEl calendario de Aurora es una herramienta de organización: no decide la frecuencia de tus controles ni interpreta resultados. Sigue el plan individual que acuerdes con el equipo que te atiende.\nEsta lectura resume una publicación de la OMS de 2016; la fecha indicada corresponde a la consulta documental de la fuente, no a una revisión clínica de tu embarazo.",
+    "fuente_nombre": "Organización Mundial de la Salud · Atención prenatal (2016)",
+    "fuente_url": "https://www.who.int/es/news-room/detail/07-11-2016-pregnant-women-must-be-able-to-access-the-right-care-at-the-right-time-says-who",
+    "fecha_revision": "2026-10-21"
+  }
+]

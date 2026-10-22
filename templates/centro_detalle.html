@@ -87,6 +87,15 @@
   </section>
   {% endif %}
 
+  {% if referencia %}
+  <section class="card aurora-card" aria-label="Fuente del establecimiento">
+    <h2 class="aurora-card-title">Información del MINSA</h2>
+    <p>Este establecimiento figura en el directorio oficial. Consulta documental: {{ referencia.fecha_consulta }}.</p>
+    <p>La inclusión en el directorio no confirma disponibilidad de atención prenatal, cupos ni horarios. Consulta esos datos con el establecimiento.</p>
+    <a href="{{ referencia.url }}" target="_blank" rel="noopener noreferrer">Ver ficha oficial del MINSA ↗</a>
+  </section>
+  {% endif %}
+
   <h2 class="eyebrow centro-services-heading">SERVICIOS REGISTRADOS</h2>
   <div class="card aurora-card centro-services-card">
     {% if servicios %}

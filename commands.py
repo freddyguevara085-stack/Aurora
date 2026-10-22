@@ -97,12 +97,33 @@ def register_commands(app) -> None:
         click.echo("Cuenta creada.")
 
     @app.cli.command("seed-centros")
-    def seed_centros() -> None:
+    @click.option('--departamento', default=None, help='Sincronizar únicamente este departamento.')
+    def seed_centros(departamento) -> None:
         """Puebla o sincroniza el directorio nacional de centros de salud del MINSA."""
         click.echo("Sincronizando directorio MINSA (hospitales, centros de salud, casas maternas)...")
-        resumen = sincronizar_centros_minsa(retirar_no_listados=False)
+        resumen = sincronizar_centros_minsa(retirar_no_listados=False, departamento=departamento)
         db.session.commit()
         click.echo(
-            f"Directorio MINSA listo: {resumen['total']} centros de toda Nicaragua "
+            f"Directorio MINSA listo: {resumen['total']} centros de {departamento or 'toda Nicaragua'} "
             f"({resumen['nuevos']} nuevos, {resumen['actualizados']} actualizados)."
         )
+
+    @app.cli.command('publish-madriz-info')
+    def publish_madriz_info():
+        """Publica las cuatro orientaciones documentales sobre acceso y organización."""
+        import json
+        from datetime import date
+        from pathlib import Path
+        from models.contenido import ContenidoPrenatal
+
+        ruta = Path(app.root_path) / 'database/seeds/orientaciones_madriz.json'
+        nuevos = 0
+        for datos in json.loads(ruta.read_text(encoding='utf-8')):
+            # Repetir el comando conserva las ediciones posteriores del administrador.
+            if db.session.scalar(db.select(ContenidoPrenatal).filter_by(titulo=datos['titulo'])):
+                continue
+            datos['fecha_revision'] = date.fromisoformat(datos['fecha_revision'])
+            db.session.add(ContenidoPrenatal(**datos, publicado=1))
+            nuevos += 1
+        db.session.commit()
+        click.echo(f'Orientaciones publicadas: {nuevos}. Las existentes se conservan.')

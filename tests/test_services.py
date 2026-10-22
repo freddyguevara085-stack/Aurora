@@ -142,7 +142,7 @@ def test_directorio_solo_tiene_fuentes_minsa():
     assert len(deptos) == 17
     assert not any("Distrito" in d for d in deptos)
     assert {centro["tipo_establecimiento"] for centro in CENTROS} == {
-        "hospital", "casa_materna", "centro_salud", "clinica"
+        "hospital", "casa_materna", "centro_salud", "clinica", "puesto_salud"
     }
     assert all(centro["fuente"] in FUENTES for centro in CENTROS)
     assert all(centro.get("zona") in (None, "urbano", "rural") for centro in CENTROS)

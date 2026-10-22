@@ -5,13 +5,16 @@ from models.directorio import CentroAtencion
 from services.catalogo_minsa import CENTROS as CENTROS_VERIFICADOS
 
 
-def sincronizar_centros_minsa(retirar_no_listados: bool = False) -> dict[str, int]:
+def sincronizar_centros_minsa(retirar_no_listados: bool = False, departamento: str | None = None) -> dict[str, int]:
     """Inserta o actualiza los centros oficiales del MINSA de forma idempotente."""
     nuevos = 0
     actualizados = 0
-    claves_canonicas = {(datos["nombre"], datos["municipio"]) for datos in CENTROS_VERIFICADOS}
+    catalogo = [c for c in CENTROS_VERIFICADOS if not departamento or c['departamento'] == departamento]
+    if departamento and not catalogo:
+        raise ValueError('No hay centros en el catálogo para ese departamento.')
+    claves_canonicas = {(datos["nombre"], datos["municipio"]) for datos in catalogo}
 
-    for datos in CENTROS_VERIFICADOS:
+    for datos in catalogo:
         existente = db.session.scalar(
             db.select(CentroAtencion).where(
                 CentroAtencion.nombre == datos["nombre"],
@@ -53,13 +56,13 @@ def sincronizar_centros_minsa(retirar_no_listados: bool = False) -> dict[str, in
         for centro in db.session.scalars(
             db.select(CentroAtencion).where(CentroAtencion.activo == 1)
         ):
-            if (centro.nombre, centro.municipio) not in claves_canonicas:
+            if (not departamento or centro.departamento == departamento) and (centro.nombre, centro.municipio) not in claves_canonicas:
                 centro.activo = 0
                 retirados += 1
 
     db.session.flush()
     return {
-        "total": len(CENTROS_VERIFICADOS),
+        "total": len(catalogo),
         "nuevos": nuevos,
         "actualizados": actualizados,
         "retirados": retirados,

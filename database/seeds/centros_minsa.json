@@ -436,7 +436,9 @@
     "municipio": "Somoto",
     "direccion": "Contiguo al Cementerio Municipal, Barrio Juan Carlos Espinoza",
     "zona": "urbano",
-    "fuente": "minsa_hospitales"
+    "fuente": "minsa_hospitales",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/hospital-departamental/hospital-departamental-juan-antonio-brenes",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Hospital Primario Luis Felipe Moncada",
@@ -447,7 +449,9 @@
     "municipio": "San Juan de Río Coco",
     "direccion": "Zona 6, contiguo a la Colonia El Maestro , Zona 6",
     "zona": "urbano",
-    "fuente": "minsa_hospitales"
+    "fuente": "minsa_hospitales",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/hospital-primario/hospital-primario-luis-felipe-moncada",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Hospital Departamental Alemán Nicaragüense",
@@ -1627,7 +1631,9 @@
     "municipio": "Somoto",
     "direccion": "Barrio Filiciano Ramos , del cacho de novio 200 vrs al oeste y 50 vra al norte",
     "zona": "urbano",
-    "fuente": "minsa_casas_maternas"
+    "fuente": "minsa_casas_maternas",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/casa-materna/aurelia-hernandez",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Bello Amanecer",
@@ -1637,7 +1643,9 @@
     "municipio": "San Lucas",
     "direccion": "Barrio Juan Francisco Estrada, contiguo a la delegación de la Policia Nacional",
     "zona": "urbano",
-    "fuente": "minsa_casas_maternas"
+    "fuente": "minsa_casas_maternas",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/casa-materna/bello-amanecer",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Casa materna de Palacagüina",
@@ -1647,7 +1655,9 @@
     "municipio": "Palacagüina",
     "direccion": "Del C/S Haydee Meneses 1 1/2 al este,BA. Ramírez Corrales",
     "zona": "urbano",
-    "fuente": "minsa_casas_maternas"
+    "fuente": "minsa_casas_maternas",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/casa-materna/casa-materna-de-palacaguina",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Francisca Bejarano",
@@ -1657,7 +1667,9 @@
     "municipio": "Yalagüina",
     "direccion": "Frente al costado norte del parque municipal, barrio coronel",
     "zona": "urbano",
-    "fuente": "minsa_casas_maternas"
+    "fuente": "minsa_casas_maternas",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/casa-materna/francisca-bejarano",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Manantial de amor",
@@ -1667,7 +1679,9 @@
     "municipio": "Telpaneca",
     "direccion": "Zona 3 Ba. Leonel Torrez, frente al C/S Julio",
     "zona": "urbano",
-    "fuente": "minsa_casas_maternas"
+    "fuente": "minsa_casas_maternas",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/casa-materna/manantial-de-amor",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Nazareth",
@@ -1677,7 +1691,9 @@
     "municipio": "Totogalpa",
     "direccion": "Frente a la rotonda Barrio Marvín Guerrero",
     "zona": "urbano",
-    "fuente": "minsa_casas_maternas"
+    "fuente": "minsa_casas_maternas",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/casa-materna/nazareth",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Nueva Vida",
@@ -1687,7 +1703,9 @@
     "municipio": "San José de Cusmapa",
     "direccion": "Ba. Augusto Calderón Sandino contiguo a la delegación de la Policia Nacional",
     "zona": "urbano",
-    "fuente": "minsa_casas_maternas"
+    "fuente": "minsa_casas_maternas",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/casa-materna/nueva-vida",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Rosario Murillo",
@@ -1697,7 +1715,9 @@
     "municipio": "Las Sabanas",
     "direccion": "Barrio Arlen Siú, contiguo al juzgado municipal",
     "zona": "urbano",
-    "fuente": "minsa_casas_maternas"
+    "fuente": "minsa_casas_maternas",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/casa-materna/rosario-murillo-0",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Sagrada Familia",
@@ -1707,7 +1727,9 @@
     "municipio": "San Juan de Río Coco",
     "direccion": "De fundenuse 1 c al oeste,zona # 2",
     "zona": "urbano",
-    "fuente": "minsa_casas_maternas"
+    "fuente": "minsa_casas_maternas",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/casa-materna/sagrada-familia",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Camila López",
@@ -3380,7 +3402,9 @@
     "municipio": "Totogalpa",
     "direccion": "Parque central 3c. al este, Barrio Enrique Bermúdez",
     "zona": "urbano",
-    "fuente": "minsa_centros_salud"
+    "fuente": "minsa_centros_salud",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/centro-de-salud/centro-de-salud-ernesto-che-guevara",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Centro de Salud Haydee Meneses",
@@ -3390,7 +3414,9 @@
     "municipio": "Palacagüina",
     "direccion": "Salida a la Shell, Barrio Ramiro Corrales",
     "zona": "urbano",
-    "fuente": "minsa_centros_salud"
+    "fuente": "minsa_centros_salud",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/centro-de-salud/centro-de-salud-haydee-meneses",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Centro de Salud Héroes y Mártires",
@@ -3400,7 +3426,9 @@
     "municipio": "San Lucas",
     "direccion": "Salida a La Comunidad de la Manzana, Bo. Juan Francisco Estrada",
     "zona": "urbano",
-    "fuente": "minsa_centros_salud"
+    "fuente": "minsa_centros_salud",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/centro-de-salud/centro-de-salud-heroes-y-martires",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Centro de Salud Héroes y Mártires de Cusmapa",
@@ -3410,7 +3438,9 @@
     "municipio": "San José de Cusmapa",
     "direccion": "Contiguo a Tanque de Agua, Barrio Augusto César Sandino",
     "zona": "urbano",
-    "fuente": "minsa_centros_salud"
+    "fuente": "minsa_centros_salud",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/centro-de-salud/centro-de-salud-heroes-y-martires-de-cusmapa",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Centro de Salud Jairo Bismark Moncada",
@@ -3420,7 +3450,9 @@
     "municipio": "Somoto",
     "direccion": "Esquina opuesta parque Zelaya, Barrio Constantino Maldonado",
     "zona": "urbano",
-    "fuente": "minsa_centros_salud"
+    "fuente": "minsa_centros_salud",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/centro-de-salud/centro-de-salud-jairo-bismark-moncada",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Centro de Salud Julio Martínez Obando",
@@ -3430,7 +3462,9 @@
     "municipio": "Telpaneca",
     "direccion": "Detrás de la Iglesia Municipal, Barrio Leonel Tórrez",
     "zona": "urbano",
-    "fuente": "minsa_centros_salud"
+    "fuente": "minsa_centros_salud",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/centro-de-salud/centro-de-salud-julio-martinez-obando",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Centro de Salud Silvia Ferrufino",
@@ -3440,7 +3474,9 @@
     "municipio": "Las Sabanas",
     "direccion": "Contiguo al Palacio de Justicia, Barrio Augusto C. Sandino",
     "zona": "urbano",
-    "fuente": "minsa_centros_salud"
+    "fuente": "minsa_centros_salud",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/centro-de-salud/centro-de-salud-silvia-ferrufino",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Centro de Salud William Pacheco",
@@ -3450,7 +3486,9 @@
     "municipio": "Yalagüina",
     "direccion": "De la Sub Estación Eléctrica 2 c al este, Barrio Marta Angélica Quezada",
     "zona": "urbano",
-    "fuente": "minsa_centros_salud"
+    "fuente": "minsa_centros_salud",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/centro-de-salud/centro-de-salud-william-pacheco",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Centro de Salud Altagracia (Distrito 3)",
@@ -4287,7 +4325,9 @@
     "departamento": "Madriz",
     "municipio": "Somoto",
     "direccion": "Contiguo a la Alcaldía Municipal de Somoto",
-    "fuente": "minsa_clinicas_previsionales"
+    "fuente": "minsa_clinicas_previsionales",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/clinicas-medicas-provisionales/cmp-somoto",
+    "fecha_consulta": "2026-10-21"
   },
   {
     "nombre": "Policlínico Adulto Mayor \"Lidia Saavedra de Ortega\"",
@@ -4405,5 +4445,125 @@
     "municipio": "Altagracia",
     "direccion": "Dentro de las instalaciones del Hospital Primario Héroes y Mártires de Ometepe",
     "fuente": "minsa_clinicas_previsionales"
+  },
+  {
+    "nombre": "Puesto de Salud Aguas Calientes",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Comunidad de Aguas Calientes, Comunidad de Aguas Calientes",
+    "zona": "rural",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-aguas-calientes",
+    "fecha_consulta": "2026-10-21"
+  },
+  {
+    "nombre": "Puesto de Salud El Cairo",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Asentamiento El Kairo, Comunidad El Kairo",
+    "zona": "rural",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-el-cairo",
+    "fecha_consulta": "2026-10-21"
+  },
+  {
+    "nombre": "Puesto de Salud El Zapote",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Comunidad el Zapote, Comunidad El Zapote",
+    "zona": "rural",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-el-zapote-1",
+    "fecha_consulta": "2026-10-21"
+  },
+  {
+    "nombre": "Puesto de Salud Hermanos Martínez",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Asentamiento Hermanos Martínez, Comunidad Hermanos Martínez",
+    "zona": "rural",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-hermanos-martinez",
+    "fecha_consulta": "2026-10-21"
+  },
+  {
+    "nombre": "Puesto de Salud La Playa",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Comunidad La Playa, Comunidad La Playa",
+    "zona": "rural",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-la-playa",
+    "fecha_consulta": "2026-10-21"
+  },
+  {
+    "nombre": "Puesto de Salud San Juan de Somoto",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Asentamiento San Juan de Somoto, Comunidad San Juan de Somoto",
+    "zona": "rural",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-san-juan-de-somoto",
+    "fecha_consulta": "2026-10-21"
+  },
+  {
+    "nombre": "Puesto de Salud Santa Isabel",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Comunidad Santa Isabel, Comunidad Santa Isabel",
+    "zona": "rural",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-santa-isabel-0",
+    "fecha_consulta": "2026-10-21"
+  },
+  {
+    "nombre": "Puesto de Salud Teófilo Alfaro (El Mercado)",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Mercado Municipal, Barrio Constantino Maldonado",
+    "zona": "urbano",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-teofilo-alfaro-el-mercado",
+    "fecha_consulta": "2026-10-21"
+  },
+  {
+    "nombre": "Puesto de Salud Villa Libertad",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Barrio Villa Libertad , Barrio Villa Libertad",
+    "zona": "urbano",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-villa-libertad",
+    "fecha_consulta": "2026-10-21"
+  },
+  {
+    "nombre": "Puesto de Salud Yarage",
+    "tipo_establecimiento": "puesto_salud",
+    "silais": "MADRIZ",
+    "departamento": "Madriz",
+    "municipio": "Somoto",
+    "direccion": "Comunidad Yarage, Comunidad Yarage",
+    "zona": "rural",
+    "fuente": "minsa_red_madriz",
+    "fuente_url": "https://www.minsa.gob.ni/red-de-salud/puesto-de-salud/puesto-de-salud-yarage",
+    "fecha_consulta": "2026-10-21"
   }
 ]
