@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aurora-shell-v37';
+const CACHE_NAME = 'aurora-shell-v38';
 const APP_SHELL = [
   '/manifest.json',
   '/offline.html',

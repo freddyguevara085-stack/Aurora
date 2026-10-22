@@ -1,0 +1,22 @@
+{
+  "herramienta": "image_gen incorporada",
+  "referencia": "Primera ilustración de consulta prenatal aprobada por el usuario; se conserva sin cambios de contenido.",
+  "imagenes": [
+    {
+      "archivo": "static/images/guide/scenes/consulta-v1.webp",
+      "tema": "controles",
+      "origen": "Ilustración de consulta prenatal aprobada."
+    },
+    {
+      "archivo": "static/images/guide/scenes/bolso-v1.webp",
+      "tema": "preparacion",
+      "prompt": "Use case: illustration-story. Create ONE new companion editorial illustration for Aurora's prenatal guide. The attached image is a STYLE AND CHARACTER REFERENCE, not a scene to reproduce. Match its polished hand-drawn illustrated style, warm medium-brown skin, dark flowing hair, fine purple contours and soft lavender/blush/cream palette. Scene: the same adult pregnant woman in a lavender casual outfit, seated at home beside an open lavender overnight bag, calmly preparing folded clothing and a document folder for her visit and birth preparation. Simple neatly folded baby blanket, modest practical bag, no excessive objects. Make the hands and posture natural. Square composition with generous warm cream #FFF8F5 background and uncluttered negative space, scene understandable at phone size. Primary colors #6C4BA3 #A78BD6 #F8A8C1 #2D1F3F, white, natural skin tones. Warm and competent, not infantilizing. No text, letters, numbers, logos, watermarks, medical advice, pills, medical procedures, photographic realism or fabricated institution. One image, not a collage or interface."
+    },
+    {
+      "archivo": "static/images/guide/scenes/documentos-v1.webp",
+      "tema": "atencion",
+      "prompt": "Use case: illustration-story. Create ONE new companion editorial illustration for Aurora's prenatal guide. The attached illustration is a STYLE AND CHARACTER REFERENCE. Match the same adult pregnant woman, medium-brown skin, long dark hair and lavender outfit, warm editorial drawing, fine purple outlines, soft understated shading. Scene: the woman is calmly seated at a small table organizing her plain paper documents into a simple lavender folder, with a small notebook and pen beside her. No writing, symbols, identifiers or numbers visible on any paper. This represents preparing documents and questions before seeking care, NOT a real institution or a required medical document checklist. Natural hands, respectful and competent character. Square composition, generous warm cream #FFF8F5 background, readable on a small phone, minimal home backdrop, no clutter. Palette #6C4BA3 #A78BD6 #F8A8C1 #2D1F3F, white and natural warm skin. No text, lettering, logos, watermarks, diagnostic results, medical instructions, pills, instruments, photographs, building facades, UI or collage."
+    }
+  ],
+  "entrega": "WebP 768 × 768, calidad 82, sin recorte. Las escenas no muestran establecimientos reales ni listas de requisitos médicos. Solo se muestran dentro de las lecturas abiertas. No se precargan en el service worker."
+}
