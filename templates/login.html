@@ -2,17 +2,22 @@
 {% block title %}Iniciar sesión | Aurora{% endblock %}
 {% block content %}
 <main id="main" tabindex="-1" class="app-shell login-shell">
-  <section class="login-hero" aria-labelledby="login-title">
-    <img src="{{ url_for('static', filename='icons/app-icon-192.png') }}" width="96" height="96" alt="Aurora">
-    <p class="login-brand">Aurora</p>
-    <h1 id="login-title">Bienvenida de nuevo</h1>
-    <p>Accede a tu acompañamiento prenatal.</p>
-  </section>
-  {% include 'partials/flash.html' %}
+  {% set auth_title_id = 'login-title' %}
+  {% set auth_icon_size = 96 %}
+  {% set auth_title = 'Bienvenida de nuevo' %}
+  {% set auth_subtitle = 'Accede a tu acompañamiento prenatal.' %}
+  {% include 'partials/auth_hero.html' %}
+
   <form class="login-card" method="post" action="{{ url_for('auth.login', next=request.args.get('next')) }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label for="email">Correo electrónico<input id="email" name="email" type="email" autocomplete="email" placeholder="tu@correo.com" required></label>
-    <label for="password">Contraseña<input id="password" name="password" type="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required></label>
+    <label for="email">
+      Correo electrónico
+      <input id="email" name="email" type="email" autocomplete="email" placeholder="tu@correo.com" required>
+    </label>
+    <label for="password">
+      Contraseña
+      <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Ingresa tu contraseña" required>
+    </label>
     <button class="button button--primary button--wide" type="submit">Iniciar sesión</button>
     <p class="form-note"><a href="{{ url_for('auth.recuperar_password') }}">¿Olvidaste tu contraseña?</a></p>
     <p class="form-note"><a href="{{ url_for('auth.registro') }}">Crear una cuenta</a></p>

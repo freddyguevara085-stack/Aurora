@@ -8,7 +8,7 @@ from services.gestacion import (
     validar_fecha_nacimiento_real,
     validar_fechas_embarazo,
 )
-from demo_nicaragua import BORRADORES, CENTROS, FUENTES, SENALES_ALERTA
+from services.catalogo_minsa import CENTROS, FUENTES
 from services.home import calcular_semana_gestacional
 
 
@@ -136,14 +136,8 @@ def test_validar_fecha_nacimiento_real_rechaza_fechas_futuras_y_acepta_hoy():
     assert validar_fecha_nacimiento_real(hoy.isoformat(), hoy) == (hoy, None)
 
 
-def test_guia_demo_cubre_filtros_y_directorio_solo_tiene_fuentes_minsa():
-    assert {item["categoria"] for item in BORRADORES} >= {
-        "controles", "preparacion", "puerperio", "registro", "alertas"
-    }
-    assert all(item["fuente"].startswith("minsa_") and item["fuente"] in FUENTES for item in BORRADORES)
+def test_directorio_solo_tiene_fuentes_minsa():
     assert len(CENTROS) >= 430
-    assert len(SENALES_ALERTA) == 10
-    assert all(s["activo"] == 1 and s["titulo"] and s["accion_recomendada"] for s in SENALES_ALERTA)
     deptos = {centro["departamento"] for centro in CENTROS}
     assert len(deptos) == 17
     assert not any("Distrito" in d for d in deptos)

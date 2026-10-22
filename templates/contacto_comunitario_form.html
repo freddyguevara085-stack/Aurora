@@ -1,7 +1,7 @@
 {% extends 'layouts/base.html' %}
 {% block title %}{{ 'Editar contacto' if contacto else 'Nuevo contacto' }} | Aurora{% endblock %}
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell section-shell community-page aurora-page-container">
+<main id="main" tabindex="-1" class="app-shell section-shell detail-form-page community-page aurora-page-container">
   {% set back_url = url_for('main.red_comunitaria') %}
   {% set back_label = 'Volver a mi red de apoyo' %}
   {% set page_title = 'Red de apoyo' %}
@@ -9,18 +9,19 @@
 
   {% include 'partials/flash.html' %}
 
-  <section class="section-intro">
+  <section class="section-intro detail-form-intro">
     <h2>{{ 'Editar contacto de apoyo' if contacto else 'Agregar contacto de apoyo' }}</h2>
     <p>Registra a una persona o transporte de confianza cuyo teléfono hayas confirmado.</p>
   </section>
 
   {% set values = form_data or contacto %}
-  <form class="card-surface plan-form plan-form--editor" method="post" action="{{ url_for('main.editar_contacto_comunitario', contacto_id=contacto.id) if contacto else url_for('main.nuevo_contacto_comunitario') }}">
+  <form class="card-surface plan-form plan-form--editor detail-form" method="post" action="{{ url_for('main.editar_contacto_comunitario', contacto_id=contacto.id) if contacto else url_for('main.nuevo_contacto_comunitario') }}">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <p class="detail-form__hint">Nombre y tipo de apoyo son obligatorios. Confirma el teléfono con tu contacto.</p>
     <fieldset class="plan-form__section">
       <legend><span class="plan-form__icon material-symbols-outlined" aria-hidden="true">person</span><span>Datos del contacto</span></legend>
-      <label>Nombre completo
-        <input name="nombre" maxlength="150" required value="{{ values.nombre if values and values.nombre else '' }}">
+      <label>Nombre completo <span class="field-required" aria-hidden="true">*</span>
+        <input name="nombre" autocomplete="section-contact name" maxlength="150" required value="{{ values.nombre if values and values.nombre else '' }}">
       </label>
       <label>Tipo de apoyo
         <select name="rol" required>
@@ -30,14 +31,14 @@
           {% endfor %}
         </select>
       </label>
-      <label>Teléfono
-        <input name="telefono" type="tel" maxlength="30" value="{{ values.telefono if values and values.telefono else '' }}" placeholder="8888-0000">
+      <label>Teléfono <span class="field-optional">Opcional</span>
+        <input name="telefono" type="tel" inputmode="tel" autocomplete="section-contact tel" maxlength="30" value="{{ values.telefono if values and values.telefono else '' }}" placeholder="8888-0000">
       </label>
-      <label>Comunidad o barrio
+      <label>Comunidad o barrio <span class="field-optional">Opcional</span>
         <input name="comunidad_barrio" maxlength="150" value="{{ values.comunidad_barrio if values and values.comunidad_barrio else '' }}">
       </label>
-      <label>Notas de apoyo
-        <textarea name="notas" maxlength="255">{{ values.notas if values and values.notas else '' }}</textarea>
+      <label>Notas de apoyo <span class="field-optional">Opcional</span>
+        <textarea name="notas" maxlength="255" placeholder="Ej. Puede acompañarme por las tardes.">{{ values.notas if values and values.notas else '' }}</textarea>
       </label>
     </fieldset>
     <div class="plan-form__actions">

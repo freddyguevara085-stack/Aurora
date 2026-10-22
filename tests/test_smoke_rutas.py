@@ -1,7 +1,7 @@
 import pytest
 
 from controllers import gestante as gestante_mod, publicas as publicas_mod
-from test_routes import _iniciar_sesion_falsa
+from conftest import _iniciar_sesion_falsa
 
 
 RUTAS_GESTANTE = [
@@ -27,7 +27,6 @@ RUTAS_PUBLICAS = ["/", "/fuentes", "/acerca", "/guia", "/centros"]
 @pytest.fixture
 def gestante(client, monkeypatch):
     """Sesión de gestante sin embarazo: las páginas nuevas deben renderizar igual."""
-    monkeypatch.setitem(client.application.config, "DEMO_MODE", False)
     usuario = _iniciar_sesion_falsa(client, monkeypatch, "usuario")
     usuario.nombres = "Ana"
     usuario.apellidos = "Ruiz"

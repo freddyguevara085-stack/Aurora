@@ -1,7 +1,5 @@
 """CRUD de centros de atención del panel de administración."""
 
-from datetime import date
-
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from sqlalchemy import or_, select
@@ -11,120 +9,14 @@ from controllers.admin import admin_bp
 from controllers.admin._common import _alternar
 from controllers.decorators import admin_required
 from extensions import db
-from models.directorio import CentroAtencion, CentroServicio, Servicio
+from models.directorio import CentroAtencion, Servicio
 from models.seguimiento import ControlPrenatal
+from services.admin import (
+    TIPOS_ESTABLECIMIENTO_VALIDOS,
+    _sincronizar_servicios_centro,
+    validar_datos_centro,
+)
 from services.auditoria import registrar_auditoria
-
-
-def validar_datos_centro(form_data, centro_actual_id=None):
-    """Valida y limpia los datos del formulario de centro de salud."""
-    errores = []
-
-    nombre = (form_data.get("nombre") or "").strip()
-    if not nombre:
-        errores.append("El nombre del centro de salud es obligatorio.")
-    elif len(nombre) > 150:
-        errores.append("El nombre no puede exceder 150 caracteres.")
-
-    codigo_minsa = (form_data.get("codigo_minsa") or "").strip() or None
-    if codigo_minsa:
-        if len(codigo_minsa) > 20:
-            errores.append("El código MINSA no puede exceder 20 caracteres.")
-        else:
-            existente = db.session.scalar(
-                select(CentroAtencion).where(CentroAtencion.codigo_minsa == codigo_minsa)
-            )
-            if existente and (not centro_actual_id or existente.id != centro_actual_id):
-                errores.append("Ya existe otro centro registrado con ese código MINSA.")
-
-    tipo = (form_data.get("tipo_establecimiento") or "").strip()
-    tipos_validos = {"hospital", "centro_salud", "puesto_salud", "casa_materna", "clinica", "otro"}
-    if tipo not in tipos_validos:
-        errores.append("El tipo de establecimiento seleccionado no es válido.")
-
-    silais = (form_data.get("silais") or "").strip() or None
-    if silais and len(silais) > 100:
-        errores.append("El SILAIS no puede exceder 100 caracteres.")
-
-    municipio = (form_data.get("municipio") or "").strip()
-    if not municipio:
-        errores.append("El municipio es obligatorio.")
-    elif len(municipio) > 100:
-        errores.append("El municipio no puede exceder 100 caracteres.")
-
-    departamento = (form_data.get("departamento") or "").strip()
-    if not departamento:
-        errores.append("El departamento es obligatorio.")
-    elif len(departamento) > 100:
-        errores.append("El departamento no puede exceder 100 caracteres.")
-
-    direccion = (form_data.get("direccion") or "").strip() or None
-    telefono = (form_data.get("telefono") or "").strip() or None
-    if telefono and len(telefono) > 30:
-        errores.append("El teléfono no puede exceder 30 caracteres.")
-
-    horario = (form_data.get("horario") or "").strip() or None
-    if horario and len(horario) > 255:
-        errores.append("El horario no puede exceder 255 caracteres.")
-
-    latitud_raw = (form_data.get("latitud") or "").strip()
-    latitud = None
-    if latitud_raw:
-        try:
-            latitud = float(latitud_raw)
-            if not (-90.0 <= latitud <= 90.0):
-                errores.append("La latitud debe estar entre -90 y 90 grados.")
-        except ValueError:
-            errores.append("La latitud debe ser un número decimal válido.")
-
-    longitud_raw = (form_data.get("longitud") or "").strip()
-    longitud = None
-    if longitud_raw:
-        try:
-            longitud = float(longitud_raw)
-            if not (-180.0 <= longitud <= 180.0):
-                errores.append("La longitud debe estar entre -180 y 180 grados.")
-        except ValueError:
-            errores.append("La longitud debe ser un número decimal válido.")
-
-    fecha_ver_raw = (form_data.get("fecha_verificacion") or "").strip()
-    fecha_verificacion = None
-    if fecha_ver_raw:
-        try:
-            fecha_verificacion = date.fromisoformat(fecha_ver_raw)
-            if fecha_verificacion > date.today():
-                errores.append("La fecha de revisión no puede estar en el futuro.")
-        except ValueError:
-            errores.append("La fecha de verificación debe tener formato AAAA-MM-DD válido.")
-
-    activo = 1 if form_data.get("activo") in ("1", "true", "on") else 0
-
-    servicios_seleccionados = form_data.getlist("servicios_ids")
-
-    servicios_ids = []
-    for sid in servicios_seleccionados:
-        try:
-            servicios_ids.append(int(sid))
-        except (ValueError, TypeError):
-            pass
-
-    datos = {
-        "codigo_minsa": codigo_minsa,
-        "nombre": nombre,
-        "tipo_establecimiento": tipo,
-        "silais": silais,
-        "municipio": municipio,
-        "departamento": departamento,
-        "direccion": direccion,
-        "telefono": telefono,
-        "horario": horario,
-        "latitud": latitud,
-        "longitud": longitud,
-        "fecha_verificacion": fecha_verificacion,
-        "activo": activo,
-    }
-
-    return datos, servicios_ids, errores
 
 
 @admin_bp.route("/centros")
@@ -146,7 +38,7 @@ def centros():
                 CentroAtencion.departamento.ilike(termino),
             )
         )
-    if tipo in {"hospital", "centro_salud", "puesto_salud", "casa_materna", "clinica", "otro"}:
+    if tipo in TIPOS_ESTABLECIMIENTO_VALIDOS:
         query = query.where(CentroAtencion.tipo_establecimiento == tipo)
     if estado == "activo":
         query = query.where(CentroAtencion.activo == 1)
@@ -192,16 +84,7 @@ def nuevo_centro():
             nuevo = CentroAtencion(**datos)
             db.session.add(nuevo)
             db.session.flush()
-
-            for sid in servicios_ids:
-                if db.session.get(Servicio, sid):
-                    asig = CentroServicio(
-                        centro_atencion_id=nuevo.id,
-                        servicio_id=sid,
-                        disponible=1,
-                        fecha_verificacion=datos["fecha_verificacion"],
-                    )
-                    db.session.add(asig)
+            _sincronizar_servicios_centro(nuevo.id, servicios_ids, datos["fecha_verificacion"])
 
             registrar_auditoria(
                 usuario_id=current_user.id,
@@ -267,19 +150,7 @@ def editar_centro(centro_id):
             for campo, valor in datos.items():
                 setattr(item, campo, valor)
 
-            # Sincronizar servicios asignados
-            db.session.execute(
-                db.delete(CentroServicio).where(CentroServicio.centro_atencion_id == item.id)
-            )
-            for sid in servicios_ids:
-                if db.session.get(Servicio, sid):
-                    asig = CentroServicio(
-                        centro_atencion_id=item.id,
-                        servicio_id=sid,
-                        disponible=1,
-                        fecha_verificacion=datos["fecha_verificacion"],
-                    )
-                    db.session.add(asig)
+            _sincronizar_servicios_centro(item.id, servicios_ids, datos["fecha_verificacion"])
 
             registrar_auditoria(
                 usuario_id=current_user.id,

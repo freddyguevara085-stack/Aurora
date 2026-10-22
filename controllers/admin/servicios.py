@@ -9,70 +9,13 @@ from controllers.admin import admin_bp
 from controllers.admin._common import _alternar
 from controllers.decorators import admin_required
 from extensions import db
-from models.directorio import CentroAtencion, CentroServicio, Servicio
+from models.directorio import CentroServicio, Servicio
+from services.admin import (
+    _centros_visibles_para_asignar,
+    _sincronizar_centros_servicio,
+    validar_datos_servicio,
+)
 from services.auditoria import registrar_auditoria
-
-
-def validar_datos_servicio(form_data, servicio_actual_id=None):
-    """Valida y limpia los datos del formulario de servicio."""
-    errores = []
-
-    nombre = (form_data.get("nombre") or "").strip()
-    if not nombre:
-        errores.append("El nombre del servicio es obligatorio.")
-    elif len(nombre) > 120:
-        errores.append("El nombre del servicio no puede exceder 120 caracteres.")
-    else:
-        existente = db.session.scalar(
-            select(Servicio).where(Servicio.nombre == nombre)
-        )
-        if existente and (not servicio_actual_id or existente.id != servicio_actual_id):
-            errores.append("Ya existe otro servicio registrado con ese nombre.")
-
-    descripcion = (form_data.get("descripcion") or "").strip() or None
-    if descripcion and len(descripcion) > 500:
-        errores.append("La descripción no puede exceder 500 caracteres.")
-
-    activo = 1 if form_data.get("activo") in ("1", "true", "on") else 0
-    centros_ids = []
-    for centro_id in form_data.getlist("centros_ids"):
-        try:
-            centros_ids.append(int(centro_id))
-        except (TypeError, ValueError):
-            continue
-
-    datos = {
-        "nombre": nombre,
-        "descripcion": descripcion,
-        "activo": activo,
-    }
-
-    return datos, centros_ids, errores
-
-
-def _centros_visibles_para_asignar():
-    return db.session.scalars(
-        select(CentroAtencion)
-        .where(CentroAtencion.activo == 1)
-        .order_by(CentroAtencion.departamento, CentroAtencion.municipio, CentroAtencion.nombre)
-    ).all()
-
-
-def _sincronizar_centros_servicio(servicio_id, centros_ids):
-    """Reemplaza las asignaciones del servicio por los centros elegidos."""
-    db.session.execute(
-        db.delete(CentroServicio).where(CentroServicio.servicio_id == servicio_id)
-    )
-    for centro_id in set(centros_ids):
-        centro = db.session.get(CentroAtencion, centro_id)
-        if centro and centro.activo:
-            db.session.add(
-                CentroServicio(
-                    centro_atencion_id=centro.id,
-                    servicio_id=servicio_id,
-                    disponible=1,
-                )
-            )
 
 
 @admin_bp.route("/servicios")

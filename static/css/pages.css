@@ -1,203 +1,1251 @@
+/* === 01. Public & Auth === */
 
-.home-shell{padding-top:22px}
-.home-header{display:flex;align-items:center;justify-content:space-between;height:34px}
-.home-header img{display:block;object-fit:contain}
-.home-intro{margin-top:24px}
-.home-intro h1{margin:0;font-size:30px;line-height:38px;letter-spacing:-.02em}
-.home-intro p{max-width:310px;margin:0;color:var(--muted);font-size:16px;line-height:24px}
-.home-tutorial-trigger{margin-top:8px;padding:0;border:0;background:none;color:var(--primary);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
-.home-tutorial-footer{text-align:center;margin:24px 0 12px}
-.aurora-tutorial{position:fixed;width:min(100% - 32px,400px);max-height:min(90dvh,640px);padding:24px;border:0;border-radius:24px;background:var(--white);color:var(--ink);text-align:center;box-shadow:var(--shadow)}
-.aurora-tutorial::backdrop{background:rgba(26,28,28,.55)}
-.aurora-tutorial__close{position:absolute;top:12px;right:14px;width:44px;height:44px;border:0;border-radius:50%;background:var(--soft);color:var(--ink);font-size:28px;cursor:pointer}
-.aurora-tutorial__image{display:block;width:160px;height:160px;margin:0 auto 8px;object-fit:contain}
-.aurora-tutorial__step{margin:0 0 8px;color:var(--primary);font-size:13px;font-weight:600}
-.aurora-tutorial h2{margin:0 0 8px;font-size:22px;line-height:1.3}
-.aurora-tutorial__copy{margin:0 auto 16px;color:var(--muted);font-size:15px;line-height:1.55}
-.aurora-tutorial__progress{display:block;width:100%;height:8px;margin:16px 0 20px;accent-color:var(--primary)}
-.aurora-tutorial__actions{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.aurora-tutorial__actions .button{width:auto;min-height:44px}
-.aurora-tutorial [hidden]{display:none}
-.week-ring{position:relative;display:flex;width:128px;height:128px;margin:0 auto;flex-direction:column;align-items:center;justify-content:center;border:7px solid var(--primary-light);border-radius:50%;box-shadow:0 0 0 5px var(--line);color:var(--primary)}
-.week-ring:after{position:absolute;inset:-7px;content:'';border-radius:50%;border:7px solid transparent;border-top-color:#b16ce5;transform:rotate(38deg)}
-.week-ring span{font-size:22px;font-weight:600;line-height:28px}
-.week-ring strong{font-size:30px;line-height:34px}
-.stage-pill{display:inline-block;margin-top:22px;padding:9px 18px;border-radius:var(--radius-badge);background:var(--color-care-pink);color:var(--color-text-main)}
-.pregnancy-overview>p{margin:28px 0 30px;font-size:16px}
-.home-card{margin-top:32px}
-.next-control{position:relative;display:grid;grid-template-columns:1fr 42px;gap:12px;padding:17px;border:1px solid var(--line);border-radius:20px;background:#fff;box-shadow:var(--shadow)}
-.next-control h2{margin:3px 0 0;color:var(--ink);font-size:17px;line-height:24px}
-.next-control p{margin:0}
-.round-icon{display:grid;width:42px;height:42px;place-items:center;border-radius:var(--radius-icon-box);background:var(--aurora-surface-lilac);color:var(--color-primary)}
-.home-actions{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px}
-.home-action{display:flex;min-height:80px;flex-direction:column;align-items:center;justify-content:center;gap:7px;border-radius:16px;box-shadow:var(--shadow);font-size:13px}
-.home-action--primary{background:var(--primary);color:#fff}
-.home-action--pink{background:var(--pink);color:var(--aurora-on-pink)}
-.home-action .material-symbols-outlined{font-size:27px}
-.home-guide{margin-top:32px}
-.home-guide>header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-.home-guide>header a{color:var(--secondary);font-size:13px}
-.feature-article{overflow:hidden;border-radius:24px;background:#fff;box-shadow:var(--shadow)}
-.feature-article__image{position:relative;height:128px}
-.feature-article__image>img{width:100%;height:100%;object-fit:cover}
-.feature-article__image>span{position:absolute;top:12px;left:12px;padding:4px 8px;border-radius:var(--radius-badge);background:#fff;color:var(--color-primary);font-size:13px}
-.feature-article>div:last-child{padding:22px 24px}
-.feature-article h3{margin:0;color:var(--ink);font-size:18px;font-weight:500;line-height:26px}
-.feature-article p{display:-webkit-box;margin:8px 0 16px;overflow:hidden;color:var(--muted);font-size:14px;-webkit-box-orient:vertical;-webkit-line-clamp:2}
-.feature-article a{display:flex;align-items:center;gap:3px;color:var(--primary);font-size:13px;font-weight:500}
-.feature-article a span{font-size:16px}
-.offline-note{display:flex;align-items:center;justify-content:center;gap:4px;margin:44px 0 6px;color:var(--outline);font-size:13px}
-.offline-note .material-symbols-outlined{font-size:15px}
+.public-home {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 82% 12%, rgba(237, 231, 246, 0.82), transparent 26rem),
+    linear-gradient(180deg, #fffaf7 0%, var(--color-bg-app) 100%);
+}
 
-.pregnancy-page .section-intro{margin-bottom:30px}
-.edit-panel summary,.profile-editor summary{color:var(--primary);font-weight:600;cursor:pointer}
+.public-home__container {
+  width: min(100% - 48px, 1120px);
+  margin: 0 auto;
+}
 
-.controls-page{min-height:100dvh;padding-bottom:calc(130px + env(safe-area-inset-bottom, 0px));background-color:#FFF8F5}
+.public-home__header {
+  display: flex;
+  min-height: 82px;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(108, 75, 163, 0.12);
+}
 
-.guide-page{padding-top:80px}
-.guide-topbar{position:absolute;top:0;left:0;display:grid;width:100%;height:64px;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 24px;background:#fff;border-bottom:1px solid #f0eef2}
-.guide-topbar>span:first-child{color:var(--primary)}
-.guide-topbar strong{color:var(--primary);font-size:24px}
-.guide-page .section-intro{margin:16px 0 30px}
-.guide-search{position:relative}
-.guide-search .material-symbols-outlined{position:absolute;top:50%;left:14px;transform:translateY(-50%);color:#c8c0cd;font-size:21px}
-.guide-search input{width:100%;height:48px;padding:0 14px 0 42px;border:0;border-radius:12px;background:#f5f5f7;color:var(--ink)}
-.guide-search input:focus{outline:2px solid var(--primary);outline-offset:2px;box-shadow:0 0 0 3px var(--primary-light)}
-.guide-topics,.guide-recommended{margin-top:32px}
-.guide-topics h2,.guide-recommended h2{margin:0 0 16px;font-size:18px;font-weight:500}
-.guide-topics>div{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.guide-topics a{display:flex;min-height:104px;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-radius:16px;background:#fff;box-shadow:var(--shadow);text-align:center}
-.guide-topics a>.material-symbols-outlined{color:var(--secondary);font-size:30px}
-.guide-list{display:grid;gap:16px}
-.guide-row{display:grid;min-height:104px;grid-template-columns:45% 1fr;overflow:hidden}
-.guide-row>img{width:100%;height:104px;object-fit:cover}
-.guide-row>span{display:flex;padding:12px 14px;flex-direction:column;justify-content:center}
-.guide-row strong{color:var(--ink);font-size:15px;font-weight:500;line-height:21px}
-.guide-row small{display:flex;align-items:center;gap:3px;margin-top:8px;color:var(--outline);font-size:14px}
-.guide-row small .material-symbols-outlined{font-size:15px}
-.guide-footer{margin-top:32px;padding:16px 0 4px;border-top:1px solid var(--line)}
-.guide-footer p{display:flex;align-items:start;gap:8px;margin:7px 0;color:var(--muted);font-size:13px}
-.guide-footer p:last-child{color:var(--secondary)}
-.guide-footer .material-symbols-outlined{font-size:14px}
+.public-home__brand,
+.public-home__nav,
+.public-home__about-link {
+  display: inline-flex;
+  align-items: center;
+}
 
-.profile-page{padding-bottom:112px}
-.profile-identity{display:flex;margin:8px 0 30px;flex-direction:column;align-items:center}
-.profile-identity>span{display:grid;width:96px;height:96px;place-items:center;border-radius:50%;background:var(--pink-strong);color:var(--aurora-on-pink-strong);font-size:30px;font-weight:600}
-.profile-identity h2{margin:14px 0 8px;font-size:24px}
-.profile-identity p{margin:0;padding:4px 16px;border-radius:var(--radius-badge);background:var(--color-care-pink);color:var(--color-text-main);font-size:13px}
-.profile-card{margin-top:30px;padding:24px}
-.profile-card>header{display:flex;align-items:center;justify-content:space-between}
-.profile-card h3{margin:0 0 12px;font-size:18px;font-weight:500}
-.profile-card>header h3{margin:0}
-.profile-card>header a{display:flex;align-items:center;gap:3px;padding:4px 11px;border-radius:var(--radius-badge);background:var(--aurora-surface-soft);color:var(--color-primary);font-size:13px}
-.profile-card>header a .material-symbols-outlined{font-size:15px}
-.profile-data-row{display:flex;align-items:center;gap:16px;margin-top:16px}
-.profile-data-row__icon{display:grid;width:40px;height:40px;flex:0 0 40px;place-items:center;border-radius:50%}
-.profile-data-row__icon--purple{background:#eddcff;color:var(--primary)}
-.profile-data-row__icon--pink{background:var(--pink);color:var(--aurora-on-pink-strong)}
-.profile-data-row p{display:flex;min-width:0;margin:0;flex:1;flex-direction:column}
-.profile-data-row small{color:var(--muted);font-size:14px}
-.profile-data-row strong{color:var(--ink);font-size:15px;font-weight:400}
-.profile-editor{margin-top:30px;padding:20px}
+.public-home__brand {
+  gap: 10px;
+  color: var(--ink);
+  font-size: 19px;
+  font-weight: 700;
+}
 
-.login-shell{display:flex;min-height:100dvh;flex-direction:column;justify-content:center;padding-bottom:40px}
-.login-hero{text-align:center}
-.login-hero img{display:block;margin:0 auto}
-.login-brand{margin:4px 0 16px;color:var(--primary);font-size:24px;font-weight:700}
-.login-hero h1{margin:0;font-size:28px;line-height:36px}
-.login-hero>p:last-child{margin:5px 0 0;color:var(--muted);font-size:14px}
-.login-card{margin-top:20px;padding:24px;border-radius:24px;background:#fff;box-shadow:var(--shadow)}
-.chip{display:inline-block;padding:5px 10px;border-radius:var(--radius-badge);background:var(--color-care-pink);color:var(--color-text-main);font-size:13px}
-.filters{display:grid;gap:12px}
-.quick-links{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.quick-links a{padding:12px;border-radius:12px;background:#fff;box-shadow:var(--shadow);text-align:center}
-.admin-action-btn{min-width:44px;min-height:44px}
+.public-home__brand img {
+  display: block;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+}
 
-.admin-shell{max-width:1280px;margin:0 auto;padding:16px 16px 48px;min-height:100dvh}
-.admin-topbar{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;background:var(--white);border-radius:20px;box-shadow:var(--shadow);margin-bottom:16px}
-.admin-topbar__brand{display:flex;align-items:center;gap:8px;color:var(--primary)}
-.admin-topbar__brand strong{font-size:18px}
-.admin-badge{font-size:13px;padding:2px 8px;background:var(--aurora-lavender);color:var(--color-text-main);border-radius:var(--radius-badge);font-weight:600}
-.admin-topbar__user{display:flex;align-items:center;gap:12px;font-size:13px;color:var(--muted)}
-.admin-logout-btn{background:none;border:none;color:var(--secondary);cursor:pointer;display:grid;place-items:center;padding:4px;border-radius:8px}
-.admin-logout-btn:hover{background:var(--soft)}
-.admin-nav{display:flex;gap:10px;margin-bottom:24px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
-.admin-nav-link{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:14px;background:var(--white);color:var(--muted);box-shadow:var(--shadow);font-size:13px;font-weight:500;transition:all 0.2s}
-.admin-nav-link:hover,.admin-nav-link.is-active{background:var(--primary);color:#fff}
-.admin-welcome{margin-bottom:24px}
-.admin-welcome h1{margin:0 0 4px;font-size:24px}
-.admin-welcome p{margin:0;color:var(--muted);font-size:14px}
-.admin-metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:28px}
-.metric-card{padding:20px;display:flex;flex-direction:column;gap:6px}
-.metric-card__header{display:flex;justify-content:space-between;align-items:center}
-.metric-icon{font-size:28px;color:var(--primary);background:var(--soft);padding:8px;border-radius:12px}
-.metric-icon--pink{color:var(--secondary);background:var(--pink)}
-.metric-count{font-size:28px;font-weight:700;color:var(--primary)}
-.metric-card h3{margin:4px 0 0;font-size:15px;color:var(--ink)}
-.metric-card p{margin:0;font-size:13px;color:var(--muted)}
-.admin-section{padding:24px;margin-bottom:24px}
-.admin-section h2{margin:0 0 16px;font-size:18px}
-.admin-table-container{overflow-x:auto}
-.admin-table{width:100%;border-collapse:collapse;font-size:13px}
-.admin-table th,.admin-table td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line)}
-.admin-table th{color:var(--muted);font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:0.04em}
-.admin-page-header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px;flex-wrap:wrap}
-.admin-page-header h1{margin:0 0 4px;font-size:22px}
-.admin-page-header p{margin:0;color:var(--muted);font-size:13px}
-.admin-filter-card{padding:16px 20px;margin-bottom:20px}
-.admin-filter-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;align-items:end}
-.admin-cell-desc{margin:3px 0 0;color:var(--muted);font-size:13px}
-.status-badge{display:inline-block;padding:3px 10px;border-radius:var(--radius-badge);font-size:13px;font-weight:600}
-.status-badge--success{background:#d4edda;color:var(--aurora-success-text)}
-.status-badge--warning{background:#fff3cd;color:#856404}
-.admin-row-actions{display:flex;align-items:center;gap:6px}
-.admin-action-btn{display:grid;place-items:center;width:34px;height:34px;border:none;border-radius:8px;background:var(--soft);color:var(--primary);cursor:pointer;transition:all 0.2s}
-.admin-action-btn:hover{background:var(--primary-light);color:var(--primary)}
-.admin-action-btn--danger{color:var(--aurora-error-text)}
-.admin-action-btn--danger:hover{background:var(--aurora-error-bg);color:var(--aurora-error-text)}
+.public-home__nav {
+  gap: 26px;
+}
+
+.public-home__about-link {
+  min-height: 44px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.public-home__about-link:hover,
+.public-home__login-link:hover,
+.public-home__footer a:hover {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.public-home__signin {
+  min-height: 44px;
+}
+
+.public-home__hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
+  align-items: center;
+  gap: clamp(42px, 7vw, 92px);
+  padding: clamp(58px, 8vw, 96px) 0 86px;
+}
+
+.public-home__copy {
+  min-width: 0;
+}
+
+.public-home__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 19px;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.public-home__eyebrow > span {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--color-coral);
+  box-shadow: 0 0 0 5px rgba(255, 143, 159, 0.17);
+}
+
+.public-home__copy h1 {
+  max-width: 20ch;
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(2.55rem, 4.5vw, 3.75rem);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.public-home__copy h1 span {
+  color: var(--primary);
+}
+
+.public-home__lead {
+  max-width: 54ch;
+  margin: 22px 0 0;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.public-home__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.public-home__primary-action {
+  min-height: 52px;
+  padding-inline: 22px;
+  box-shadow: var(--shadow-btn-primary);
+}
+
+.public-home__primary-action .material-symbols-outlined {
+  font-size: 19px;
+  transition: transform 0.18s ease;
+}
+
+.public-home__primary-action:hover {
+  box-shadow: 0 7px 18px rgba(108, 75, 163, 0.25);
+  transform: translateY(-1px);
+}
+
+.public-home__primary-action:hover .material-symbols-outlined {
+  transform: translateX(3px);
+}
+
+.public-home__login-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.public-home__note {
+  display: flex;
+  max-width: 52ch;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 22px 0 0;
+  color: #5c5364;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.public-home__note .material-symbols-outlined {
+  flex: 0 0 auto;
+  color: var(--primary);
+  font-size: 18px;
+}
+
+.public-home__preview {
+  position: relative;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid rgba(108, 75, 163, 0.1);
+  border-radius: 28px;
+  background: linear-gradient(145deg, #f2ebfa, #fff0ed);
+  box-shadow: 0 24px 60px rgba(55, 30, 80, 0.11);
+}
+
+.public-home__preview-glow {
+  position: absolute;
+  top: -24px;
+  right: -18px;
+  z-index: -1;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background: rgba(255, 213, 158, 0.72);
+  filter: blur(1px);
+}
+
+.public-home__preview-card {
+  position: relative;
+  padding: 25px;
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 10px 28px rgba(55, 30, 80, 0.07);
+}
+
+.public-home__preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.public-home__preview-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.public-home__preview-mark {
+  display: flex;
+  gap: 4px;
+}
+
+.public-home__preview-mark span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #d8c9e9;
+}
+
+.public-home__preview-card h2 {
+  margin: 10px 0 21px;
+  color: var(--ink);
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.public-home__preview-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 0;
+  border-top: 1px solid #f0ebf4;
+}
+
+.public-home__preview-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  font-size: 21px;
+}
+
+.public-home__preview-icon--lavender {
+  background: #f0eafa;
+  color: var(--primary);
+}
+
+.public-home__preview-icon--peach {
+  background: #fff0e3;
+  color: #a76a24;
+}
+
+.public-home__preview-row > span:nth-child(2) {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.public-home__preview-row strong {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.public-home__preview-row small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.public-home__preview-check {
+  color: #6b9b75;
+  font-size: 19px;
+}
+
+.public-home__preview-foot {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 13px;
+  padding: 13px 14px;
+  border-radius: 12px;
+  background: #fbf7fc;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.public-home__preview-foot .material-symbols-outlined {
+  color: #c66b87;
+  font-size: 17px;
+}
+
+.public-home__preview-caption {
+  display: block;
+  margin: 12px 0 0;
+  color: #62586d;
+  font-size: 11px;
+  text-align: center;
+}
+
+.public-home__features {
+  padding: 0 0 64px;
+}
+
+.public-home__section-heading {
+  margin-bottom: 22px;
+}
+
+.public-home__section-heading .public-home__eyebrow {
+  margin-bottom: 8px;
+}
+
+.public-home__section-heading h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.65rem, 3vw, 2.1rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.public-home__feature-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.public-home__feature {
+  min-width: 0;
+  min-height: 194px;
+  padding: 21px;
+  border: 1px solid rgba(108, 75, 163, 0.1);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.87);
+  box-shadow: 0 7px 22px rgba(55, 30, 80, 0.045);
+}
+
+.public-home__feature-icon {
+  display: grid;
+  width: 43px;
+  height: 43px;
+  place-items: center;
+  border-radius: 13px;
+  font-size: 22px;
+}
+
+.public-home__feature-icon--lavender {
+  background: #f0eafa;
+  color: var(--primary);
+}
+
+.public-home__feature-icon--peach {
+  background: #fff0e3;
+  color: #a76a24;
+}
+
+.public-home__feature-icon--pink {
+  background: #fde9ee;
+  color: #9a4860;
+}
+
+.public-home__feature-icon--green {
+  background: #e9f3eb;
+  color: #477552;
+}
+
+.public-home__feature h3 {
+  margin: 15px 0 6px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.public-home__feature p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.public-home__safety {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  margin-bottom: 24px;
+  padding: 17px 20px;
+  border: 1px solid #f0dfc2;
+  border-radius: 16px;
+  background: #fff8e9;
+  color: #51453a;
+}
+
+.public-home__safety > .material-symbols-outlined {
+  flex: 0 0 auto;
+  color: #8a6515;
+  font-size: 22px;
+}
+
+.public-home__safety p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.public-home__safety strong {
+  color: #382d25;
+}
+
+.public-home__footer {
+  display: flex;
+  min-height: 60px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid rgba(108, 75, 163, 0.12);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.public-home__footer a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--primary);
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .public-home__hero {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+    gap: 34px;
+  }
+
+  .public-home__feature-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .public-home__container {
+    width: min(100% - 36px, 520px);
+  }
+
+  .public-home__header {
+    min-height: 72px;
+  }
+
+  .public-home__about-link {
+    display: none;
+  }
+
+  .public-home__hero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 52px 0 58px;
+  }
+
+  .public-home__copy h1 {
+    max-width: 14ch;
+    font-size: clamp(2.45rem, 10vw, 3.4rem);
+  }
+
+  .public-home__lead {
+    margin-top: 17px;
+    font-size: 16px;
+  }
+
+  .public-home__preview {
+    width: min(100%, 460px);
+    justify-self: center;
+  }
+
+  .public-home__features {
+    padding-bottom: 44px;
+  }
+
+  .public-home__feature {
+    min-height: 180px;
+    padding: 18px;
+  }
+}
+
+@media (max-width: 420px) {
+  .public-home__container {
+    width: min(100% - 32px, 520px);
+  }
+
+  .public-home__header {
+    min-height: 68px;
+  }
+
+  .public-home__brand {
+    font-size: 17px;
+  }
+
+  .public-home__brand img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .public-home__hero {
+    padding-top: 40px;
+  }
+
+  .public-home__actions {
+    display: grid;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .public-home__primary-action {
+    width: 100%;
+  }
+
+  .public-home__login-link {
+    justify-content: center;
+  }
+
+  .public-home__preview {
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .public-home__preview-card {
+    padding: 19px;
+  }
+
+  .public-home__preview-row {
+    grid-template-columns: 38px minmax(0, 1fr) 18px;
+    gap: 9px;
+  }
+
+  .public-home__preview-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .public-home__feature-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .public-home__feature {
+    min-height: 0;
+  }
+
+  .public-home__footer {
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+    padding: 12px 0;
+  }
+}
+
+.login-shell {
+  display: flex;
+  min-height: 100dvh;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 40px;
+}
+
+.login-hero {
+  text-align: center;
+}
+
+.login-hero img {
+  display: block;
+  margin: 0 auto;
+}
+
+.login-brand {
+  margin: 4px 0 16px;
+  color: var(--primary);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.login-hero h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 36px;
+}
+
+.login-hero > p:last-child {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.login-card {
+  margin-top: 20px;
+  padding: 24px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
 
 
-.pregnancy-edit-link{margin:0 0 16px}
-.pregnancy-edit-card{margin-bottom:16px}
-.pregnancy-form-actions{display:grid;gap:10px;margin-top:20px}
+/* === 02. Home & Onboarding === */
 
-.admin-nav::-webkit-scrollbar{display:none}
+.home-shell {
+  padding-top: 20px;
+  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+  background-color: #FFF8F5;
+}
 
-.profile-identity__subtitle{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.home-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  margin-bottom: 4px;
+}
 
-.visit-card{padding:20px;border:1px solid #e7dcef;border-radius:24px;background:linear-gradient(145deg,#fff 65%,var(--aurora-gradient-lilac));box-shadow:var(--shadow)}
-.visit-card__header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.visit-card__header h2{margin:3px 0 0;color:var(--ink);font-size:18px;line-height:1.3}
-.visit-date{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-top:20px}
-.visit-date strong{color:var(--primary);font-size:22px}
-.visit-date span{color:var(--muted);font-size:13px}
-.visit-location{margin:10px 0 18px}
-.visit-note{margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
-.visit-note label{color:var(--ink);font-size:14px}
-.visit-note textarea{min-height:90px;background:#fff}
-.visit-note .form-help{margin:6px 0 14px;line-height:1.5}
-.visit-note .button{font-size:13px}
-.visit-calendar{margin-top:14px}
-.visit-empty{margin:16px 0;color:var(--muted);line-height:1.6}
+.home-header img {
+  display: block;
+  object-fit: contain;
+}
 
-.visit-share{margin:18px 0;padding:14px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.75)}
-.visit-share__notice{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.5}
-.visit-share__label{margin:0 0 5px;color:var(--ink);font-size:13px;font-weight:500}
-.visit-share__details{margin:0;color:var(--ink);font-size:13px;line-height:1.7;user-select:text}
-.visit-share__actions{display:grid;gap:8px;margin-top:12px}
-.visit-share__actions [hidden]{display:none}
-.visit-share__actions button{min-height:48px}
-.visit-share__copy{width:100%;border:1px solid var(--primary);background:#fff;color:var(--primary)}
+.home-header a {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  margin-left: -6px;
+  place-items: center;
+}
 
-.install-banner{position:fixed;z-index:40;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom));display:grid;width:min(calc(100% - 24px),390px);grid-template-columns:32px 1fr;gap:8px 12px;margin:0;padding:14px;border:1px solid #e7dcef;border-radius:18px;background:#fff;box-shadow:var(--shadow)}
-.install-banner[hidden]{display:none}
-.install-banner__icon{color:var(--secondary);font-size:28px}
-.install-banner__copy strong{color:var(--primary);font-size:14px}
-.install-banner__copy p{margin:2px 0 0;color:var(--muted);font-size:13px;line-height:1.45}
-.install-banner__actions{display:flex;grid-column:1/-1;gap:8px}
-.install-banner__actions .button{min-height:44px;flex:1;padding:8px 12px;font-size:13px}
-.install-banner__dismiss{border:1px solid var(--line);background:#fff;color:var(--muted)}
+.home-intro {
+  margin: 4px 0 16px;
+}
 
+.home-intro h1 {
+  margin: 0;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: #2D1F3F;
+}
+
+.home-intro p {
+  max-width: 310px;
+  margin: 4px 0 0;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
+  color: #5C5364;
+  line-height: 1.4;
+}
+
+.home-tutorial-trigger {
+  margin-top: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font: inherit;
+  font-size: 14px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.home-tutorial-footer {
+  text-align: center;
+  margin: 24px 0 12px;
+}
+
+.aurora-tutorial {
+  position: fixed;
+  width: min(100% - 32px, 400px);
+  max-height: min(90dvh, 640px);
+  padding: 24px;
+  border: 0;
+  border-radius: 24px;
+  background: var(--white);
+  color: var(--ink);
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.aurora-tutorial::backdrop {
+  background: rgba(26, 28, 28, 0.55);
+}
+
+.aurora-tutorial__close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--soft);
+  color: var(--ink);
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.aurora-tutorial__image {
+  display: block;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 8px;
+  object-fit: contain;
+}
+
+.aurora-tutorial__step {
+  margin: 0 0 8px;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.aurora-tutorial h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  line-height: 1.3;
+}
+
+.aurora-tutorial__copy {
+  margin: 0 auto 16px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.aurora-tutorial__progress {
+  display: block;
+  width: 100%;
+  height: 8px;
+  margin: 16px 0 20px;
+  accent-color: var(--primary);
+}
+
+.aurora-tutorial__actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.aurora-tutorial__actions .button {
+  width: auto;
+  min-height: 44px;
+}
+
+.aurora-tutorial [hidden] {
+  display: none;
+}
+
+.home-card {
+  margin-top: 32px;
+}
+
+.round-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: var(--radius-icon-box);
+  background: var(--aurora-surface-lilac);
+  color: var(--color-primary);
+}
+
+.home-shell .card-surface,
+.home-shell .pregnancy-overview,
+.home-shell .visit-card,
+.home-shell .shortcut-card,
+.home-shell .birth-plan-reminder,
+.home-shell .home-guide {
+  background: #FFFFFF;
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.home-shell .card-surface:hover,
+.home-shell .shortcut-card:hover {
+  border-color: rgba(108, 75, 163, 0.16);
+}
+
+.home-shell .pregnancy-overview {
+  position: relative;
+  overflow: hidden;
+  margin-top: 8px;
+  margin-bottom: 18px;
+  padding: 16px;
+  text-align: center;
+}
+
+.pregnancy-overview > p {
+  margin: 28px 0 30px;
+  font-size: 16px;
+}
+
+.home-shell .gestational-ring-wrap {
+  width: 128px;
+  height: 128px;
+  margin: 2px auto 10px;
+}
+
+.home-shell .gestational-ring__week {
+  font-size: 22px;
+}
+
+.home-shell .gestational-progress-container {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.home-shell .visit-card {
+  padding: 20px;
+  margin-bottom: 18px;
+  background: #FFFFFF;
+}
+
+.home-shell .visit-card--soon {
+  border-color: var(--aurora-purple);
+}
+
+.home-shell .birth-plan-reminder {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  text-decoration: none;
+  min-height: 48px;
+  color: inherit;
+}
+
+.birth-plan-reminder__text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.birth-plan-reminder__text strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2D1F3F;
+}
+
+.birth-plan-reminder__text small {
+  font-size: 14px;
+  color: #5C5364;
+  line-height: 1.35;
+}
+
+.birth-plan-reminder .chevron {
+  font-size: 18px;
+  color: #8b496c;
+}
+
+.home-shortcuts {
+  margin-bottom: 18px;
+}
+
+.home-shortcuts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.home-shortcuts-grid .aurora-card {
+  margin-bottom: 0;
+}
+
+.shortcut-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+  min-height: 104px;
+  text-decoration: none;
+}
+
+.home-shell .shortcut-card--alert,
+.home-shortcuts-grid .shortcut-card:last-child:nth-child(even) {
+  grid-column: 1 / -1;
+}
+
+.home-shell .shortcut-card--alert {
+  background: var(--pink);
+  border-color: var(--aurora-coral);
+}
+
+.shortcut-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.shortcut-card .chevron {
+  font-size: 16px;
+  color: #8b496c;
+  transition: transform 0.15s;
+}
+
+.shortcut-card:hover .chevron {
+  transform: translateX(2px);
+  color: #6C4BA3;
+}
+
+.shortcut-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.shortcut-card__body strong {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D1F3F;
+  line-height: 1.3;
+}
+
+.shortcut-card__body span {
+  font-size: 13px;
+  color: #5C5364;
+  line-height: 1.3;
+}
+
+.shortcut-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.shortcut-icon .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.shortcut-icon--warn {
+  background: #FFF0F5;
+  color: var(--aurora-danger);
+}
+
+.shortcut-icon--support {
+  background: #F1ECF8;
+  color: #6C4BA3;
+}
+
+.shortcut-icon--questions {
+  background: #F6F0FC;
+  color: #553A86;
+}
+
+.shortcut-icon--guide {
+  background: #F0EBF8;
+  color: #6C4BA3;
+}
+
+.home-guide {
+  margin-top: 32px;
+}
+
+.home-shell .home-guide {
+  padding: 20px;
+  margin-top: 0;
+  margin-bottom: 18px;
+}
+
+.home-guide > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.home-guide > header a {
+  color: var(--secondary);
+  font-size: 13px;
+}
+
+.home-guide__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.home-guide__header h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  color: #2D1F3F;
+}
+
+.home-guide__link {
+  color: #6C4BA3;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.feature-article {
+  overflow: hidden;
+  border-radius: 24px;
+  background: #fff;
+  padding-top: 4px;
+}
+
+.feature-article__image {
+  position: relative;
+  height: 128px;
+}
+
+.feature-article__image > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.feature-article__image > span {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 4px 8px;
+  border-radius: var(--radius-badge);
+  background: #fff;
+  color: var(--color-primary);
+  font-size: 13px;
+}
+
+.feature-article h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #2D1F3F;
+  line-height: 1.4;
+}
+
+.feature-article p {
+  display: -webkit-box;
+  margin: 0 0 10px;
+  overflow: hidden;
+  font-size: 13px;
+  color: #5C5364;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.feature-article a,
+.feature-article__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: #6C4BA3;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.feature-article a span {
+  font-size: 16px;
+}
+
+.offline-note {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin: 32px auto 16px;
+  padding: 0 12px;
+  color: #5C5364;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.offline-note .material-symbols-outlined {
+  font-size: 16px;
+  color: #8b496c;
+  flex-shrink: 0;
+}
+
+.install-banner {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(86px + env(safe-area-inset-bottom));
+  display: grid;
+  width: min(calc(100% - 24px), 390px);
+  grid-template-columns: 32px 1fr;
+  gap: 8px 12px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #e7dcef;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.install-banner[hidden] {
+  display: none;
+}
+
+.install-banner__icon {
+  color: var(--secondary);
+  font-size: 28px;
+}
+
+.install-banner__copy strong {
+  color: var(--primary);
+  font-size: 14px;
+}
+
+.install-banner__copy p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.install-banner__actions {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 8px;
+}
+
+.install-banner__actions .button {
+  min-height: 44px;
+  flex: 1;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.install-banner__dismiss {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--muted);
+}
+
+.confirm-dialog {
+  width: min(100% - 32px, 360px);
+  padding: 24px;
+  border: 0;
+  border-radius: 20px;
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+
+.confirm-dialog::backdrop {
+  background: rgba(26, 28, 28, 0.45);
+}
+
+.confirm-dialog h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.confirm-dialog p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.confirm-dialog__actions .button {
+  width: auto;
+  min-height: 44px;
+}
+
+.toast {
+  position: fixed;
+  z-index: 41;
+  left: 50%;
+  bottom: calc(94px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(calc(100% - 24px), 390px);
+  animation: toast-in 0.25s ease;
+}
+
+.toast .flash {
+  margin: 0;
+  padding: 10px 40px 10px 14px;
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.toast__close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #fff;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+.alert-banner:hover {
+  box-shadow: 0 8px 24px rgba(108, 75, 163, 0.16);
+}
 
 .aurora-page-container .card-surface,
 .aurora-page-container .centro-card {
@@ -207,159 +1255,1385 @@
   box-shadow: var(--aurora-shadow-card);
 }
 
-.aurora-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.aurora-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
 
-.aurora-badge-lavanda { background: var(--aurora-lavender); color: #512DA8; }
+.aurora-badge-lavanda {
+  background: var(--aurora-lavender);
+  color: #512DA8;
+}
 
-.aurora-badge-rosa { background: #FDE8EF; color: #9C2754; }
+.aurora-badge-rosa {
+  background: #FDE8EF;
+  color: #9C2754;
+}
 
-.aurora-badge-amanecer { background: #FFF4E5; color: #8C5500; }
+.aurora-badge-amanecer {
+  background: #FFF4E5;
+  color: #8C5500;
+}
 
-.btn-aurora-chip-action { display: inline-flex; min-height: 44px; align-items: center; align-self: flex-start; gap: 8px; width: auto; margin-top: 12px; padding: 8px 16px; border: 0; border-radius: 10px; background: var(--aurora-purple); box-shadow: var(--aurora-shadow-chip); color: #FFFFFF !important; font-size: 14px; font-weight: 600; text-decoration: none; }
+.btn-aurora-chip-action {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  align-self: flex-start;
+  gap: 8px;
+  width: auto;
+  margin-top: 12px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--aurora-purple);
+  box-shadow: var(--aurora-shadow-chip);
+  color: #FFFFFF !important;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
 
 
-/* Mis preguntas: entrada clara y acciones compactas dentro de cada tarjeta. */
-.questions-page .question-form textarea,
-.questions-page .question-item textarea {
+/* === 03. Embarazo & Gestational Widget === */
+
+.pregnancy-page {
+  background-color: #FFF8F5;
+  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+}
+
+.pregnancy-page .section-intro {
+  margin-bottom: 30px;
+}
+
+.edit-panel summary {
+  color: var(--primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pregnancy-edit-link {
+  margin: 0 0 16px;
+}
+
+.pregnancy-edit-card {
+  margin-bottom: 16px;
+}
+
+.pregnancy-form-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pregnancy-header {
+  margin: 6px 0 22px;
+}
+
+.pregnancy-header__title {
+  margin: 0;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #2D1F3F;
+}
+
+.pregnancy-header__subtitle {
+  margin: 4px 0 0;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #5c5364;
+  line-height: 1.45;
+}
+
+.pregnancy-page .card-surface {
+  background: #FFFFFF;
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  padding: 20px;
+  margin-bottom: 18px;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.pregnancy-page .card-surface:hover {
+  border-color: rgba(108, 75, 163, 0.14);
+}
+
+.pregnancy-visual {
+  text-align: center;
+}
+
+.pregnancy-week-link {
+  border-radius: 50%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.pregnancy-week-link:focus-visible {
+  outline: 3px solid var(--aurora-purple);
+  outline-offset: 5px;
+}
+
+.gestational-ring-wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 4px auto 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gestational-ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gestational-ring__outer-trace {
+  fill: none;
+  stroke: rgba(167, 139, 214, 0.35);
+  stroke-width: 1.5;
+}
+
+.gestational-ring__track {
+  fill: none;
+  stroke: #F1ECF8;
+  stroke-width: 8;
+}
+
+.gestational-ring__progress {
+  fill: none;
+  stroke: url(#aurora-ring-grad);
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.6s ease-in-out;
+}
+
+.gestational-ring__inner-trace {
+  fill: none;
+  stroke: rgba(167, 139, 214, 0.25);
+  stroke-width: 1;
+}
+
+.gestational-ring__center {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.gestational-ring__week {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #2D1F3F;
+  letter-spacing: -0.015em;
+}
+
+.gestational-ring__badge {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 6px;
+  padding: 3px 12px;
+  border-radius: var(--radius-badge);
+  background: var(--aurora-lavender);
+  color: var(--color-text-main);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.gestational-analogy {
+  margin: 6px auto 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 10px;
+  background: var(--aurora-surface-soft);
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  color: #2D1F3F;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  box-shadow: none;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: none;
+}
+
+.gestational-analogy * {
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: none;
+}
+
+.gestational-progress-container {
+  margin-top: 10px;
+}
+
+.gestational-progress-container .progress-track {
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #F0EBF8;
+}
+
+.gestational-progress-container .progress-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #A78BD6, #6C4BA3);
+  transition: width 0.4s ease;
+}
+
+.gestational-progress-container .range-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  color: #5c5364;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--aurora-surface-soft);
+  border: 1px solid rgba(108, 75, 163, 0.05);
+}
+
+.status-row__icon {
+  color: #6C4BA3;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.status-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.status-row__text small {
+  color: #5c5364;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.status-row__text strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2D1F3F;
+}
+
+.birth-followup-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0 0 18px;
+  padding: 16px;
+  border: 1px solid var(--aurora-divider);
+  border-radius: 14px;
+  background: var(--aurora-surface-soft);
+  color: var(--color-text-main);
+}
+
+.birth-followup-card > .material-symbols-outlined {
+  color: var(--color-primary);
+  font-size: 24px;
+}
+
+.birth-followup-card strong {
+  display: block;
+  font-size: 15px;
+}
+
+.birth-followup-card p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.birth-followup-card--summary {
+  display: block;
+}
+
+.birth-followup-card--summary h2 {
+  margin: 0;
+  color: var(--color-text-main);
+  font-size: 20px;
+  line-height: 1.3;
+}
+
+.birth-followup-card--summary .birth-date-list {
+  margin: 14px 0;
+}
+
+.birth-followup-card--fecha_probable_alcanzada {
+  background: #fff8e7;
+  border-color: #f2d185;
+}
+
+.birth-followup-card--despues_fecha_probable {
+  background: #f4eefa;
+  border-color: #d8c9eb;
+}
+
+.birth-date-list {
+  display: grid;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.birth-date-list div {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--aurora-surface-soft);
+}
+
+.birth-date-list dt {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.birth-date-list dd {
+  margin: 2px 0 0;
+  font-weight: 600;
+}
+
+.birth-followup-note {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff8e7;
+  color: #654b13;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.birth-followup-note .material-symbols-outlined {
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+
+.birth-record-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.birth-form-card {
+  min-width: 0;
+}
+
+.birth-form {
+  min-width: 0;
+}
+
+.birth-form__date-input {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+}
+
+.pregnancy-page .button--primary,
+.button--tactile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  background: #6C4BA3;
+  color: #FFFFFF;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.pregnancy-page .button--primary:hover,
+.button--tactile:hover {
+  background: #553a86;
+}
+
+.pregnancy-page .button--primary:active,
+.button--tactile:active {
+  transform: scale(0.98);
+}
+
+.pregnancy-page .button--wide {
+  width: 100%;
+}
+
+@media (max-width: 360px) {
+  .home-shell .pregnancy-overview {
+    padding: 16px;
+  }
+
+  .gestational-ring-wrap {
+    width: 150px;
+    height: 150px;
+    margin-top: 2px;
+  }
+
+  .gestational-ring__week {
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+
+  .gestational-ring__badge {
+    max-width: 78%;
+    margin-top: 4px;
+    padding: 2px 7px;
+    border-radius: 8px;
+    font-size: 9px;
+    line-height: 1.25;
+    white-space: normal;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .gestational-analogy {
+    max-width: 100%;
+    padding: 5px 10px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+}
+
+@media (max-width: 320px) {
+  .gestational-ring-wrap {
+    width: 132px;
+    height: 132px;
+  }
+
+  .gestational-ring__week {
+    font-size: 16px;
+  }
+
+  .gestational-ring__badge {
+    max-width: 76%;
+    padding: 2px 6px;
+    font-size: 8px;
+  }
+
+  .gestational-analogy {
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+}
+
+
+/* === 04. Controles & Consulta === */
+
+.controls-page {
+  min-height: 100dvh;
+  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+  background-color: #FFF8F5;
+}
+
+.visit-card {
+  padding: 20px;
+  border: 1px solid #e7dcef;
+  border-radius: 24px;
+  background: linear-gradient(145deg, #fff 65%, var(--aurora-gradient-lilac));
+  box-shadow: var(--shadow);
+}
+
+.visit-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.visit-card__header h2 {
+  margin: 4px 0 0;
+  color: #2D1F3F;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.visit-date {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.visit-date strong {
+  color: #6C4BA3;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.visit-date span {
+  color: #5C5364;
+  font-size: 13px;
+}
+
+.visit-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 16px;
+  color: #5C5364;
+  font-size: 13px;
+}
+
+.visit-location .material-symbols-outlined {
+  font-size: 18px;
+  color: #8b496c;
+  flex-shrink: 0;
+}
+
+.visit-note {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+
+.visit-note label {
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.visit-note textarea {
   min-height: 90px;
+  background: #fff;
+}
+
+.visit-note .form-help {
+  margin: 6px 0 14px;
+  line-height: 1.5;
+}
+
+.visit-note .button {
+  font-size: 13px;
+}
+
+.visit-calendar {
+  margin-top: 14px;
+}
+
+.visit-empty {
+  margin: 12px 0 16px;
+  color: #5C5364;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.visit-share {
+  margin: 18px 0;
   padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.75);
+}
+
+.visit-share__notice {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.visit-share__label {
+  margin: 0 0 5px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.visit-share__details {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.7;
+  user-select: text;
+}
+
+.visit-share__actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.visit-share__actions [hidden] {
+  display: none;
+}
+
+.visit-share__actions button {
+  min-height: 48px;
+}
+
+.visit-share__copy {
+  width: 100%;
+  border: 1px solid var(--primary);
+  background: #fff;
+  color: var(--primary);
+}
+
+.visit-details h2 {
+  margin: 8px 0 16px;
+  color: var(--ink);
+  font-size: 22px;
+}
+
+.visit-details__list {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 8px 12px;
+  margin: 0 0 18px;
+}
+
+.visit-details__list dt {
+  color: var(--muted);
+}
+
+.visit-details__list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.visit-details-link,
+.visit-details__print {
+  width: 100%;
+  margin-top: 16px;
+  border: 1px solid var(--primary);
+  background: #fff;
+  color: var(--primary);
+}
+
+.visit-details__share h2 {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.visit-details__print {
+  margin-top: 0;
+}
+
+.controls-hero {
+  margin-bottom: 24px;
+}
+
+.controls-hero__header {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.controls-hero__title {
+  margin: 0 0 4px;
+  color: #2D1F3F;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.controls-hero__subtitle {
+  margin: 0;
+  color: #5C5364;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.controls-hero__add-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  align-self: flex-start;
+  min-height: 44px;
+  width: auto;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: #6C4BA3;
+  color: #FFF8F5 !important;
+  border: none;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(108, 75, 163, 0.18);
+  transition: all 0.18s ease;
+}
+
+.controls-hero__add-btn:hover {
+  background: #553A86;
+  color: #FFF8F5 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(108, 75, 163, 0.24);
+}
+
+.controls-hero__add-btn:active {
+  transform: scale(0.98);
+}
+
+.controls-hero__add-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.controls-section {
+  margin-bottom: 28px;
+}
+
+.controls-section h2 {
+  margin: 0 0 12px;
+  color: #2D1F3F;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.next-appointment-card {
+  position: relative;
+  background: #FFFFFF;
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: 0 4px 18px rgba(108, 75, 163, 0.06);
+}
+
+.next-appointment__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.next-appointment__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.next-appointment__top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.next-appointment__top-row--badge-only {
+  justify-content: flex-end;
+  margin-bottom: 6px;
+}
+
+.next-appointment__badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 8px;
+  background: var(--aurora-lavender);
+  color: #6C4BA3;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.next-appointment__date {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #2D1F3F;
+  line-height: 1.3;
+  margin-bottom: 8px;
+}
+
+.next-appointment__subtitle {
+  margin: 0 0 8px;
+  color: #5C5364;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.next-appointment__meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.next-appointment__meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #5C5364;
+  font-size: 13.5px;
+}
+
+.next-appointment__meta-item .material-symbols-outlined {
+  font-size: 18px;
+  color: #6C4BA3;
+  flex-shrink: 0;
+}
+
+.link-calendar {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 42px;
+  padding: 8px 4px;
+  color: #5C5364;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.link-calendar .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--aurora-text-faint);
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.link-calendar:hover {
+  color: #6C4BA3;
+}
+
+.link-calendar:hover .material-symbols-outlined {
+  color: #6C4BA3;
+  transform: translateX(2px);
+}
+
+.history-list {
+  display: grid;
+  gap: 12px;
+}
+
+.history-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 10px rgba(108, 75, 163, 0.04);
+  transition: all 0.15s ease;
+}
+
+.history-card:hover {
+  box-shadow: 0 4px 14px rgba(108, 75, 163, 0.08);
+}
+
+.history-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.history-card__type {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.history-card__type-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--aurora-surface-mist);
+  color: #6C4BA3;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.history-card__type-badge--ultrasonido {
+  background: #E8F4FD;
+  color: #1976D2;
+}
+
+.history-card__type-badge--laboratorio {
+  background: #FFF4E5;
+  color: #B26A00;
+}
+
+.history-card__num {
+  color: var(--aurora-text-faint);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.status-chip--realizado {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: var(--radius-badge);
+  background: #E8F5E9;
+  color: #2E7D32;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.history-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.history-card__detail {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #5C5364;
+  font-size: 13px;
+}
+
+.history-card__detail time {
+  font-weight: 600;
+  color: #2D1F3F;
+}
+
+.history-card__detail .material-symbols-outlined {
+  font-size: 16px;
+  color: var(--aurora-text-faint);
+  flex-shrink: 0;
+}
+
+.history-card__time {
+  color: var(--aurora-text-faint);
+  font-size: 13px;
+}
+
+.history-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-top: 10px;
+  border-top: 1px solid rgba(108, 75, 163, 0.06);
+}
+
+.history-card__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: #6C4BA3;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.history-card__link:hover {
+  background: var(--aurora-surface-mist);
+  color: #553A86;
+}
+
+.history-card__link .material-symbols-outlined {
+  font-size: 16px;
+  transition: transform 0.15s ease;
+}
+
+.history-card__link:hover .material-symbols-outlined {
+  transform: translateX(2px);
+}
+
+.empty-history-card {
+  text-align: center;
+  padding: 14px 16px;
+  background: #FFFFFF;
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  border-radius: 16px;
+}
+
+.empty-history-card__icon {
+  display: block;
+  margin: 0 auto 6px;
+  font-size: 28px;
+  color: #A78BD6;
+}
+
+.empty-history-card__title {
+  margin: 0 0 4px;
+  color: #2D1F3F;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.empty-history-card__text {
+  margin: 0;
+  color: #5C5364;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.control-form-page {
+  background-color: #FFF8F5;
+  padding-top: 16px;
+  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+.control-form-header {
+  margin-bottom: 20px;
+}
+
+.control-form-title {
+  margin: 0;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #2D1F3F;
+  line-height: 1.25;
+}
+
+.control-form-subtitle {
+  margin: 4px 0 0;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
+  color: #5C5364;
+  line-height: 1.4;
+}
+
+.control-card-form {
+  background: #FFFFFF;
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  border-radius: 14px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.control-badge-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--aurora-surface-soft);
+  border: 1px solid rgba(108, 75, 163, 0.10);
+}
+
+.control-badge-icon {
+  font-size: 22px;
+  color: #6C4BA3;
+  flex-shrink: 0;
+}
+
+.control-badge-text strong {
+  display: block;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
+  color: #2D1F3F;
+  font-weight: 600;
+}
+
+.control-badge-text small {
+  display: block;
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  color: #5C5364;
+  margin-top: 1px;
+}
+
+.control-type-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.control-type-option {
+  position: relative;
+  display: block;
+  cursor: pointer;
+  margin: 0;
+}
+
+.control-type-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.control-type-card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #FFFFFF;
+  border: 1px solid var(--aurora-divider);
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
+  min-height: 64px;
+}
+
+.control-type-option input[type="radio"]:checked + .control-type-card {
+  background: var(--aurora-surface-soft);
+  border-color: #6C4BA3;
+  box-shadow: 0 0 0 1px #6C4BA3;
+}
+
+.control-type-option:hover .control-type-card {
+  border-color: rgba(108, 75, 163, 0.4);
+}
+
+.control-type-icon {
+  font-size: 22px;
+  color: #6C4BA3;
+  margin-bottom: 2px;
+}
+
+.control-type-title {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D1F3F;
+}
+
+.control-type-desc {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  color: #5C5364;
+  line-height: 1.3;
+}
+
+.control-card-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.control-card-form .form-label {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #2D1F3F;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.control-card-form .form-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
   border: 1px solid var(--aurora-divider);
   border-radius: 12px;
   background: #FFFFFF;
   color: #2D1F3F;
-  font-family: 'Poppins', sans-serif;
-  font-size: 15px;
-}
-
-
-.questions-page .question-form textarea::placeholder,
-.questions-page .question-item textarea::placeholder { color: #6F6678; opacity: 1; }
-
-.questions-page .question-form textarea:focus,
-.questions-page .question-item textarea:focus { background: #FFFFFF; }
-
-
-.question-item__text {
+  font-family: 'Poppins', system-ui, sans-serif;
+  font-size: 14px;
   margin: 0;
-  color: #2D1F3F;
-  font-size: 15px;
-  font-weight: 500;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.control-card-form .form-input:focus {
+  border-color: #6C4BA3;
+  box-shadow: 0 0 0 3px rgba(108, 75, 163, 0.12);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.control-card-form .form-textarea {
+  min-height: 88px;
+  resize: vertical;
   line-height: 1.45;
+  padding: 12px 14px;
 }
 
-.question-edit-submit { width: auto; padding: 10px 16px; }
+#centro_atencion_input,
+.control-card-form input[list] {
+  padding-right: 38px;
+}
 
-.confirm-dialog{width:min(100% - 32px,360px);padding:24px;border:0;border-radius:20px;background:var(--white);color:var(--ink);box-shadow:var(--shadow)}
-
-.confirm-dialog::backdrop{background:rgba(26,28,28,.45)}
-
-.confirm-dialog h2{margin:0 0 8px;font-size:18px}
-
-.confirm-dialog p{margin:0 0 20px;color:var(--muted);font-size:14px;line-height:1.5}
-
-.confirm-dialog__actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
-
-.confirm-dialog__actions .button{width:auto;min-height:44px}
-
-.print-page{display:flex;min-height:100dvh;margin:0;padding:24px 16px;flex-direction:column;align-items:center;gap:20px;background:var(--page);color:var(--ink)}
-.print-sheet{width:100%;max-width:640px;padding:32px;border-radius:16px;background:var(--white);box-shadow:var(--shadow)}
-.print-sheet__title{margin:0 0 24px;color:var(--primary);font-size:24px;line-height:1.3}
-.print-sheet__details{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;margin:0 0 24px;padding:0}
-.print-sheet__details dt{color:var(--muted);font-size:13px;font-weight:500}
-.print-sheet__details dd{margin:0;color:var(--ink);font-size:15px}
-.print-sheet__note{padding-top:20px;border-top:1px solid var(--line)}
-.print-sheet__note h2{margin:0 0 10px;font-size:16px}
-.print-sheet__note-text{margin:0;font-size:15px;line-height:1.6;white-space:pre-wrap}
-.print-sheet__note-text--empty{color:var(--muted);font-style:italic}
-.print-page__actions{display:flex;width:100%;max-width:640px;flex-direction:column;gap:12px}
-.print-page__warning{margin:0;padding:12px 14px;border:1px solid #f2d185;border-radius:12px;background:#fff8e7;color:#654b13;font-size:13px;line-height:1.5}
-.print-page__actions .button{min-height:48px;gap:6px}
-.print-page__actions .text-link{justify-content:center}
-
-.visit-details h2{margin:8px 0 16px;color:var(--ink);font-size:22px}
-.visit-details__list{display:grid;grid-template-columns:72px minmax(0,1fr);gap:8px 12px;margin:0 0 18px}
-.visit-details__list dt{color:var(--muted)}
-.visit-details__list dd{margin:0;overflow-wrap:anywhere}
-.visit-details-link,.visit-details__print{width:100%;margin-top:16px;border:1px solid var(--primary);background:#fff;color:var(--primary)}
-.visit-details__share h2{margin:0 0 10px;color:var(--ink);font-size:17px}
-.visit-details__print{margin-top:0}
-.print-sheet__questions{margin:0;padding-left:22px}
-.print-sheet__questions li{margin:0 0 10px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
-
-/* ==========================================================================
-   Calendario: la agenda deja de ser texto suelto y pasa a tarjetas.
-   ========================================================================== */
-
-.calendar-page { padding-bottom: 112px; }
-
-
-.calendar-intro {
+.gestational-calc-note {
   display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  margin: 4px 0 20px;
-  padding: 14px 16px;
-  border-radius: 16px;
-  background: var(--aurora-gradient-lilac);
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--aurora-surface-soft);
+  border: 1px solid rgba(108, 75, 163, 0.08);
+  color: #2D1F3F;
+  font-size: 13px;
+  line-height: 1.4;
+  margin-top: -6px;
 }
 
-.calendar-intro .material-symbols-outlined { flex: 0 0 auto; color: var(--primary); font-size: 22px; }
+.gestational-calc-note .material-symbols-outlined {
+  font-size: 20px;
+  color: #6C4BA3;
+  flex-shrink: 0;
+}
 
-.calendar-intro p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.gestational-calc-note strong {
+  color: #6C4BA3;
+  font-weight: 600;
+}
 
+.control-card-form .form-help,
+.control-card-form .form-hint {
+  font-size: 13px;
+  color: #5C5364;
+  line-height: 1.35;
+  margin-top: 2px;
+  display: block;
+}
 
-.calendar-section { margin-top: 30px; }
-
-.calendar-section > h2 { margin: 0 0 14px; color: var(--ink); font-size: 18px; font-weight: 500; }
-
-
-.agenda { display: grid; gap: 12px; }
-
-.agenda-item { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: center; padding: 16px; }
-
-.agenda-item__icon { display: grid; width: 44px; height: 44px; place-items: center; border-radius: var(--radius-icon-box); background: var(--aurora-surface-lilac); color: var(--color-primary); }
-
-.agenda-item__icon--pink { background: var(--pink); color: var(--aurora-on-pink-strong); }
-
-.agenda-item__body { min-width: 0; }
-
-.agenda-item__body h3 { margin: 0; color: var(--ink); font-size: 15px; font-weight: 500; }
-
-.agenda-item__body p { display: flex; align-items: center; gap: 5px; margin: 3px 0 0; color: var(--muted); font-size: 13px; }
-
-.agenda-item__body .material-symbols-outlined { flex: 0 0 auto; font-size: 16px; }
-
-
-/* ==========================================================================
-   Plan de parto y emergencia comunitaria.
-   ========================================================================== */
-
-.birth-plan { padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)); }
-
-.birth-plan .section-intro { margin-bottom: 24px; }
+.control-card-form .form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
 
 
-.birth-plan-entry { margin-bottom: 16px; padding: 20px; }
+/* === 05. Plan de Parto & Red Comunitaria === */
 
-.birth-plan-entry h3 { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; color: var(--ink); font-size: 18px; font-weight: 500; }
+.birth-plan {
+  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+}
 
-.birth-plan-entry h3 .material-symbols-outlined { color: var(--secondary); }
+.birth-plan .section-intro {
+  margin-bottom: 24px;
+}
 
-.birth-plan-entry p { margin: 0 0 12px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+.birth-plan-entry {
+  margin-bottom: 16px;
+  padding: 20px;
+}
 
+.birth-plan-entry h3 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 500;
+}
 
-.birth-plan-reminder { display: grid; grid-template-columns: 40px 1fr 24px; align-items: center; gap: 12px; margin-top: 32px; padding: 16px; border-radius: 20px; background: var(--pink); box-shadow: var(--shadow); color: var(--aurora-on-pink-strong); }
+.birth-plan-entry h3 .material-symbols-outlined {
+  color: var(--secondary);
+}
 
-.birth-plan-reminder > .material-symbols-outlined { font-size: 26px; }
+.birth-plan-entry p {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
 
-.birth-plan-reminder span:nth-child(2) { display: flex; flex-direction: column; }
+.birth-plan-reminder {
+  display: grid;
+  grid-template-columns: 40px 1fr 24px;
+  align-items: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--pink);
+  box-shadow: var(--shadow);
+  color: var(--aurora-on-pink-strong);
+}
 
-.birth-plan-reminder strong { color: var(--ink); font-size: 16px; }
+.birth-plan-reminder > .material-symbols-outlined {
+  font-size: 26px;
+}
 
-.birth-plan-reminder small { margin-top: 2px; font-size: 14px; line-height: 1.4; }
+.birth-plan-reminder span:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+}
 
+.birth-plan-reminder strong {
+  color: var(--ink);
+  font-size: 16px;
+}
 
-.plan-summary { display: grid; gap: 0; }
+.birth-plan-reminder small {
+  margin-top: 2px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.birth-plan-reminder--coral {
+  border: 1px solid #f6c6cf;
+  background: #fff5f6;
+}
+
+.birth-plan-reminder--coral > .material-symbols-outlined {
+  color: var(--aurora-coral);
+}
+
+.plan-summary {
+  display: grid;
+  gap: 0;
+}
 
 .plan-summary-card,
 .plan-summary__card {
@@ -370,7 +2644,6 @@
   border-radius: 16px;
   box-shadow: 0 4px 16px rgba(108, 75, 163, 0.07);
 }
-
 
 .badge-tag {
   display: inline-flex;
@@ -384,13 +2657,16 @@
   white-space: nowrap;
 }
 
+.badge-familiar {
+  background: #FDE8EF;
+  color: #9C2754;
+}
 
-.badge-familiar { background: #FDE8EF; color: #9C2754; }
+.badge-transporte {
+  background: var(--aurora-lavender);
+  color: #512DA8;
+}
 
-.badge-transporte { background: var(--aurora-lavender); color: #512DA8; }
-
-
-/* Checklist de preparativos integrado y uniforme */
 .plan-checklist {
   margin: 14px 0 0;
   padding: 0;
@@ -399,7 +2675,6 @@
   flex-direction: column;
   gap: 8px;
 }
-
 
 .plan-checklist__item {
   display: flex;
@@ -410,25 +2685,21 @@
   line-height: 1.4;
 }
 
-
 .plan-checklist__item .check-icon {
   color: #6C4BA3;
   font-size: 20px;
   flex-shrink: 0;
 }
 
-
 .plan-checklist__item.is-pending {
   color: #5C5364;
 }
-
 
 .plan-card-notes {
   margin-top: 12px;
   padding-top: 10px;
   border-top: 1px solid rgba(108, 75, 163, 0.08);
 }
-
 
 .plan-card-notes__label {
   display: block;
@@ -438,7 +2709,6 @@
   margin-bottom: 2px;
 }
 
-
 .plan-card-notes__text {
   margin: 0;
   font-size: 13px;
@@ -446,9 +2716,11 @@
   line-height: 1.45;
 }
 
-
-/* Botones de acción al pie */
-.plan-actions { display: grid; gap: 12px; margin-top: 24px; }
+.plan-actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
 
 .plan-actions .button--primary {
   min-height: 48px;
@@ -485,23 +2757,49 @@
   border-color: rgba(108, 75, 163, 0.38);
 }
 
+.plan-form {
+  padding: 20px;
+}
 
-.plan-form { padding: 20px; }
+.plan-form fieldset {
+  margin: 0 0 22px;
+  padding: 0;
+  border: 0;
+}
 
-.plan-form fieldset { margin: 0 0 22px; padding: 0; border: 0; }
+.plan-form legend {
+  margin-bottom: 12px;
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 600;
+}
 
-.plan-form legend { margin-bottom: 12px; color: var(--primary); font-size: 15px; font-weight: 600; }
+.plan-form label {
+  color: var(--ink);
+  font-size: 14px;
+}
 
-.plan-form label { color: var(--ink); font-size: 14px; }
+.plan-form .form-help {
+  margin: 4px 0 14px;
+}
 
-.plan-form .form-help { margin: 4px 0 14px; }
+.plan-form .checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 0 12px;
+  line-height: 1.45;
+}
 
-.plan-form .checkbox-row { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 12px; line-height: 1.45; }
+.plan-form .checkbox-row input {
+  width: auto;
+  margin: 4px 0 0;
+}
 
-.plan-form .checkbox-row input { width: auto; margin: 4px 0 0; }
-
-.plan-form__actions { display: grid; gap: 12px; }
-
+.plan-form__actions {
+  display: grid;
+  gap: 12px;
+}
 
 .plan-form--editor {
   padding: 18px;
@@ -511,18 +2809,19 @@
   box-shadow: 0 4px 18px rgba(108, 75, 163, 0.08);
 }
 
-
 .plan-form--editor .plan-form__section {
   margin: 0;
   padding: 18px 0;
   border-bottom: 1px solid var(--aurora-surface-tint);
 }
 
+.plan-form--editor .plan-form__section:first-of-type {
+  padding-top: 2px;
+}
 
-.plan-form--editor .plan-form__section:first-of-type { padding-top: 2px; }
-
-.plan-form--editor .plan-form__section:last-of-type { border-bottom: 0; }
-
+.plan-form--editor .plan-form__section:last-of-type {
+  border-bottom: 0;
+}
 
 .plan-form--editor legend {
   display: flex;
@@ -533,7 +2832,6 @@
   font-size: 16px;
   font-weight: 600;
 }
-
 
 .plan-form__icon {
   display: inline-flex;
@@ -547,7 +2845,6 @@
   font-size: 20px;
 }
 
-
 .plan-form--editor label:not(.checkbox-row) {
   display: block;
   margin-bottom: 14px;
@@ -557,9 +2854,9 @@
   line-height: 1.4;
 }
 
-
-.plan-form--editor label:not(.checkbox-row):last-child { margin-bottom: 0; }
-
+.plan-form--editor label:not(.checkbox-row):last-child {
+  margin-bottom: 0;
+}
 
 .plan-form--editor input:not([type="checkbox"]),
 .plan-form--editor select,
@@ -576,19 +2873,16 @@
   box-shadow: 0 2px 8px rgba(108, 75, 163, 0.04);
 }
 
-
 .plan-form--editor select {
   min-height: 48px;
   appearance: auto;
 }
-
 
 .plan-form--editor textarea {
   min-height: 104px;
   resize: vertical;
   line-height: 1.5;
 }
-
 
 .plan-form--editor input:not([type="checkbox"]):focus,
 .plan-form--editor select:focus,
@@ -599,7 +2893,6 @@
   outline: 2px solid var(--primary);
   outline-offset: 2px;
 }
-
 
 .plan-form--editor .checkbox-row {
   min-height: 44px;
@@ -613,12 +2906,17 @@
   font-size: 13px;
 }
 
+.plan-form--editor .checkbox-row input {
+  accent-color: #6C4BA3;
+}
 
-.plan-form--editor .checkbox-row input { accent-color: #6C4BA3; }
+.plan-form--editor .plan-form__actions {
+  margin-top: 18px;
+}
 
-.plan-form--editor .plan-form__actions { margin-top: 18px; }
-
-.plan-form--editor .plan-form__actions .button { border-radius: 12px; }
+.plan-form--editor .plan-form__actions .button {
+  border-radius: 12px;
+}
 
 .plan-form--editor .select-helper-contacto {
   min-height: 44px;
@@ -636,38 +2934,18 @@
   background: #FFFFFF;
 }
 
-
-.plan-emergency-card { border: 3px solid var(--primary); }
-
-.plan-emergency-card .print-sheet__title { margin-bottom: 18px; }
-
-.plan-emergency-card .print-sheet__details dd { font-size: 16px; }
-
-.plan-emergency-card .print-sheet__note h2 { color: var(--primary); }
-
-.plan-emergency-card .print-sheet__questions li { font-size: 15px; line-height: 1.5; }
-
-
-/* ==========================================================================
-   Red de apoyo comunitario - Refactor UI/UX Accesible
-   ========================================================================== */
-
 .community-page {
   padding-bottom: 120px;
   background-color: #FFF8F5;
 }
 
-
-/* 1. Limpieza y Compactación de la Cabecera */
 .community-header {
   margin-bottom: 20px;
 }
 
-
 .community-header__text {
   margin-bottom: 14px;
 }
-
 
 .community-header__title {
   margin: 0 0 6px;
@@ -678,7 +2956,6 @@
   line-height: 1.25;
 }
 
-
 .community-header__subtitle {
   margin: 0;
   color: #5C5364;
@@ -686,8 +2963,6 @@
   line-height: 1.45;
 }
 
-
-/* Botón superior compacto secundario */
 .add-contact-btn {
   display: inline-flex;
   align-items: center;
@@ -707,23 +2982,19 @@
   transition: all 0.18s ease;
 }
 
-
 .add-contact-btn:hover {
   background: var(--aurora-surface-mist);
   border-color: #553A86;
   color: #553A86 !important;
 }
 
-
 .add-contact-btn:active {
   transform: scale(0.98);
 }
 
-
 .add-contact-btn .material-symbols-outlined {
   font-size: 20px;
 }
-
 
 .add-contact-btn--empty {
   display: inline-flex;
@@ -743,24 +3014,19 @@
   transition: all 0.18s ease;
 }
 
-
 .add-contact-btn--empty:hover {
   background: #553A86;
   color: #FFF8F5 !important;
 }
 
-
 .community-section {
   margin-top: 14px;
 }
 
-
-/* 2. Rediseño de las Tarjetas de Contacto */
 .contact-list {
   display: grid;
   gap: 14px;
 }
-
 
 .contact-card {
   background: #FFFFFF;
@@ -771,11 +3037,9 @@
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-
 .contact-card:hover {
   box-shadow: 0 6px 18px rgba(108, 75, 163, 0.07);
 }
-
 
 .contact-card__header {
   display: flex;
@@ -784,7 +3048,6 @@
   gap: 10px;
   margin-bottom: 6px;
 }
-
 
 .contact-card__name {
   margin: 0;
@@ -795,8 +3058,6 @@
   line-height: 1.35;
 }
 
-
-/* Badge de rol/categoría alineado a la derecha, Lavanda suave #EDE7F6 y texto en #2D1F3F */
 .role-badge {
   display: inline-flex;
   align-items: center;
@@ -813,8 +3074,6 @@
   flex-shrink: 0;
 }
 
-
-/* Ubicación: icono con texto en 14px (#5C5364) */
 .contact-location {
   display: flex;
   align-items: center;
@@ -824,15 +3083,12 @@
   font-size: 14px;
 }
 
-
 .contact-location .material-symbols-outlined {
   font-size: 18px;
   color: var(--aurora-text-faint);
   flex-shrink: 0;
 }
 
-
-/* Notas de apoyo: párrafo tipográfico regular sin fondos artificiales de formulario */
 .contact-notes {
   margin: 8px 0 0;
   padding: 0;
@@ -843,12 +3099,9 @@
   line-height: 1.4;
 }
 
-
-/* 3. Botón de Llamada Rápida (Ergonomía de emergencia) */
 .contact-card__call-wrap {
   margin-top: 14px;
 }
-
 
 .contact-meta {
   display: flex;
@@ -859,8 +3112,6 @@
   font-size: 13px;
 }
 
-
-/* 4. Fila Inferior de Gestión con separador sutil 1px solid #F0EBF4 */
 .contact-card__actions {
   display: flex;
   align-items: center;
@@ -871,11 +3122,9 @@
   border-top: 1px solid var(--aurora-surface-tint);
 }
 
-
 .contact-card__actions form {
   margin: 0;
 }
-
 
 .contact-action-link {
   display: inline-flex;
@@ -893,11 +3142,9 @@
   transition: all 0.15s ease;
 }
 
-
 .contact-action-link--edit {
   color: #6C4BA3;
 }
-
 
 .contact-action-link--edit .material-symbols-outlined {
   font-size: 18px;
@@ -905,26 +3152,21 @@
   transition: transform 0.15s ease;
 }
 
-
 .contact-action-link--edit:hover {
   color: #553A86;
 }
-
 
 .contact-action-link--edit:hover .material-symbols-outlined {
   transform: translateX(2px);
 }
 
-
 .contact-action-link--delete {
   color: #6F6678;
 }
 
-
 .contact-action-link--delete:hover {
   color: var(--aurora-error-text);
 }
-
 
 .community-empty {
   text-align: center;
@@ -934,13 +3176,11 @@
   background: #FFFFFF;
 }
 
-
 .community-empty .empty-icon {
   font-size: 42px;
   color: #A78BD6;
   margin-bottom: 10px;
 }
-
 
 .community-empty h3 {
   margin: 0 0 6px;
@@ -948,7 +3188,6 @@
   font-size: 17px;
   font-weight: 600;
 }
-
 
 .community-empty p {
   margin: 0 0 18px;
@@ -958,438 +3197,7 @@
 }
 
 
-/* ==========================================================================
-   Mis Controles - Refactor UI/UX Historial y Citas
-   ========================================================================== */
-
-.controls-hero {
-  margin-bottom: 24px;
-}
-
-
-.controls-hero__header {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-
-.controls-hero__title {
-  margin: 0 0 4px;
-  color: #2D1F3F;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.25;
-}
-
-
-.controls-hero__subtitle {
-  margin: 0;
-  color: #5C5364;
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-
-/* 1. Botón Principal Superior: + Registrar nuevo control (contenido, no bloque) */
-.controls-hero__add-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  align-self: flex-start;
-  min-height: 44px;
-  width: auto;
-  padding: 10px 20px;
-  border-radius: 12px;
-  background: #6C4BA3;
-  color: #FFF8F5 !important;
-  border: none;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 4px 14px rgba(108, 75, 163, 0.18);
-  transition: all 0.18s ease;
-}
-
-
-.controls-hero__add-btn:hover {
-  background: #553A86;
-  color: #FFF8F5 !important;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(108, 75, 163, 0.24);
-}
-
-
-.controls-hero__add-btn:active {
-  transform: scale(0.98);
-}
-
-
-.controls-hero__add-btn .material-symbols-outlined {
-  font-size: 20px;
-}
-
-
-.controls-section {
-  margin-bottom: 28px;
-}
-
-
-.controls-section h2 {
-  margin: 0 0 12px;
-  color: #2D1F3F;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-
-/* 2. Tarjeta: Próximo Control */
-.next-appointment-card {
-  position: relative;
-  background: #FFFFFF;
-  border: 1px solid rgba(108, 75, 163, 0.08);
-  border-radius: 20px;
-  padding: 20px 22px;
-  box-shadow: 0 4px 18px rgba(108, 75, 163, 0.06);
-}
-
-
-.next-appointment__main {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-
-.next-appointment__info {
-  flex: 1;
-  min-width: 0;
-}
-
-
-.next-appointment__top-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 4px;
-}
-
-
-.next-appointment__top-row--badge-only {
-  justify-content: flex-end;
-  margin-bottom: 6px;
-}
-
-
-/* Badge integrado en la tarjeta: esquina superior derecha, fondo Lavanda suave #EDE7F6 */
-.next-appointment__badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 8px;
-  background: var(--aurora-lavender);
-  color: #6C4BA3;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-}
-
-
-.next-appointment__date {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-weight: 600;
-  font-size: 18px;
-  color: #2D1F3F;
-  line-height: 1.3;
-  margin-bottom: 8px;
-}
-
-
-.next-appointment__subtitle {
-  margin: 0 0 8px;
-  color: #5C5364;
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-
-.next-appointment__meta-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-
-.next-appointment__meta-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #5C5364;
-  font-size: 13.5px;
-}
-
-
-.next-appointment__meta-item .material-symbols-outlined {
-  font-size: 18px;
-  color: #6C4BA3;
-  flex-shrink: 0;
-}
-
-
-.link-calendar {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 42px;
-  padding: 8px 4px;
-  color: #5C5364;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.15s ease;
-}
-
-
-.link-calendar .material-symbols-outlined {
-  font-size: 16px;
-  color: var(--aurora-text-faint);
-  transition: transform 0.15s ease, color 0.15s ease;
-}
-
-
-.link-calendar:hover {
-  color: #6C4BA3;
-}
-
-
-.link-calendar:hover .material-symbols-outlined {
-  color: #6C4BA3;
-  transform: translateX(2px);
-}
-
-
-/* 3. Sección Controles Anteriores: Lista de tarjetas compactas */
-.history-list {
-  display: grid;
-  gap: 12px;
-}
-
-
-.history-card {
-  background: #FFFFFF;
-  border: 1px solid rgba(108, 75, 163, 0.08);
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 2px 10px rgba(108, 75, 163, 0.04);
-  transition: all 0.15s ease;
-}
-
-
-.history-card:hover {
-  box-shadow: 0 4px 14px rgba(108, 75, 163, 0.08);
-}
-
-
-.history-card__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-
-.history-card__type {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-
-.history-card__type-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 8px;
-  border-radius: 6px;
-  background: var(--aurora-surface-mist);
-  color: #6C4BA3;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-
-.history-card__type-badge--ultrasonido {
-  background: #E8F4FD;
-  color: #1976D2;
-}
-
-
-.history-card__type-badge--laboratorio {
-  background: #FFF4E5;
-  color: #B26A00;
-}
-
-
-.history-card__num {
-  color: var(--aurora-text-faint);
-  font-size: 13px;
-  font-weight: 500;
-}
-
-
-.status-chip--realizado {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: var(--radius-badge);
-  background: #E8F5E9;
-  color: #2E7D32;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-
-
-.history-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 10px;
-}
-
-
-.history-card__detail {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #5C5364;
-  font-size: 13px;
-}
-
-
-.history-card__detail time {
-  font-weight: 600;
-  color: #2D1F3F;
-}
-
-
-.history-card__detail .material-symbols-outlined {
-  font-size: 16px;
-  color: var(--aurora-text-faint);
-  flex-shrink: 0;
-}
-
-
-.history-card__time {
-  color: var(--aurora-text-faint);
-  font-size: 13px;
-}
-
-
-.history-card__footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding-top: 10px;
-  border-top: 1px solid rgba(108, 75, 163, 0.06);
-}
-
-
-.history-card__link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 44px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  color: #6C4BA3;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.15s ease;
-}
-
-
-.history-card__link:hover {
-  background: var(--aurora-surface-mist);
-  color: #553A86;
-}
-
-
-.history-card__link .material-symbols-outlined {
-  font-size: 16px;
-  transition: transform 0.15s ease;
-}
-
-
-.history-card__link:hover .material-symbols-outlined {
-  transform: translateX(2px);
-}
-
-
-/* Empty State Controles Anteriores: sobrio y compacto en fondo blanco con borde tenue de 1px */
-.empty-history-card {
-  text-align: center;
-  padding: 14px 16px;
-  background: #FFFFFF;
-  border: 1px solid rgba(108, 75, 163, 0.08);
-  border-radius: 16px;
-}
-
-
-.empty-history-card__icon {
-  display: block;
-  margin: 0 auto 6px;
-  font-size: 28px;
-  color: #A78BD6;
-}
-
-
-.empty-history-card__title {
-  margin: 0 0 4px;
-  color: #2D1F3F;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-
-.empty-history-card__text {
-  margin: 0;
-  color: #5C5364;
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-
-/* ==========================================================================
-   Ajustes pontuales: estados dehover, variante coral y listas de fuentes.
-   ========================================================================== */
-
-.home-action:hover,
-.alert-banner:hover { box-shadow: 0 8px 24px rgba(108, 75, 163, .16); }
-
-.home-action:active { transform: translateY(1px); }
-
-
-.birth-plan-reminder--coral { border: 1px solid #f6c6cf; background: #fff5f6; }
-
-.birth-plan-reminder--coral > .material-symbols-outlined { color: var(--aurora-coral); }
-
+/* === 06. Preguntas & Calendario === */
 
 .questions-lead {
   display: flex;
@@ -1401,29 +3209,177 @@
   background: var(--aurora-gradient-lilac);
 }
 
-.questions-lead .material-symbols-outlined { flex: 0 0 auto; color: var(--primary); font-size: 22px; }
+.questions-lead .material-symbols-outlined {
+  flex: 0 0 auto;
+  color: var(--primary);
+  font-size: 22px;
+}
 
-.questions-lead p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.questions-lead p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
 
+.questions-page .question-form textarea,
+.questions-page .question-item textarea {
+  min-height: 90px;
+  padding: 14px;
+  border: 1px solid var(--aurora-divider);
+  border-radius: 12px;
+  background: #FFFFFF;
+  color: #2D1F3F;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+}
 
-.draft-badge { display: block; margin-top: 8px; }
+.questions-page .question-form textarea::placeholder,
+.questions-page .question-item textarea::placeholder {
+  color: #6F6678;
+  opacity: 1;
+}
 
+.questions-page .question-form textarea:focus,
+.questions-page .question-item textarea:focus {
+  background: #FFFFFF;
+}
+
+.question-item__text {
+  margin: 0;
+  color: #2D1F3F;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.question-edit-submit {
+  width: auto;
+  padding: 10px 16px;
+}
 
 @media (max-width: 350px) {
-  .question-actions { flex-direction: column; align-items: stretch; }
+  .question-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .question-actions .button,
   .question-actions form,
   .question-edit summary,
-  .question-delete summary { width: 100%; justify-content: center; }
+  .question-delete summary {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+.calendar-page {
+  padding-bottom: 112px;
+}
+
+.calendar-intro {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 4px 0 20px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--aurora-gradient-lilac);
+}
+
+.calendar-intro .material-symbols-outlined {
+  flex: 0 0 auto;
+  color: var(--primary);
+  font-size: 22px;
+}
+
+.calendar-intro p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.calendar-section {
+  margin-top: 30px;
+}
+
+.calendar-section > h2 {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.agenda {
+  display: grid;
+  gap: 12px;
+}
+
+.agenda-item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+}
+
+.agenda-item__icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: var(--radius-icon-box);
+  background: var(--aurora-surface-lilac);
+  color: var(--color-primary);
+}
+
+.agenda-item__icon--pink {
+  background: var(--pink);
+  color: var(--aurora-on-pink-strong);
+}
+
+.agenda-item__body {
+  min-width: 0;
+}
+
+.agenda-item__body h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.agenda-item__body p {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.agenda-item__body .material-symbols-outlined {
+  flex: 0 0 auto;
+  font-size: 16px;
 }
 
 
-/* ==========================================================================
-   Orientación prenatal (guía rediseñada).
-   ========================================================================== */
+/* === 07. Guía & Directorio de Centros === */
 
-.orient-page { padding-bottom: 112px; }
+.guide-recommended {
+  margin-top: 32px;
+}
 
+.guide-recommended h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.orient-page {
+  padding-bottom: 112px;
+}
 
 .orient-search {
   position: relative;
@@ -1457,7 +3413,6 @@
   box-shadow: 0 0 0 3px var(--primary-light);
 }
 
-
 .orient-chips {
   display: flex;
   gap: 8px;
@@ -1471,9 +3426,14 @@
   mask-image: linear-gradient(90deg, #000 calc(100% - 26px), transparent);
 }
 
-.orient-chips::-webkit-scrollbar { height: 3px; }
-.orient-chips::-webkit-scrollbar-thumb { background: var(--aurora-divider); border-radius: 99px; }
+.orient-chips::-webkit-scrollbar {
+  height: 3px;
+}
 
+.orient-chips::-webkit-scrollbar-thumb {
+  background: var(--aurora-divider);
+  border-radius: 99px;
+}
 
 .orient-chip {
   flex: 0 0 auto;
@@ -1493,7 +3453,9 @@
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.orient-chip .material-symbols-outlined { font-size: 16px; }
+.orient-chip .material-symbols-outlined {
+  font-size: 16px;
+}
 
 .orient-chip.is-active {
   background: var(--primary);
@@ -1515,7 +3477,9 @@
   background: var(--aurora-coral);
 }
 
-.orient-chip--warn.is-active::after { background: #fff; }
+.orient-chip--warn.is-active::after {
+  background: #fff;
+}
 
 .orient-chip--cat {
   padding: 3px 10px;
@@ -1526,7 +3490,6 @@
   font-size: 13px;
   cursor: default;
 }
-
 
 .orient-stage {
   display: flex;
@@ -1545,17 +3508,14 @@
   font-size: 22px;
 }
 
-
-.orient-list { display: grid; gap: 14px; }
-
+.orient-list {
+  display: grid;
+  gap: 14px;
+}
 
 .orient-card {
   border-radius: 16px;
   overflow: hidden;
-}
-
-.orient-card--draft {
-  border-left: 3px solid var(--sunrise);
 }
 
 .orient-card__toggle {
@@ -1620,14 +3580,12 @@
   transform: rotate(180deg);
 }
 
-
 .orient-intro {
   margin: -14px 0 20px;
   color: var(--muted);
   font-size: 14px;
   line-height: 1.45;
 }
-
 
 .orient-card__body {
   padding: 0 16px 16px;
@@ -1640,11 +3598,6 @@
   white-space: pre-line;
 }
 
-.orient-card__draft-badge {
-  display: block;
-  margin: 12px 0 4px;
-}
-
 .orient-card__link {
   display: inline-flex;
   align-items: center;
@@ -1655,11 +3608,13 @@
   font-weight: 500;
 }
 
-.orient-card__link .material-symbols-outlined { font-size: 16px; }
+.orient-card__link .material-symbols-outlined {
+  font-size: 16px;
+}
 
-
-.orient-card[hidden] { display: none; }
-
+.orient-card[hidden] {
+  display: none;
+}
 
 .orient-no-results {
   display: flex;
@@ -1713,7 +3668,6 @@
   font-size: 20px;
 }
 
-
 .orient-footer {
   margin-top: 24px;
   padding: 14px 0 4px;
@@ -1728,13 +3682,9 @@
   text-align: center;
 }
 
-
-/* ==========================================================================
-   Directorio de centros de salud (estilo sobrio Aurora).
-   ========================================================================== */
-
-.centros-page { padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)); }
-
+.centros-page {
+  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+}
 
 .centros-notice {
   display: flex;
@@ -1775,7 +3725,6 @@
   text-underline-offset: 2px;
 }
 
-
 .centros-search {
   position: relative;
   margin: 0 0 12px;
@@ -1811,14 +3760,12 @@
   box-shadow: 0 0 0 3px rgba(108, 75, 163, 0.12);
 }
 
-
 .centros-filters {
   display: flex;
   flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
 }
-
 
 .centros-depto-wrapper {
   position: relative;
@@ -1866,7 +3813,6 @@
   box-shadow: 0 0 0 3px rgba(108, 75, 163, 0.12);
 }
 
-
 .centros-chips {
   display: flex;
   gap: 8px;
@@ -1878,9 +3824,14 @@
   margin-right: -24px;
 }
 
-.centros-chips::-webkit-scrollbar { height: 3px; }
-.centros-chips::-webkit-scrollbar-thumb { background: var(--aurora-divider); border-radius: 99px; }
+.centros-chips::-webkit-scrollbar {
+  height: 3px;
+}
 
+.centros-chips::-webkit-scrollbar-thumb {
+  background: var(--aurora-divider);
+  border-radius: 99px;
+}
 
 .centros-chip {
   flex: 0 0 auto;
@@ -1920,14 +3871,12 @@
   color: #fff;
 }
 
-
 .centros-list {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   width: 100%;
 }
-
 
 .centro-card {
   background: var(--white);
@@ -1953,7 +3902,6 @@
   display: none !important;
 }
 
-
 .centro-card__category {
   display: block;
   font-size: 13px;
@@ -1963,6 +3911,19 @@
   margin-bottom: 6px;
 }
 
+.aurora-page-container .centro-card__category.aurora-badge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 4px 10px;
+  border-radius: var(--aurora-radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: normal;
+  word-break: break-word;
+}
 
 .centro-card__title {
   font-size: 17px;
@@ -1973,7 +3934,6 @@
   min-width: 0;
   overflow-wrap: anywhere;
 }
-
 
 .centro-card__location {
   display: flex;
@@ -1995,7 +3955,6 @@
   color: var(--outline);
   flex: 0 0 auto;
 }
-
 
 .centro-card__link {
   display: inline-flex;
@@ -2031,769 +3990,85 @@
   border-radius: 4px;
 }
 
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   VISTA MI EMBARAZO: DISEÑO CANÓNICO AURORA (SOBRIO, HUMANO Y ACCESIBLE)
-   ══════════════════════════════════════════════════════════════════════════════ */
-
-.pregnancy-page {
-  background-color: #FFF8F5;
-  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
+.centro-detail-card {
+  margin-bottom: 24px;
 }
 
-
-/* FASE 1: Cabecera limpia y navegación sin flecha redundante */
-.pregnancy-header {
-  margin: 6px 0 22px;
+.centro-detail-card__badge-wrap {
+  margin-bottom: 16px;
 }
 
+.centro-detail-card__badge {
+  text-transform: capitalize;
+}
 
-.pregnancy-header__title {
-  margin: 0;
-  font-family: 'Poppins', system-ui, sans-serif;
+.centro-detail-card__title {
+  margin-top: 0;
   font-size: 22px;
-  font-weight: 600;
-  line-height: 1.25;
-  color: #2D1F3F;
+  line-height: 1.3;
 }
 
-
-.pregnancy-header__subtitle {
-  margin: 4px 0 0;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 400;
-  color: #5c5364;
-  line-height: 1.45;
+.centro-detail-card__location {
+  margin-bottom: 20px;
 }
 
-
-/* FASE 4: Tarjetas con estética sobria y controlada (igual que Centros/Inicio) */
-.pregnancy-page .card-surface {
-  background: #FFFFFF;
-  border: 1px solid rgba(108, 75, 163, 0.08);
-  border-radius: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-  padding: 20px;
-  margin-bottom: 18px;
-  transition: box-shadow 0.15s, border-color 0.15s;
-}
-
-
-.pregnancy-page .card-surface:hover {
-  border-color: rgba(108, 75, 163, 0.14);
-}
-
-
-/* FASE 2: Widget Gestacional Canónico con Anillo SVG de Doble Trazo */
-.pregnancy-visual {
-  text-align: center;
-}
-
-.pregnancy-week-link {
-  border-radius: 50%;
-  color: inherit;
-  text-decoration: none;
-}
-
-.pregnancy-week-link:focus-visible {
-  outline: 3px solid var(--aurora-purple);
-  outline-offset: 5px;
-}
-
-
-.gestational-ring-wrap {
-  position: relative;
-  width: 180px;
-  height: 180px;
-  margin: 4px auto 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-.gestational-ring {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-
-.gestational-ring__outer-trace {
-  fill: none;
-  stroke: rgba(167, 139, 214, 0.35);
-  stroke-width: 1.5;
-}
-
-
-.gestational-ring__track {
-  fill: none;
-  stroke: #F1ECF8;
-  stroke-width: 8;
-}
-
-
-.gestational-ring__progress {
-  fill: none;
-  stroke: url(#aurora-ring-grad);
-  stroke-width: 8;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 0.6s ease-in-out;
-}
-
-
-.gestational-ring__inner-trace {
-  fill: none;
-  stroke: rgba(167, 139, 214, 0.25);
-  stroke-width: 1;
-}
-
-
-.gestational-ring__center {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-
-.gestational-ring__week {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 28px;
-  font-weight: 700;
-  line-height: 1.15;
-  color: #2D1F3F;
-  letter-spacing: -0.015em;
-}
-
-
-.gestational-ring__badge {
-  display: inline-flex;
-  align-items: center;
-  margin-top: 6px;
-  padding: 3px 12px;
-  border-radius: var(--radius-badge);
-  background: var(--aurora-lavender);
-  color: var(--color-text-main);
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-
-/* Analogía cálida de tamaño */
-.gestational-analogy {
-  margin: 6px auto 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 6px 14px;
-  border-radius: 10px;
-  background: var(--aurora-surface-soft);
-  border: 1px solid rgba(108, 75, 163, 0.08);
-  color: #2D1F3F;
-  font-size: 13px;
-  font-weight: 500;
-  text-align: center;
-  appearance: none;
-  -webkit-appearance: none;
-  outline: none;
-  box-shadow: none;
-  cursor: default;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
-  pointer-events: none;
-}
-
-
-.gestational-analogy * {
-  cursor: default;
-  user-select: none;
-  -webkit-user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
-  pointer-events: none;
-}
-
-
-/* Escala estándar de 40 semanas */
-.gestational-progress-container {
-  margin-top: 10px;
-}
-
-
-.gestational-progress-container .progress-track {
-  width: 100%;
-  height: 6px;
-  overflow: hidden;
-  border-radius: 99px;
-  background: #F0EBF8;
-}
-
-
-.gestational-progress-container .progress-track > span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, #A78BD6, #6C4BA3);
-  transition: width 0.4s ease;
-}
-
-
-.gestational-progress-container .range-labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 6px;
-  color: #5c5364;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-
-.status-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-
-.status-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: var(--aurora-surface-soft);
-  border: 1px solid rgba(108, 75, 163, 0.05);
-}
-
-
-.status-row__icon {
-  color: #6C4BA3;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-
-.status-row__text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-
-.status-row__text small {
-  color: #5c5364;
-  font-size: 14px;
-  font-weight: 400;
-}
-
-
-.status-row__text strong {
-  font-size: 14px;
-  font-weight: 600;
-  color: #2D1F3F;
-}
-
-.birth-followup-card{display:flex;align-items:flex-start;gap:12px;margin:0 0 18px;padding:16px;border:1px solid var(--aurora-divider);border-radius:14px;background:var(--aurora-surface-soft);color:var(--color-text-main)}
-.birth-followup-card>.material-symbols-outlined{color:var(--color-primary);font-size:24px}
-.birth-followup-card strong{display:block;font-size:15px}
-.birth-followup-card p{margin:4px 0 0;font-size:13px;line-height:1.5}
-.birth-followup-card--summary{display:block}
-.birth-followup-card--summary h2{margin:0;color:var(--color-text-main);font-size:20px;line-height:1.3}
-.birth-followup-card--summary .birth-date-list{margin:14px 0}
-.birth-followup-card--fecha_probable_alcanzada{background:#fff8e7;border-color:#f2d185}
-.birth-followup-card--despues_fecha_probable{background:#f4eefa;border-color:#d8c9eb}
-.birth-date-list{display:grid;gap:12px;margin:16px 0}
-.birth-date-list div{padding:10px 12px;border-radius:10px;background:var(--aurora-surface-soft)}
-.birth-date-list dt{color:var(--color-text-muted);font-size:13px}
-.birth-date-list dd{margin:2px 0 0;font-weight:600}
-.birth-followup-note{display:flex;gap:8px;margin:12px 0;padding:10px 12px;border-radius:10px;background:#fff8e7;color:#654b13;font-size:13px;line-height:1.45}
-.birth-followup-note .material-symbols-outlined{font-size:18px;flex:0 0 auto}
-.birth-record-card{display:flex;flex-direction:column;gap:14px}
-.birth-form-card{min-width:0}
-.birth-form{min-width:0}
-.birth-form__date-input{box-sizing:border-box;display:block;width:100%;min-width:0;min-height:48px}
-
-
-/* FASE 4: Botones con eliminación de Pill Overload (12px radius, min 48px height) */
-.pregnancy-page .button--primary,
-.button--tactile {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 48px;
-  padding: 12px 20px;
-  border-radius: 12px;
-  background: #6C4BA3;
-  color: #FFFFFF;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  text-decoration: none;
-  border: 0;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
-}
-
-
-.pregnancy-page .button--primary:hover,
-.button--tactile:hover {
-  background: #553a86;
-}
-
-
-.pregnancy-page .button--primary:active,
-.button--tactile:active {
-  transform: scale(0.98);
-}
-
-
-.pregnancy-page .button--wide {
-  width: 100%;
-}
-
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   PANTALLA DE INICIO (HOME): DISEÑO CANÓNICO AURORA
-   ══════════════════════════════════════════════════════════════════════════════ */
-
-.home-shell {
-  padding-top: 20px;
-  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
-  background-color: #FFF8F5;
-}
-
-
-.home-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 44px;
-  margin-bottom: 4px;
-}
-
-.home-header a {
-  display: grid;
-  width: 44px;
-  height: 44px;
-  margin-left: -6px;
-  place-items: center;
-}
-
-
-.home-intro {
-  margin: 4px 0 16px;
-}
-
-
-.home-intro h1 {
-  margin: 0;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  line-height: 1.25;
-  color: #2D1F3F;
-}
-
-
-.home-intro p {
-  margin: 4px 0 0;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 14px;
-  color: #5C5364;
-  line-height: 1.4;
-}
-
-
-/* 2. Homogeneización de Tarjetas en Inicio */
-.home-shell .card-surface,
-.home-shell .pregnancy-overview,
-.home-shell .visit-card,
-.home-shell .shortcut-card,
-.home-shell .birth-plan-reminder,
-.home-shell .home-guide {
-  background: #FFFFFF;
-  border: 1px solid rgba(108, 75, 163, 0.08);
-  border-radius: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-  transition: box-shadow 0.15s, border-color 0.15s;
-}
-
-
-.home-shell .card-surface:hover,
-.home-shell .shortcut-card:hover {
-  border-color: rgba(108, 75, 163, 0.16);
-}
-
-
-/* 1. Widget Gestacional en Inicio */
-.home-shell .pregnancy-overview {
-  position: relative;
-  overflow: hidden;
-  margin-top: 8px;
-  margin-bottom: 18px;
-  padding: 16px;
-  text-align: center;
-}
-
-/* El héroe de Inicio no debe empujar la acción principal bajo la barra:
-   en Inicio el anillo se reduce y se oculta la barra lineal (duplica el anillo) */
-.home-shell .gestational-ring-wrap {
-  width: 128px;
-  height: 128px;
-  margin: 2px auto 10px;
-}
-
-.home-shell .gestational-ring__week {
-  font-size: 22px;
-}
-
-/* La barra lineal solo repite el anillo: se oculta visualmente pero se conserva
-   el role="progressbar" para lectores de pantalla */
-.home-shell .gestational-progress-container {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-}
-
-
-/* Tarjeta: Tu Próximo Paso */
-.home-shell .visit-card {
-  padding: 20px;
-  margin-bottom: 18px;
-  background: #FFFFFF;
-}
-
-
-.visit-card__header {
-  display: flex;
+.centro-detail-card__meta {
   align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-
-.visit-card__header h2 {
-  margin: 4px 0 0;
-  color: #2D1F3F;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
-
-.visit-date {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 14px;
-}
-
-
-.visit-date strong {
-  color: #6C4BA3;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-
-.visit-date span {
-  color: #5C5364;
-  font-size: 13px;
-}
-
-
-.visit-location {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 8px 0 16px;
-  color: #5C5364;
-  font-size: 13px;
-}
-
-
-.visit-location .material-symbols-outlined {
-  font-size: 18px;
-  color: #8b496c;
-  flex-shrink: 0;
-}
-
-
-.visit-empty {
-  margin: 12px 0 16px;
-  color: #5C5364;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-
-/* Recordatorio Plan de Parto (Trimester 3) */
-.home-shell .birth-plan-reminder {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  margin-bottom: 18px;
-  text-decoration: none;
-  min-height: 48px;
-  color: inherit;
-}
-
-
-.birth-plan-reminder__text {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-
-.birth-plan-reminder__text strong {
-  font-size: 14px;
-  font-weight: 600;
-  color: #2D1F3F;
-}
-
-
-.birth-plan-reminder__text small {
-  font-size: 14px;
-  color: #5C5364;
-  line-height: 1.35;
-}
-
-
-.birth-plan-reminder .chevron {
-  font-size: 18px;
-  color: #8b496c;
-}
-
-
-/* 3. Cuadrícula Compacta de Accesos Directos (2 Columnas) */
-.home-shortcuts {
-  margin-bottom: 18px;
-}
-
-
-.home-shortcuts-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-
-.shortcut-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 14px;
-  min-height: 104px;
-  text-decoration: none;
-}
-
-
-.home-shell .shortcut-card--alert,
-.home-shortcuts-grid .shortcut-card:last-child:nth-child(even) {
-  grid-column: 1 / -1;
-}
-
-.home-shell .shortcut-card--alert {
-  background: var(--pink);
-  border-color: var(--aurora-coral);
-}
-
-
-.home-shell .visit-card--soon {
-  border-color: var(--aurora-purple);
-}
-
-
-.shortcut-card__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-
-.shortcut-card .chevron {
-  font-size: 16px;
-  color: #8b496c;
-  transition: transform 0.15s;
-}
-
-
-.shortcut-card:hover .chevron {
-  transform: translateX(2px);
-  color: #6C4BA3;
-}
-
-
-.shortcut-card__body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-
-.shortcut-card__body strong {
-  font-size: 13px;
-  font-weight: 600;
-  color: #2D1F3F;
-  line-height: 1.3;
-}
-
-
-.shortcut-card__body span {
-  font-size: 13px;
-  color: #5C5364;
-  line-height: 1.3;
-}
-
-
-/* Iconos de atajos con toques suaves de color (Rosa solo en badge/icono pequeño) */
-.shortcut-icon {
-  display: grid;
-  width: 36px;
-  height: 36px;
-  place-items: center;
-  border-radius: 10px;
-  flex-shrink: 0;
-}
-
-
-.shortcut-icon .material-symbols-outlined {
-  font-size: 20px;
-}
-
-
-.shortcut-icon--warn {
-  background: #FFF0F5;
-  color: var(--aurora-danger);
-}
-
-
-.shortcut-icon--support {
-  background: #F1ECF8;
-  color: #6C4BA3;
-}
-
-
-.shortcut-icon--questions {
-  background: #F6F0FC;
-  color: #553A86;
-}
-
-
-.shortcut-icon--guide {
-  background: #F0EBF8;
-  color: #6C4BA3;
-}
-
-
-/* 4. Sección Guía en Inicio */
-.home-shell .home-guide {
-  padding: 20px;
-  margin-bottom: 18px;
-}
-
-
-.home-guide__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   margin-bottom: 12px;
 }
 
-
-.home-guide__header h2 {
-  margin: 0;
-  font-size: 17px;
-  font-weight: 600;
-  color: #2D1F3F;
+.centro-detail-card__meta--spaced {
+  margin-bottom: 20px;
 }
 
-
-.home-guide__link {
-  color: #6C4BA3;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
+.centro-detail-card__meta .material-symbols-outlined {
+  margin-top: 2px;
 }
 
-
-.feature-article {
-  padding-top: 4px;
+.centro-detail-card__meta span:last-child {
+  color: var(--ink);
 }
 
-
-.feature-article h3 {
-  margin: 0 0 6px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #2D1F3F;
-  line-height: 1.4;
-}
-
-
-.feature-article p {
-  margin: 0 0 10px;
-  font-size: 13px;
-  color: #5C5364;
-  line-height: 1.45;
-}
-
-
-.feature-article__link {
-  display: inline-flex;
-  align-items: center;
-  color: #6C4BA3;
-  font-size: 13px;
-  font-weight: 500;
-  text-decoration: none;
-}
-
-
-/* 5. Footer PWA / Nota sin conexión */
-.offline-note {
+.centro-detail-card__actions {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  margin: 32px auto 16px;
-  padding: 0 12px;
-  color: #5C5364;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.centro-detail-card__map {
+  margin-top: 24px;
+}
+
+.centro-detail-card__map--compact {
+  margin-top: 12px;
+}
+
+.centro-services-heading {
+  margin-bottom: 12px;
+}
+
+.centro-services-card {
+  padding: 20px;
+}
+
+.centro-services-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.centro-service-tag {
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  color: var(--ink);
   font-size: 13px;
-  line-height: 1.5;
-  text-align: center;
+  font-weight: 500;
 }
 
 
-.offline-note .material-symbols-outlined {
-  font-size: 16px;
-  color: #8b496c;
-  flex-shrink: 0;
-}
-
-
-/* ══════════════════════════════════════════════════════════════════════════════
-   PANTALLA DE PERFIL (PROFILE): DISEÑO CANÓNICO AURORA
-   ══════════════════════════════════════════════════════════════════════════════ */
+/* === 08. Perfil === */
 
 .profile-page {
   background-color: #FFF8F5;
@@ -2801,13 +4076,10 @@
   padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px));
 }
 
-
-/* 1. Cabecera y Avatar Centrado */
 .profile-header {
   text-align: center;
   margin: 8px 0 24px;
 }
-
 
 .profile-avatar {
   display: grid;
@@ -2821,14 +4093,12 @@
   box-shadow: 0 4px 14px rgba(248, 168, 193, 0.35);
 }
 
-
 .profile-avatar span {
   font-family: 'Poppins', system-ui, sans-serif;
   font-size: 32px;
   font-weight: 600;
   line-height: 1;
 }
-
 
 .profile-name {
   margin: 0;
@@ -2839,7 +4109,6 @@
   color: #2D1F3F;
 }
 
-
 .profile-email {
   margin: 4px 0 0;
   font-family: 'Poppins', system-ui, sans-serif;
@@ -2848,8 +4117,6 @@
   color: #5C5364;
 }
 
-
-/* 2. Tarjetas de Perfil y Ajustes (Grouped Lists) */
 .profile-card {
   margin-top: 0;
   margin-bottom: 18px;
@@ -2861,7 +4128,6 @@
   overflow: hidden;
 }
 
-
 .profile-card__header {
   display: flex;
   align-items: center;
@@ -2869,7 +4135,6 @@
   padding: 16px 18px 12px;
   border-bottom: 1px solid var(--aurora-surface-tint);
 }
-
 
 .profile-card__title {
   margin: 0;
@@ -2879,13 +4144,10 @@
   color: #2D1F3F;
 }
 
-
 .profile-card__body {
   padding: 4px 18px;
 }
 
-
-/* Filas informativas de la Ficha */
 .profile-info-row {
   display: grid;
   grid-template-columns: 24px 1fr auto;
@@ -2896,11 +4158,9 @@
   border-bottom: 1px solid var(--aurora-surface-soft);
 }
 
-
 .profile-info-row:last-child {
   border-bottom: none;
 }
-
 
 .profile-row__icon {
   font-size: 22px;
@@ -2908,11 +4168,9 @@
   flex-shrink: 0;
 }
 
-
 .profile-row__icon--emergency {
   color: var(--aurora-danger);
 }
-
 
 .profile-row__label {
   font-size: 14px;
@@ -2920,14 +4178,12 @@
   color: #5C5364;
 }
 
-
 .profile-row__value {
   font-size: 14px;
   font-weight: 600;
   color: #2D1F3F;
   text-align: right;
 }
-
 
 .profile-row__link {
   font-size: 14px;
@@ -2937,12 +4193,9 @@
   text-align: right;
 }
 
-
-/* Acción unificada de edición al pie de la Ficha */
 .profile-card__drawer {
   border-top: 1px solid var(--aurora-surface-tint);
 }
-
 
 .profile-card__trigger {
   display: flex;
@@ -2958,17 +4211,14 @@
   transition: background 0.15s, color 0.15s;
 }
 
-
 .profile-card__trigger::-webkit-details-marker {
   display: none;
 }
-
 
 .profile-card__trigger:hover {
   background: var(--aurora-surface-soft);
   color: #553A86;
 }
-
 
 .profile-card__trigger .chevron {
   font-size: 18px;
@@ -2976,11 +4226,9 @@
   transition: transform 0.2s;
 }
 
-
 .profile-card__drawer[open] .profile-card__trigger .chevron {
   transform: rotate(90deg);
 }
-
 
 .profile-card__drawer-content {
   padding: 16px 18px 20px;
@@ -2988,6 +4236,9 @@
   border-top: 1px solid rgba(108, 75, 163, 0.06);
 }
 
+.profile-form-submit {
+  margin-top: 16px;
+}
 
 .settings-row__badge {
   font-size: 13px;
@@ -2996,8 +4247,6 @@
   margin-right: 4px;
 }
 
-
-/* 4. Botón de Cerrar Sesión Ergonómico y Seguro */
 .profile-logout-wrap {
   margin: 32px 0 16px;
   display: flex;
@@ -3005,516 +4254,318 @@
 }
 
 
-/* ══════════════════════════════════════════════════════════════════════════════
-   FORMULARIO DE CONTROL PRENATAL (NUEVO / EDITAR): DISEÑO CANÓNICO AURORA
-   ══════════════════════════════════════════════════════════════════════════════ */
+/* === 09. Panel Administrativo === */
 
-.control-form-page {
-  background-color: #FFF8F5;
-  padding-top: 16px;
-  padding-bottom: calc(130px + env(safe-area-inset-bottom, 0px)) !important;
-}
-
-
-.control-form-header {
-  margin-bottom: 20px;
-}
-
-
-.control-form-title {
-  margin: 0;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 22px;
-  font-weight: 600;
-  color: #2D1F3F;
-  line-height: 1.25;
-}
-
-
-.control-form-subtitle {
-  margin: 4px 0 0;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 14px;
-  color: #5C5364;
-  line-height: 1.4;
-}
-
-
-/* Tarjeta Principal del Formulario */
-.control-card-form {
-  background: #FFFFFF;
-  border: 1px solid rgba(108, 75, 163, 0.08);
-  border-radius: 14px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
-  padding: 22px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  margin-bottom: 20px;
-}
-
-
-/* 3.1 Badge Informativo del Número de Control */
-.control-badge-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: var(--aurora-surface-soft);
-  border: 1px solid rgba(108, 75, 163, 0.10);
-}
-
-
-.control-badge-icon {
-  font-size: 22px;
-  color: #6C4BA3;
-  flex-shrink: 0;
-}
-
-
-.control-badge-text strong {
-  display: block;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 14px;
-  color: #2D1F3F;
-  font-weight: 600;
-}
-
-
-.control-badge-text small {
-  display: block;
-  font-family: 'Poppins', system-ui, sans-serif;
+.chip {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: var(--radius-badge);
+  background: var(--color-care-pink);
+  color: var(--color-text-main);
   font-size: 13px;
-  color: #5C5364;
-  margin-top: 1px;
 }
 
+.chip--soft {
+  background: var(--soft);
+  color: var(--primary);
+}
 
-.control-type-grid {
+.chip--bold {
+  font-weight: 700;
+}
+
+.filters {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 12px;
 }
 
-
-@media (min-width: 360px) {
-  .control-type-grid {
-    grid-template-columns: 1fr;
-  }
+.admin-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px 16px 48px;
+  min-height: 100dvh;
 }
 
-
-.control-type-option {
-  position: relative;
-  display: block;
-  cursor: pointer;
-  margin: 0;
-}
-
-
-.control-type-option input[type="radio"] {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-  pointer-events: none;
-}
-
-
-.control-type-card {
+.admin-topbar {
   display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: #FFFFFF;
-  border: 1px solid var(--aurora-divider);
-  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
-  min-height: 64px;
-}
-
-
-.control-type-option input[type="radio"]:checked + .control-type-card {
-  background: var(--aurora-surface-soft);
-  border-color: #6C4BA3;
-  box-shadow: 0 0 0 1px #6C4BA3;
-}
-
-
-.control-type-option:hover .control-type-card {
-  border-color: rgba(108, 75, 163, 0.4);
-}
-
-
-.control-type-icon {
-  font-size: 22px;
-  color: #6C4BA3;
-  margin-bottom: 2px;
-}
-
-
-.control-type-title {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: #2D1F3F;
-}
-
-
-.control-type-desc {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 13px;
-  color: #5C5364;
-  line-height: 1.3;
-}
-
-
-/* Grupos y Etiquetas */
-.control-card-form .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 0;
-}
-
-
-.control-card-form .form-label {
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  color: #2D1F3F;
-  margin: 0;
-  display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: var(--white);
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
 }
 
-
-/* 2. Inputs de Diseño Aurora (Fondo blanco, borde sutil, foco morado) */
-.control-card-form .form-input {
-  width: 100%;
-  min-height: 48px;
-  padding: 10px 14px;
-  border: 1px solid var(--aurora-divider);
-  border-radius: 12px;
-  background: #FFFFFF;
-  color: #2D1F3F;
-  font-family: 'Poppins', system-ui, sans-serif;
-  font-size: 14px;
-  margin: 0;
-  transition: border-color 0.15s, box-shadow 0.15s;
-  -webkit-appearance: none;
-  appearance: none;
-}
-
-
-.control-card-form .form-input:focus {
-  border-color: #6C4BA3;
-  box-shadow: 0 0 0 3px rgba(108, 75, 163, 0.12);
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
-}
-
-
-.control-card-form .form-textarea {
-  min-height: 88px;
-  resize: vertical;
-  line-height: 1.45;
-  padding: 12px 14px;
-}
-
-
-#centro_atencion_input,
-.control-card-form input[list] {
-  padding-right: 38px;
-}
-
-
-/* 3.2 Nota reactiva de edad gestacional */
-.gestational-calc-note {
+.admin-topbar__brand {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: var(--aurora-surface-soft);
-  border: 1px solid rgba(108, 75, 163, 0.08);
-  color: #2D1F3F;
+  color: var(--primary);
+}
+
+.admin-topbar__brand strong {
+  font-size: 18px;
+}
+
+.admin-badge {
   font-size: 13px;
-  line-height: 1.4;
-  margin-top: -6px;
-}
-
-
-.gestational-calc-note .material-symbols-outlined {
-  font-size: 20px;
-  color: #6C4BA3;
-  flex-shrink: 0;
-}
-
-
-.gestational-calc-note strong {
-  color: #6C4BA3;
+  padding: 2px 8px;
+  background: var(--aurora-lavender);
+  color: var(--color-text-main);
+  border-radius: var(--radius-badge);
   font-weight: 600;
 }
 
-
-/* Textos de ayuda */
-.control-card-form .form-help,
-.control-card-form .form-hint {
+.admin-topbar__user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 13px;
-  color: #5C5364;
-  line-height: 1.35;
-  margin-top: 2px;
-  display: block;
+  color: var(--muted);
 }
 
+.admin-logout-btn {
+  background: none;
+  border: none;
+  color: var(--secondary);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  padding: 4px;
+  border-radius: 8px;
+}
 
-/* 5. Jerarquía de Acciones al Pie */
-.control-card-form .form-actions {
+.admin-logout-btn:hover {
+  background: var(--soft);
+}
+
+.admin-nav {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.admin-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border-radius: 14px;
+  background: var(--white);
+  color: var(--muted);
+  box-shadow: var(--shadow);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.admin-nav-link:hover,
+.admin-nav-link.is-active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.admin-welcome {
+  margin-bottom: 24px;
+}
+
+.admin-welcome h1 {
+  margin: 0 0 4px;
+  font-size: 24px;
+}
+
+.admin-welcome p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.admin-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.metric-card {
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 8px;
+  gap: 6px;
 }
 
-
-/* Rejilla de accesos de Inicio: los márgenes de tarjeta los da el grid. */
-.home-shortcuts-grid .aurora-card { margin-bottom: 0; }
-
-
-.aurora-page-container .centro-card__category.aurora-badge {
-  display: inline-flex;
+.metric-card__header {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  align-self: flex-start;
-  max-width: 100%;
-  padding: 4px 10px;
-  border-radius: var(--aurora-radius-sm);
+}
+
+.metric-icon {
+  font-size: 28px;
+  color: var(--primary);
+  background: var(--soft);
+  padding: 8px;
+  border-radius: 12px;
+}
+
+.metric-icon--pink {
+  color: var(--secondary);
+  background: var(--pink);
+}
+
+.metric-count {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.metric-card h3 {
+  margin: 4px 0 0;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.metric-card p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.admin-section {
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.admin-section h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.admin-table-container {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-table th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.admin-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.admin-page-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+}
+
+.admin-page-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.admin-filter-card {
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+
+.admin-filter-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.admin-cell-desc {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.admin-cell-desc--accent {
+  color: var(--aurora-on-pink);
+  font-weight: 500;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: var(--radius-badge);
   font-size: 13px;
   font-weight: 600;
-  line-height: 1.35;
-  white-space: normal;
-  word-break: break-word;
 }
 
-
-/* ==========================================================================
-   Responsive: widget gestacional de Inicio en viewports pequeños.
-   Soluciona overflow causado por anillo fijo de 180px y tipografía grande.
-   ========================================================================== */
-@media (max-width: 360px) {
-  .home-shell .pregnancy-overview { padding: 16px; }
-
-  .gestational-ring-wrap {
-    width: 150px;
-    height: 150px;
-    margin-top: 2px;
-  }
-
-  .gestational-ring__week {
-    font-size: 18px;
-    letter-spacing: -0.02em;
-  }
-
-  .gestational-ring__badge {
-    max-width: 78%;
-    margin-top: 4px;
-    padding: 2px 7px;
-    border-radius: 8px;
-    font-size: 9px;
-    line-height: 1.25;
-    white-space: normal;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .gestational-analogy {
-    max-width: 100%;
-    padding: 5px 10px;
-    font-size: 13px;
-    line-height: 1.4;
-  }
+.status-badge--success {
+  background: #d4edda;
+  color: var(--aurora-success-text);
 }
 
-
-@media (max-width: 320px) {
-  .gestational-ring-wrap {
-    width: 132px;
-    height: 132px;
-  }
-
-  .gestational-ring__week {
-    font-size: 16px;
-  }
-
-  .gestational-ring__badge {
-    max-width: 76%;
-    padding: 2px 6px;
-    font-size: 8px;
-  }
-
-  .gestational-analogy {
-    padding: 4px 8px;
-    font-size: 13px;
-  }
+.status-badge--warning {
+  background: #fff3cd;
+  color: #856404;
 }
 
-
-/* Toasts flash (mejora progresiva: sin JS se ven inline como siempre) */
-.toast{position:fixed;z-index:41;left:50%;bottom:calc(94px + env(safe-area-inset-bottom));transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;width:min(calc(100% - 24px),390px);animation:toast-in .25s ease}
-
-.toast .flash{margin:0;padding:10px 40px 10px 14px;border-radius:14px;box-shadow:var(--shadow)}
-
-.toast__close{position:absolute;top:6px;right:6px;width:32px;height:32px;padding:0;border:0;border-radius:50%;background:var(--primary);color:#fff;font-size:16px;line-height:1;cursor:pointer}
-
-@media (prefers-reduced-motion:reduce){.toast{animation:none}}
-
-/* Public landing page */
-.public-home {
-  position: relative;
-  isolation: isolate;
-  min-height: 100dvh;
-  overflow: hidden;
-  background:
-    radial-gradient(ellipse at 82% 12%, rgba(237, 231, 246, .82), transparent 26rem),
-    linear-gradient(180deg, #fffaf7 0%, var(--color-bg-app) 100%);
-}
-
-.public-home__container {
-  width: min(100% - 48px, 1120px);
-  margin: 0 auto;
-}
-
-.public-home__header {
+.admin-row-actions {
   display: flex;
-  min-height: 82px;
   align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(108, 75, 163, .12);
+  gap: 6px;
 }
 
-.public-home__brand,
-.public-home__nav,
-.public-home__about-link,
-.public-home__download-link {
-  display: inline-flex;
-  align-items: center;
-}
-
-.public-home__brand { gap: 10px; color: var(--ink); font-size: 19px; font-weight: 700; }
-.public-home__brand img { display: block; width: 42px; height: 42px; border-radius: 13px; }
-.public-home__nav { gap: 26px; }
-.public-home__about-link { min-height: 44px; color: var(--muted); font-size: 14px; }
-.public-home__download-link { min-height: 44px; gap: 5px; color: var(--primary); font-size: 14px; font-weight: 600; }
-.public-home__download-link .material-symbols-outlined { font-size: 18px; }
-.public-home__about-link:hover,
-.public-home__download-link:hover,
-.public-home__login-link:hover,
-.public-home__footer a:hover { color: var(--primary); text-decoration: underline; text-underline-offset: 4px; }
-.public-home__signin { min-height: 44px; }
-
-.public-home__hero {
+.admin-action-btn {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(360px, .92fr);
-  align-items: center;
-  gap: clamp(42px, 7vw, 92px);
-  padding: clamp(58px, 8vw, 96px) 0 86px;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  min-width: 44px;
+  min-height: 44px;
+  border: none;
+  border-radius: 8px;
+  background: var(--soft);
+  color: var(--primary);
+  cursor:pointer;
+  transition: all 0.2s;
 }
 
-.public-home__copy { min-width: 0; }
-.public-home__eyebrow { display: flex; align-items: center; gap: 9px; margin: 0 0 19px; color: var(--primary); font-size: 13px; font-weight: 600; }
-.public-home__eyebrow > span { width: 9px; height: 9px; border-radius: 50%; background: var(--color-coral); box-shadow: 0 0 0 5px rgba(255, 143, 159, .17); }
-.public-home__copy h1 { max-width: 20ch; margin: 0; color: var(--ink); font-size: clamp(2.55rem, 4.5vw, 3.75rem); font-weight: 600; line-height: 1.06; letter-spacing: -.045em; text-wrap: balance; }
-.public-home__copy h1 span { color: var(--primary); }
-.public-home__lead { max-width: 54ch; margin: 22px 0 0; color: var(--muted); font-size: 17px; line-height: 1.7; }
-.public-home__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; margin-top: 30px; }
-.public-home__primary-action { min-height: 52px; padding-inline: 22px; box-shadow: var(--shadow-btn-primary); }
-.public-home__primary-action .material-symbols-outlined { font-size: 19px; transition: transform .18s ease; }
-.public-home__primary-action:hover { box-shadow: 0 7px 18px rgba(108, 75, 163, .25); transform: translateY(-1px); }
-.public-home__primary-action:hover .material-symbols-outlined { transform: translateX(3px); }
-.public-home__download-action { min-height: 52px; padding-inline: 18px; }
-.public-home__download-action .material-symbols-outlined { font-size: 19px; }
-.public-home__login-link { display: inline-flex; min-height: 44px; align-items: center; color: var(--muted); font-size: 14px; font-weight: 500; }
-.public-home__download-note { display: flex; max-width: 55ch; align-items: flex-start; gap: 8px; margin: 16px 0 0; color: #5c5364; font-size: 13px; line-height: 1.5; }
-.public-home__download-note .material-symbols-outlined { flex: 0 0 auto; color: var(--primary); font-size: 18px; }
-.public-home__demo-note { display: flex; max-width: 52ch; align-items: flex-start; gap: 8px; margin: 22px 0 0; color: #5c5364; font-size: 13px; line-height: 1.5; }
-.public-home__demo-note .material-symbols-outlined { flex: 0 0 auto; color: var(--primary); font-size: 18px; }
-
-.public-home__preview { position: relative; min-width: 0; padding: 22px; border: 1px solid rgba(108, 75, 163, .1); border-radius: 28px; background: linear-gradient(145deg, #f2ebfa, #fff0ed); box-shadow: 0 24px 60px rgba(55, 30, 80, .11); }
-.public-home__preview-glow { position: absolute; top: -24px; right: -18px; z-index: -1; width: 104px; height: 104px; border-radius: 50%; background: rgba(255, 213, 158, .72); filter: blur(1px); }
-.public-home__preview-card { position: relative; padding: 25px; border: 1px solid rgba(108, 75, 163, .08); border-radius: 20px; background: rgba(255, 255, 255, .96); box-shadow: 0 10px 28px rgba(55, 30, 80, .07); }
-.public-home__preview-header { display: flex; align-items: center; justify-content: space-between; }
-.public-home__preview-label { color: var(--muted); font-size: 12px; font-weight: 500; }
-.public-home__preview-mark { display: flex; gap: 4px; }
-.public-home__preview-mark span { width: 6px; height: 6px; border-radius: 50%; background: #d8c9e9; }
-.public-home__preview-card h2 { margin: 10px 0 21px; color: var(--ink); font-size: 21px; font-weight: 600; line-height: 1.3; letter-spacing: -.02em; }
-.public-home__preview-row { display: grid; grid-template-columns: 42px minmax(0, 1fr) 20px; align-items: center; gap: 12px; padding: 14px 0; border-top: 1px solid #f0ebf4; }
-.public-home__preview-icon { display: grid; width: 42px; height: 42px; place-items: center; border-radius: 13px; font-size: 21px; }
-.public-home__preview-icon--lavender { background: #f0eafa; color: var(--primary); }
-.public-home__preview-icon--peach { background: #fff0e3; color: #a76a24; }
-.public-home__preview-row > span:nth-child(2) { display: grid; min-width: 0; gap: 3px; }
-.public-home__preview-row strong { color: var(--ink); font-size: 14px; font-weight: 600; }
-.public-home__preview-row small { color: var(--muted); font-size: 12px; line-height: 1.4; }
-.public-home__preview-check { color: #6b9b75; font-size: 19px; }
-.public-home__preview-foot { display: flex; align-items: center; gap: 7px; margin-top: 13px; padding: 13px 14px; border-radius: 12px; background: #fbf7fc; color: var(--muted); font-size: 12px; }
-.public-home__preview-foot .material-symbols-outlined { color: #c66b87; font-size: 17px; }
-.public-home__preview-caption { display: block; margin: 12px 0 0; color: #62586d; font-size: 11px; text-align: center; }
-
-.public-home__features { padding: 0 0 64px; }
-.public-home__section-heading { margin-bottom: 22px; }
-.public-home__section-heading .public-home__eyebrow { margin-bottom: 8px; }
-.public-home__section-heading h2 { margin: 0; color: var(--ink); font-size: clamp(1.65rem, 3vw, 2.1rem); font-weight: 600; line-height: 1.2; letter-spacing: -.03em; text-wrap: balance; }
-.public-home__feature-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 15px; }
-.public-home__feature { min-width: 0; min-height: 194px; padding: 21px; border: 1px solid rgba(108, 75, 163, .1); border-radius: var(--radius-card); background: rgba(255, 255, 255, .87); box-shadow: 0 7px 22px rgba(55, 30, 80, .045); }
-.public-home__feature-icon { display: grid; width: 43px; height: 43px; place-items: center; border-radius: 13px; font-size: 22px; }
-.public-home__feature-icon--lavender { background: #f0eafa; color: var(--primary); }
-.public-home__feature-icon--peach { background: #fff0e3; color: #a76a24; }
-.public-home__feature-icon--pink { background: #fde9ee; color: #9a4860; }
-.public-home__feature-icon--green { background: #e9f3eb; color: #477552; }
-.public-home__feature h3 { margin: 15px 0 6px; color: var(--ink); font-size: 15px; font-weight: 600; line-height: 1.35; }
-.public-home__feature p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
-
-.public-home__safety { display: flex; align-items: flex-start; gap: 13px; margin-bottom: 24px; padding: 17px 20px; border: 1px solid #f0dfc2; border-radius: 16px; background: #fff8e9; color: #51453a; }
-.public-home__safety > .material-symbols-outlined { flex: 0 0 auto; color: #8a6515; font-size: 22px; }
-.public-home__safety p { margin: 0; font-size: 13px; line-height: 1.6; }
-.public-home__safety strong { color: #382d25; }
-.public-home__footer { display: flex; min-height: 60px; align-items: center; justify-content: space-between; gap: 16px; border-top: 1px solid rgba(108, 75, 163, .12); color: var(--muted); font-size: 12px; }
-.public-home__footer a { min-height: 44px; display: inline-flex; align-items: center; color: var(--primary); font-weight: 500; }
-
-@media (max-width: 900px) {
-  .public-home__hero { grid-template-columns: minmax(0, 1fr) minmax(300px, .9fr); gap: 34px; }
-  .public-home__feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.admin-action-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary);
 }
 
-@media (max-width: 680px) {
-  .public-home__container { width: min(100% - 36px, 520px); }
-  .public-home__header { min-height: 72px; }
-  .public-home__about-link { display: none; }
-  .public-home__hero { grid-template-columns: 1fr; gap: 32px; padding: 52px 0 58px; }
-  .public-home__copy h1 { max-width: 14ch; font-size: clamp(2.45rem, 10vw, 3.4rem); }
-  .public-home__lead { margin-top: 17px; font-size: 16px; }
-  .public-home__preview { width: min(100%, 460px); justify-self: center; }
-  .public-home__features { padding-bottom: 44px; }
-  .public-home__feature { min-height: 180px; padding: 18px; }
+.admin-action-btn--danger {
+  color: var(--aurora-error-text);
 }
 
-@media (max-width: 420px) {
-  .public-home__container { width: min(100% - 32px, 520px); }
-  .public-home__header { min-height: 68px; }
-  .public-home__brand { font-size: 17px; }
-  .public-home__brand img { width: 38px; height: 38px; }
-  .public-home__hero { padding-top: 40px; }
-  .public-home__actions { display: grid; gap: 8px; margin-top: 24px; }
-  .public-home__primary-action { width: 100%; }
-  .public-home__download-action { width: 100%; }
-  .public-home__login-link { justify-content: center; }
-  .public-home__preview { padding: 14px; border-radius: 22px; }
-  .public-home__preview-card { padding: 19px; }
-  .public-home__preview-row { grid-template-columns: 38px minmax(0, 1fr) 18px; gap: 9px; }
-  .public-home__preview-icon { width: 38px; height: 38px; }
-  .public-home__feature-grid { grid-template-columns: 1fr; }
-  .public-home__feature { min-height: 0; }
-  .public-home__footer { align-items: flex-start; flex-direction: column; justify-content: center; gap: 0; padding: 12px 0; }
+.admin-action-btn--danger:hover {
+  background: var(--aurora-error-bg);
+  color: var(--aurora-error-text);
 }

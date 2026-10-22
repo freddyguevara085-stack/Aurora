@@ -1,83 +1,17 @@
 """CRUD de señales de alerta del panel de administración."""
 
-from datetime import date
-
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from controllers.admin import admin_bp
-from controllers.admin._common import _alternar, _url_fuente_valida
+from controllers.admin._common import _alternar, _url_fuente_valida  # noqa: F401
 from controllers.decorators import admin_required
 from extensions import db
 from models.contenido import SenalAlerta
+from services.admin import validar_datos_senal
 from services.auditoria import registrar_auditoria
-
-
-def validar_datos_senal(form_data):
-    """Valida y limpia los datos del formulario de señal de alerta."""
-    errores = []
-
-    titulo = (form_data.get("titulo") or "").strip()
-    if not titulo:
-        errores.append("El título es obligatorio.")
-    elif len(titulo) > 180:
-        errores.append("El título no puede exceder 180 caracteres.")
-
-    descripcion = (form_data.get("descripcion") or "").strip()
-    if not descripcion:
-        errores.append("La descripción de la señal es obligatoria.")
-
-    accion_recomendada = (form_data.get("accion_recomendada") or "").strip()
-    if not accion_recomendada:
-        errores.append("La acción recomendada es obligatoria.")
-
-    orden_raw = (form_data.get("orden_visual") or "0").strip()
-    orden_visual = 0
-    try:
-        orden_visual = int(orden_raw)
-        if not (0 <= orden_visual <= 65535):
-            errores.append("El orden visual debe ser un número entero entre 0 y 65535.")
-    except ValueError:
-        errores.append("El orden visual debe ser un número entero.")
-
-    fuente_nombre = (form_data.get("fuente_nombre") or "").strip()
-    if not fuente_nombre:
-        errores.append("El nombre de la fuente es obligatorio.")
-    elif len(fuente_nombre) > 180:
-        errores.append("El nombre de la fuente no puede exceder 180 caracteres.")
-
-    fuente_url = (form_data.get("fuente_url") or "").strip() or None
-    if fuente_url and len(fuente_url) > 500:
-        errores.append("La URL de la fuente no puede exceder 500 caracteres.")
-    if not _url_fuente_valida(fuente_url):
-        errores.append("La URL de la fuente debe usar HTTP o HTTPS.")
-
-    fecha_rev_raw = (form_data.get("fecha_revision") or "").strip()
-    fecha_revision = None
-    if not fecha_rev_raw:
-        errores.append("La fecha de revisión médica es obligatoria.")
-    else:
-        try:
-            fecha_revision = date.fromisoformat(fecha_rev_raw)
-        except ValueError:
-            errores.append("La fecha de revisión debe tener formato AAAA-MM-DD válido.")
-
-    activo = 1 if form_data.get("activo") in ("1", "true", "on") else 0
-
-    datos = {
-        "titulo": titulo,
-        "descripcion": descripcion,
-        "accion_recomendada": accion_recomendada,
-        "orden_visual": orden_visual,
-        "fuente_nombre": fuente_nombre,
-        "fuente_url": fuente_url,
-        "fecha_revision": fecha_revision,
-        "activo": activo,
-    }
-
-    return datos, errores
 
 
 @admin_bp.route("/senales")

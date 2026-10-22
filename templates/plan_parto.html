@@ -144,7 +144,7 @@
         {% if contactos %}
         <div class="helper-select-wrap">
           <label for="helper_acompanante" class="form-hint-label">Importar desde mi Red de apoyo (opcional)</label>
-          <select id="helper_acompanante" class="select-helper-contacto" onchange="autocompletarContacto(this, 'acompanante')">
+          <select id="helper_acompanante" class="select-helper-contacto" data-contact-target="acompanante">
             <option value="">Seleccionar contacto guardado</option>
             {% for contacto in contactos %}
             <option value="{{ contacto.nombre }}" data-tel="{{ contacto.telefono or '' }}" data-notas="{{ contacto.notas or '' }}">{{ contacto.nombre }}{% if roles %} ({{ roles.get(contacto.rol, contacto.rol) }}){% endif %}</option>
@@ -169,7 +169,7 @@
         {% if contactos %}
         <div class="helper-select-wrap">
           <label for="helper_transporte" class="form-hint-label">Importar contacto de transporte (opcional)</label>
-          <select id="helper_transporte" class="select-helper-contacto" onchange="autocompletarContacto(this, 'transporte')">
+          <select id="helper_transporte" class="select-helper-contacto" data-contact-target="transporte">
             <option value="">Seleccionar contacto guardado</option>
             {% for contacto in contactos %}
             <option value="{{ contacto.nombre }}" data-tel="{{ contacto.telefono or '' }}">{{ contacto.nombre }}{% if roles %} ({{ roles.get(contacto.rol, contacto.rol) }}){% endif %}</option>
@@ -193,27 +193,4 @@
     </form>
   {% endif %}
 </main>
-{% if contactos %}
-<script>
-function autocompletarContacto(selectElement, tipo) {
-  const selectedOption = selectElement.options[selectElement.selectedIndex];
-  if (!selectedOption || !selectedOption.value) return;
-
-  const nombre = selectedOption.value;
-  const telefono = selectedOption.getAttribute('data-tel') || '';
-
-  if (tipo === 'acompanante') {
-    const inputNombre = document.getElementById('acompanante_nombre');
-    const inputTel = document.getElementById('acompanante_telefono');
-    if (inputNombre) inputNombre.value = nombre;
-    if (inputTel) inputTel.value = telefono;
-  } else if (tipo === 'transporte') {
-    const inputNombre = document.getElementById('transporte_contacto');
-    const inputTel = document.getElementById('transporte_telefono');
-    if (inputNombre) inputNombre.value = nombre;
-    if (inputTel) inputTel.value = telefono;
-  }
-}
-</script>
-{% endif %}
 {% endblock %}

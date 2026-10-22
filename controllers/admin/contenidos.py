@@ -1,114 +1,17 @@
 """CRUD de contenidos prenatales (guía) del panel de administración."""
 
-from datetime import date
-
 from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from controllers.admin import admin_bp
-from controllers.admin._common import _alternar, _url_fuente_valida
+from controllers.admin._common import _alternar, _url_fuente_valida  # noqa: F401
 from controllers.decorators import admin_required
 from extensions import db
 from models.contenido import ContenidoPrenatal
+from services.admin import validar_datos_contenido
 from services.auditoria import registrar_auditoria
-
-
-def validar_datos_contenido(form_data):
-    """Valida y limpia los datos del formulario de contenido prenatal."""
-    errores = []
-
-    titulo = (form_data.get("titulo") or "").strip()
-    if not titulo:
-        errores.append("El título es obligatorio.")
-    elif len(titulo) > 180:
-        errores.append("El título no puede exceder 180 caracteres.")
-
-    resumen = (form_data.get("resumen") or "").strip() or None
-    if resumen and len(resumen) > 500:
-        errores.append("El resumen no puede exceder 500 caracteres.")
-
-    contenido = (form_data.get("contenido") or "").strip()
-    if not contenido:
-        errores.append("El cuerpo del contenido no puede estar vacío.")
-
-    categoria = (form_data.get("categoria") or "").strip()
-    if not categoria:
-        errores.append("La categoría es obligatoria.")
-    elif len(categoria) > 80:
-        errores.append("La categoría no puede exceder 80 caracteres.")
-
-    fuente_nombre = (form_data.get("fuente_nombre") or "").strip()
-    if not fuente_nombre:
-        errores.append("El nombre de la fuente es obligatorio.")
-    elif len(fuente_nombre) > 180:
-        errores.append("El nombre de la fuente no puede exceder 180 caracteres.")
-
-    fuente_url = (form_data.get("fuente_url") or "").strip() or None
-    if fuente_url and len(fuente_url) > 500:
-        errores.append("La URL de la fuente no puede exceder 500 caracteres.")
-    if not _url_fuente_valida(fuente_url):
-        errores.append("La URL de la fuente debe usar HTTP o HTTPS.")
-
-    fecha_rev_raw = (form_data.get("fecha_revision") or "").strip()
-    fecha_revision = None
-    if not fecha_rev_raw:
-        errores.append("La fecha de revisión es obligatoria.")
-    else:
-        try:
-            fecha_revision = date.fromisoformat(fecha_rev_raw)
-        except ValueError:
-            errores.append("La fecha de revisión debe tener formato AAAA-MM-DD válido.")
-
-    trimestre_raw = (form_data.get("trimestre") or "").strip()
-    trimestre = None
-    if trimestre_raw:
-        try:
-            trimestre = int(trimestre_raw)
-            if trimestre not in (1, 2, 3):
-                errores.append("El trimestre debe ser 1, 2 o 3.")
-        except ValueError:
-            errores.append("El trimestre debe ser numérico.")
-
-    sem_desde_raw = (form_data.get("semana_desde") or "").strip()
-    sem_hasta_raw = (form_data.get("semana_hasta") or "").strip()
-    semana_desde = None
-    semana_hasta = None
-
-    if sem_desde_raw or sem_hasta_raw:
-        if not (sem_desde_raw and sem_hasta_raw):
-            errores.append("Debes especificar tanto la semana inicial como la final, o dejar ambas vacías.")
-        else:
-            try:
-                semana_desde = int(sem_desde_raw)
-                semana_hasta = int(sem_hasta_raw)
-                if not (1 <= semana_desde <= 42):
-                    errores.append("La semana inicial debe estar entre 1 y 42.")
-                if not (1 <= semana_hasta <= 42):
-                    errores.append("La semana final debe estar entre 1 y 42.")
-                if semana_desde > semana_hasta:
-                    errores.append("La semana inicial no puede ser mayor que la semana final.")
-            except ValueError:
-                errores.append("Las semanas de gestación deben ser números enteros.")
-
-    publicado = 1 if form_data.get("publicado") in ("1", "true", "on") else 0
-
-    datos = {
-        "titulo": titulo,
-        "resumen": resumen,
-        "contenido": contenido,
-        "categoria": categoria,
-        "semana_desde": semana_desde,
-        "semana_hasta": semana_hasta,
-        "trimestre": trimestre,
-        "fuente_nombre": fuente_nombre,
-        "fuente_url": fuente_url,
-        "fecha_revision": fecha_revision,
-        "publicado": publicado,
-    }
-
-    return datos, errores
 
 
 @admin_bp.route("/contenidos")

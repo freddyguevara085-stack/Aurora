@@ -1,0 +1,625 @@
+/* Detalles de interacción. Conserva los tokens e identidad de Aurora. */
+.detail-form-page .page-header {
+  height: auto;
+  min-height: 72px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+.detail-form-page .page-header h1 {
+  font-size: 18px;
+  line-height: 1.4;
+}
+.detail-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 5px 0 24px;
+}
+.detail-intro__icon {
+  display: grid;
+  flex: 0 0 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--aurora-lavender);
+  color: var(--primary);
+}
+.detail-intro h2, .detail-form-intro h2 {
+  margin: 0 0 7px;
+  color: var(--ink);
+  font-size: 21px;
+  line-height: 1.4;
+  letter-spacing: -.025em;
+}
+.detail-intro p, .detail-form-intro p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.detail-form {
+  border: var(--border-card);
+  border-radius: 20px;
+}
+.detail-form__hint {
+  margin: 0 0 22px;
+  padding: 0 0 16px;
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.detail-form label {
+  margin-bottom: 22px;
+  color: var(--ink);
+  font-size: 13px;
+}
+.detail-form input, .detail-form select, .detail-form textarea {
+  min-height: 48px;
+  margin-top: 9px;
+  padding: 13px 14px;
+  line-height: 1.6;
+  font-size: 16px;
+}
+.detail-form textarea {
+  min-height: 110px;
+}
+.detail-form input::placeholder, .detail-form textarea::placeholder {
+  color: var(--muted);
+  font-size: 13px;
+  opacity: .9;
+}
+.field-optional {
+  margin-left: 5px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  background: var(--aurora-surface-soft);
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 400;
+}
+.field-required {
+  color: var(--primary);
+  margin-left: 3px;
+}
+.detail-field-help {
+  margin: -12px 0 24px;
+  padding-left: 12px;
+  border-left: 2px solid var(--secondary);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+}
+.detail-form__actions {
+  display: grid;
+  gap: 10px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  margin-top: 6px;
+}
+/* Los avisos se distinguen por icono y color, no solo por color. */
+.flash {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  border: 1px solid var(--line);
+  background: var(--aurora-surface-lilac);
+  color: var(--ink);
+  padding: 15px;
+  line-height: 1.7;
+}
+.flash__icon {
+  flex: 0 0 21px;
+  font-size: 21px;
+  margin-top: 1px;
+  color: var(--primary);
+}
+.flash__message {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.flash--success {
+  background: #eef6f0;
+  border-color: #cfe2d3;
+  color: #285537;
+}
+.flash--success .flash__icon {
+  color: #387146;
+}
+.flash--error, .flash--danger {
+  background: #fff0ee;
+  border-color: #eec9c4;
+  color: #8d3030;
+}
+.flash--error .flash__icon, .flash--danger .flash__icon {
+  color: #a33838;
+}
+.empty {
+  border: 1px solid var(--line);
+  padding: 30px 22px;
+}
+.empty__icon {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 18px;
+  place-items: center;
+  border-radius: 20px;
+  background: var(--aurora-lavender);
+  font-size: 30px;
+}
+.empty h2, .empty h3 {
+  color: var(--ink);
+  line-height: 1.45;
+  font-size: 20px;
+}
+.empty p {
+  line-height: 1.8;
+  font-size: 13px;
+}
+.empty > .button {
+  margin-top: 22px;
+}
+.confirm-dialog {
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: 0 24px 75px rgba(45,31,63,.2);
+}
+.confirm-dialog::backdrop {
+  background: rgba(45,31,63,.48);
+  backdrop-filter: blur(3px);
+}
+.confirm-dialog__icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 20px;
+  place-items: center;
+  background: #fff0ee;
+  color: #a33838;
+  border-radius: 16px;
+  font-size: 27px;
+}
+.confirm-dialog[data-tone=primary] .confirm-dialog__icon {
+  background: var(--aurora-lavender);
+  color: var(--primary);
+}
+.confirm-dialog h2 {
+  color: var(--ink);
+  font-size: 21px;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+.confirm-dialog p {
+  font-size: 13px;
+  line-height: 1.85;
+  margin-bottom: 24px;
+}
+.confirm-dialog__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.confirm-dialog__actions .button {
+  width: 100%;
+  font-size: 13px;
+  min-height: 48px;
+}
+.button:disabled, button[disabled] {
+  cursor: wait;
+  opacity: .65;
+  box-shadow: none;
+}
+input[aria-invalid=true], select[aria-invalid=true], textarea[aria-invalid=true] {
+  border-color: var(--aurora-error-text);
+  background: #fffafa;
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible,
+button:focus-visible, a:focus-visible, summary:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+.error-page {
+  padding-top: 80px;
+  gap: 14px;
+}
+.error-page__icon {
+  display: grid;
+  width: 90px;
+  height: 90px;
+  border-radius: 28px;
+  place-items: center;
+  background: var(--aurora-lavender);
+}
+.error-page > h1 {
+  margin: 6px 0;
+  font-size: 28px;
+  line-height: 1.35;
+}
+.error-page > p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.8;
+  margin: 0 0 14px;
+}
+@media (max-width: 360px) {
+  .confirm-dialog { padding: 22px; }
+  .confirm-dialog__actions { grid-template-columns: 1fr; }
+  .confirm-dialog__actions [data-confirm-cancel] { order: 2; }
+}
+@media print {
+  .confirm-dialog { display: none !important; }
+  .flash { box-shadow: none; }
+}
+
+/* Registro y edición de fechas: un formulario, dos fuentes claramente separadas. */
+.pregnancy-editor-intro {
+  margin: 0 0 22px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.pregnancy-page .pregnancy-edit-card {
+  padding: 20px;
+  border: var(--aurora-border-card);
+  border-radius: var(--aurora-radius-lg);
+}
+.pregnancy-saved-date {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.pregnancy-saved-date > .material-symbols-outlined {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--aurora-lavender);
+  color: var(--primary);
+}
+.pregnancy-saved-date div > span, .pregnancy-saved-date small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+.pregnancy-saved-date strong {
+  display: block;
+  margin: 3px 0;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 600;
+}
+.pregnancy-dates-form { margin-top: 22px; }
+.pregnancy-dates-form .pregnancy-dates-section {
+  margin: 0 0 24px;
+  padding: 0;
+}
+.pregnancy-dates-section legend {
+  margin-bottom: 4px;
+  color: var(--primary);
+  font-size: 15px;
+}
+.pregnancy-field-description {
+  margin: 6px 0 18px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+}
+.pregnancy-dates-form label {
+  display: block;
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+.pregnancy-dates-form input {
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: 12px;
+  font-size: 16px;
+}
+.pregnancy-field-help {
+  display: block;
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+.pregnancy-method-note {
+  margin: 14px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--secondary);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+.pregnancy-professional {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+}
+.pregnancy-professional > summary {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 12px;
+  list-style: none;
+  cursor: pointer;
+}
+.pregnancy-professional > summary::-webkit-details-marker { display: none; }
+.pregnancy-professional > summary > .material-symbols-outlined {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 20px;
+  color: var(--primary);
+}
+.pregnancy-professional > summary > span:nth-child(2) { flex: 1; min-width: 0; }
+.pregnancy-professional strong {
+  display: block;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.7;
+}
+.pregnancy-professional summary small {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.7;
+}
+.pregnancy-professional[open] .pregnancy-professional__chevron { transform: rotate(180deg); }
+.pregnancy-professional__body {
+  padding: 0 14px 18px;
+  border-top: 1px solid var(--line);
+}
+.pregnancy-professional__body > .pregnancy-field-description { margin-top: 16px; }
+.pregnancy-age-fields {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.pregnancy-dates-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.8;
+}
+.pregnancy-dates-note > .material-symbols-outlined { font-size: 16px; margin-top: 2px; flex-shrink: 0; }
+.pregnancy-dates-form .pregnancy-form-actions { margin-top: 22px; }
+
+/* Elección visible y controles cómodos para un uso básico del celular. */
+.pregnancy-simple-form .pregnancy-source-choice { margin: 0 0 26px; }
+.pregnancy-source-choice legend { color: var(--ink); font-size: 17px; font-weight: 600; line-height: 1.5; }
+.pregnancy-simple-form .pregnancy-field-description { font-size: 14px; line-height: 1.7; margin: 8px 0 16px; }
+.pregnancy-simple-form .pregnancy-source-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  margin: 10px 0 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 15px;
+  line-height: 1.6;
+  cursor: pointer;
+}
+.pregnancy-source-option:has(input:checked) { background: var(--aurora-surface-lilac); border-color: var(--primary); }
+.pregnancy-source-option:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 3px; }
+.pregnancy-simple-form .pregnancy-source-option input {
+  display: block;
+  width: 21px;
+  height: 21px;
+  min-height: 0;
+  flex: 0 0 21px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--primary);
+}
+.pregnancy-simple-form .pregnancy-source-panel { margin: 0; padding: 0; border: 0; }
+.pregnancy-source-panel[hidden] { display: none !important; }
+.pregnancy-simple-form .pregnancy-source-panel > label,
+.pregnancy-simple-form .pregnancy-age-fields label { font-size: 15px; line-height: 1.6; }
+.pregnancy-simple-form .pregnancy-source-panel input { min-height: 54px; padding: 14px 12px; font-size: 17px; }
+.pregnancy-simple-form .pregnancy-dates-note { font-size: 13px; line-height: 1.7; }
+.pregnancy-calculation-help { margin-top: 14px; }
+.pregnancy-calculation-help summary { display: flex; align-items: center; min-height: 44px; color: var(--primary); font-size: 13px; cursor: pointer; }
+.pregnancy-calculation-help summary::after { content: '+'; margin-left: auto; font-size: 21px; }
+.pregnancy-calculation-help[open] summary::after { content: '−'; }
+.pregnancy-calculation-help summary::-webkit-details-marker { display: none; }
+.pregnancy-calculation-help p { margin: 8px 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.pregnancy-simple-form .pregnancy-form-actions .button { min-height: 54px; font-size: 15px; }
+.pregnancy-editor-page .pregnancy-saved-date div > span,
+.pregnancy-editor-page .pregnancy-saved-date small { font-size: 13px; }
+/* El acceso flotante no debe tapar los campos ni el botón de guardar al editar. */
+.pregnancy-editor-page ~ .alert-fab { display: none; }
+
+/* Accesos de Inicio: filas completas, legibles y cómodas para tocar. */
+.home-access { margin: 20px 0 0; }
+.home-access .home-access-row {
+  display: grid;
+  grid-template-columns: 42px minmax(0,1fr) 20px;
+  align-items: center;
+  column-gap: 13px;
+  min-height: 82px;
+  padding: 17px 16px;
+  color: var(--ink);
+  text-decoration: none;
+  -webkit-tap-highlight-color: rgba(108,75,163,.08);
+}
+.home-access-icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-icon-box);
+  background: var(--aurora-surface-lilac);
+  color: var(--primary);
+}
+.home-access-icon > .material-symbols-outlined { font-size: 23px; }
+.home-access-copy { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.home-access-copy strong {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.home-access-copy > span { color: var(--muted); font-size: 12px; line-height: 1.65; }
+.home-access-chevron { font-size: 20px; color: var(--secondary); }
+.home-access-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 14px;
+  overflow: hidden;
+  border: var(--aurora-border-card);
+  border-radius: var(--radius-card);
+  background: var(--white);
+  box-shadow: 0 2px 6px rgba(0,0,0,.025);
+}
+.home-access-list > .home-access-row { position: relative; }
+.home-access-list > .home-access-row + .home-access-row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 71px;
+  right: 16px;
+  height: 1px;
+  background: var(--line);
+  opacity: .7;
+}
+.home-access .home-access-row--alert {
+  border: 1px solid #f1d8e2;
+  border-radius: var(--radius-card);
+  background: #fff3f7;
+}
+.home-access-icon--alert { background: var(--white); color: #b43863; }
+.home-access-row--alert .home-access-copy strong { color: #853750; }
+.home-access-row--alert .home-access-chevron { color: #b45e7c; }
+.home-access .home-access-row:focus-visible {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid var(--primary);
+  outline-offset: -3px;
+  border-radius: 12px;
+}
+.home-access .home-access-row:active { background: var(--aurora-surface-soft); }
+.home-shell .home-tutorial-footer { margin: 14px 0 12px; text-align: left; }
+.home-shell .home-tutorial-trigger {
+  display: grid;
+  grid-template-columns: 42px minmax(0,1fr) 20px;
+  align-items: center;
+  column-gap: 13px;
+  width: 100%;
+  min-height: 64px;
+  margin: 0;
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  background: transparent;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  text-decoration: none;
+}
+.home-tutorial-trigger > .material-symbols-outlined:first-child { justify-self: center; font-size: 22px; }
+.home-tutorial-trigger > .material-symbols-outlined:last-child { font-size: 20px; color: var(--secondary); }
+@media (hover: hover) {
+  .home-access-list > .home-access-row:hover { background: var(--aurora-surface-soft); }
+  .home-shell .home-tutorial-trigger:hover { background: var(--aurora-surface-soft); }
+}
+@media (max-width: 360px) {
+  .home-access .home-access-row,
+  .home-shell .home-tutorial-trigger {
+    grid-template-columns: 38px minmax(0,1fr) 18px;
+    column-gap: 10px;
+    padding-left: 13px;
+    padding-right: 13px;
+  }
+  .home-access-icon { width: 38px; height: 40px; }
+  .home-access-copy strong { font-size: 14px; }
+  .home-access-list > .home-access-row + .home-access-row::before { left: 61px; right: 13px; }
+}
+.text-large .home-access-copy strong { font-size: 17px; }
+.text-large .home-access-copy > span { font-size: 14px; }
+
+/* Nacimiento: la fecha elegida primero; la estimación queda como referencia. */
+.birth-entry-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 2px 0 24px;
+}
+.birth-entry-intro > .material-symbols-outlined {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  place-items: center;
+  border-radius: var(--radius-icon-box);
+  background: var(--aurora-lavender);
+  color: var(--primary);
+  font-size: 25px;
+}
+.birth-entry-intro p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.8; }
+.birth-entry-page .birth-entry-card {
+  padding: 22px 20px;
+  border: var(--aurora-border-card);
+  border-radius: var(--radius-card);
+}
+.birth-entry-card .birth-form { margin: 0; }
+.birth-entry-card h2 { margin: 0 0 12px; }
+.birth-entry-card h2 > label {
+  display: block;
+  margin: 0;
+  color: var(--ink);
+  font-size: 21px;
+  line-height: 1.5;
+  font-weight: 600;
+  letter-spacing: -.025em;
+}
+.birth-entry-help { margin: 0 0 18px; color: var(--muted); font-size: 14px; line-height: 1.8; }
+.birth-entry-card .birth-form__date-input { min-height: 58px; padding: 14px; margin: 0; font-size: 18px; }
+.birth-entry-explanation {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 15px 13px;
+  margin: 22px 0 0;
+  border-radius: 12px;
+  background: var(--aurora-surface-soft);
+}
+.birth-entry-explanation > .material-symbols-outlined { flex-shrink: 0; font-size: 19px; color: var(--primary); margin-top: 3px; }
+.birth-entry-explanation p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.birth-entry-card .pregnancy-form-actions { margin-top: 22px; }
+.birth-entry-card .pregnancy-form-actions .button { min-height: 54px; font-size: 15px; }
+.birth-entry-previous { margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid var(--line); }
+.birth-entry-previous span { display: block; color: var(--muted); font-size: 13px; }
+.birth-entry-previous strong { display: block; color: var(--primary); font-size: 22px; font-weight: 600; margin-top: 5px; }
+.birth-entry-page .birth-entry-reference { display: flex; align-items: flex-start; gap: 12px; margin: 24px 0 0; padding: 0 5px; }
+.birth-entry-reference > .material-symbols-outlined { flex-shrink: 0; font-size: 21px; color: var(--primary); margin-top: 2px; }
+.birth-entry-reference p { margin: 0 0 5px; color: var(--muted); font-size: 12px; line-height: 1.7; }
+.birth-entry-reference strong { display: block; color: var(--ink); font-size: 17px; font-weight: 500; }
+.birth-entry-reference small { display: block; margin-top: 8px; color: var(--muted); font-size: 12px; line-height: 1.8; }
+.birth-entry-page ~ .alert-fab { display: none; }
+@media (max-width: 360px) {
+  .birth-entry-page .birth-entry-card { padding: 20px 16px; }
+  .birth-entry-card h2 > label { font-size: 20px; }
+}

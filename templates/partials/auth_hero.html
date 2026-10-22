@@ -1,0 +1,7 @@
+<section class="login-hero" aria-labelledby="{{ auth_title_id }}">
+  <img src="{{ url_for('static', filename='icons/app-icon-192.png') }}" width="{{ auth_icon_size|default(80) }}" height="{{ auth_icon_size|default(80) }}" alt="Aurora">
+  <p class="login-brand">Aurora</p>
+  <h1 id="{{ auth_title_id }}">{{ auth_title }}</h1>
+  <p>{{ auth_subtitle }}</p>
+</section>
+{% include 'partials/flash.html' %}

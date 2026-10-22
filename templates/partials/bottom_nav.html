@@ -1,13 +1,16 @@
 {% set nav_items = [
   ['main.index', ['main.index'], 'home', 'Inicio'],
   ['main.embarazo', ['main.embarazo', 'main.controles', 'main.nuevo_control', 'main.editar_control', 'main.calendario'], 'pregnant_woman', 'Embarazo'],
-  ['main.guia', ['main.guia', 'main.detalle_guia', 'main.alertas'], 'menu_book', 'Guía'],
+  ['main.guia', ['main.guia', 'main.alertas'], 'menu_book', 'Guía'],
   ['main.centros', ['main.centros', 'main.detalle_centro'], 'location_on', 'Centros'],
   ['main.perfil', ['main.perfil'], 'person', 'Perfil']
 ] %}
 <nav class="bottom-nav" aria-label="Navegación principal">
   {% for endpoint, matches, icon, label in nav_items %}
-  {% set active = request.endpoint in matches %}
-  <a class="nav-item {% if active %}nav-item--active{% endif %}" href="{{ url_for(endpoint) }}"{% if active %} aria-current="page"{% endif %}><span class="material-symbols-outlined" aria-hidden="true">{{ icon }}</span><span>{{ label }}</span></a>
+    {% set active = request.endpoint in matches %}
+    <a class="nav-item {% if active %}nav-item--active{% endif %}" href="{{ url_for(endpoint) }}"{% if active %} aria-current="page"{% endif %}>
+      <span class="material-symbols-outlined" aria-hidden="true">{{ icon }}</span>
+      <span>{{ label }}</span>
+    </a>
   {% endfor %}
 </nav>

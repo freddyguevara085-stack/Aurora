@@ -1,4 +1,4 @@
-const CACHE_NAME = 'aurora-shell-v24';
+const CACHE_NAME = 'aurora-shell-v36';
 const APP_SHELL = [
   '/manifest.json',
   '/offline.html',
@@ -7,6 +7,9 @@ const APP_SHELL = [
   '/static/css/components.css',
   '/static/css/pages.css',
   '/static/css/print.css',
+  '/static/css/details.css',
+  '/static/css/gestation.css',
+  '/static/css/explore.css',
   '/static/js/app.js',
   '/static/fonts/poppins/poppins-400.woff2',
   '/static/fonts/poppins/poppins-500.woff2',

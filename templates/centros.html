@@ -1,108 +1,39 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Centros de salud | Aurora{% endblock %}
-
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell centros-page aurora-page-container">
-    {% set back_url = url_for('main.index') %}
-    {% set back_label = 'Inicio' %}
-    {% set page_title = 'Centros de salud' %}
-    {% include 'partials/page_header.html' %}
-    <p class="orient-intro">Encuentra hospitales, centros de salud, casas maternas y clínicas médicas previsionales del MINSA.</p>
+<main id="main" tabindex="-1" class="app-shell centros-page aurora-page-container explore-page">
+  {% set back_url=url_for('main.index') %}{% set back_label='Inicio' %}{% set page_title='Centros de salud' %}{% include 'partials/page_header.html' %}
+  <section class="explore-intro"><span class="explore-intro__icon material-symbols-outlined" aria-hidden="true">location_on</span><div><h2>¿Dónde buscas atención?</h2><p>Elige una zona para encontrar centros y consultar sus datos.</p></div></section>
 
-    {# ── Aviso de demostración sobrio y elegante ── #}
-    <aside class="centros-notice" role="note" id="demo-banner">
-        <span class="material-symbols-outlined centros-notice__icon" aria-hidden="true">info</span>
-        <p class="centros-notice__text">
-            <strong>Directorio de demostración</strong> — Confirma teléfono, horario y servicios con el establecimiento antes de acudir.
-            <a href="{{ url_for('main.fuentes') }}" class="centros-notice__link">Saber más</a>
-        </p>
-    </aside>
-    {% if centros|selectattr('tipo_establecimiento', 'equalto', 'clinica')|list %}
-    <aside class="verification-notice" role="note">
-        <span class="material-symbols-outlined" aria-hidden="true">info</span>
-        <div>
-            <strong>Clínicas Médicas Previsionales (CMP MINSA)</strong>
-            <p>MINSA las describe para asegurados, jubilados y beneficiarios según convenios con el INSS. <a href="https://www.minsa.gob.ni/index.php/centros-e-institutos/clinicas-medicas-previsionales-del-ministerio-de-salud-cmp-minsa" target="_blank" rel="noopener noreferrer">Confirma aquí si la atención aplica a tu caso.</a></p>
-        </div>
-    </aside>
-    {% endif %}
+  <form class="zone-form" method="get" action="{{ url_for('main.centros') }}" data-zone-form>
+    <label for="centros-depto">Tu departamento</label>
+    <select id="centros-depto" name="departamento"><option value="">Todos los departamentos</option>{% for depto in departamentos %}<option value="{{ depto }}"{% if departamento==depto %} selected{% endif %}>{{ depto }}</option>{% endfor %}</select>
+    <label for="centros-municipio">Tu municipio</label>
+    <select id="centros-municipio" name="municipio"{% if not departamento %} disabled aria-describedby="municipio-help"{% endif %}><option value="">Todos los municipios</option>{% for lugar in municipios %}<option value="{{ lugar }}"{% if municipio==lugar %} selected{% endif %}>{{ lugar }}</option>{% endfor %}</select>
+    {% if not departamento %}<p class="zone-help" id="municipio-help">Primero elige un departamento.</p>{% endif %}
+    <details class="explore-options"{% if q or tipo %} open{% endif %}><summary>Más opciones <span class="material-symbols-outlined" aria-hidden="true">expand_more</span></summary><div>
+      <label for="centros-q">Nombre del centro o lugar</label><input id="centros-q" name="q" type="search" maxlength="80" value="{{ q }}" placeholder="Ej. nombre de un centro">
+      <label for="centros-tipo">Tipo de establecimiento</label><select id="centros-tipo" name="tipo">{% for valor, nombre in [('', 'Todos los tipos'), ('centro_salud','Centros de salud'), ('puesto_salud','Puestos de salud'), ('hospital','Hospitales'), ('casa_materna','Casas maternas'), ('clinica','Clínicas previsionales'), ('otro','Otros')] %}<option value="{{ valor }}"{% if tipo==valor %} selected{% endif %}>{{ nombre }}</option>{% endfor %}</select>
+    </div></details>
+    <button type="submit" class="button button--primary button--wide"><span class="material-symbols-outlined" aria-hidden="true">search</span>Buscar centros</button>
+  </form>
 
-    {# ── Buscador omnicanal en tiempo real ── #}
-    <div class="centros-search">
-        <span class="material-symbols-outlined centros-search__icon" aria-hidden="true">search</span>
-        <input id="centros-q" type="search" placeholder="Buscar por nombre o municipio…" aria-label="Buscar centro de salud" value="{{ q }}">
-    </div>
-
-    {# ── Filtros combinados: Departamento y Tipo ── #}
-    <div class="centros-filters">
-        <div class="centros-depto-wrapper">
-            <span class="material-symbols-outlined centros-depto-icon" aria-hidden="true">location_on</span>
-            <select id="centros-depto" class="centros-depto-select" aria-label="Filtrar por departamento">
-                <option value="">Todos los departamentos</option>
-                {% for depto in departamentos %}
-                <option value="{{ depto }}" {% if departamento == depto %}selected{% endif %}>{{ depto }}</option>
-                {% endfor %}
-            </select>
-            <span class="material-symbols-outlined centros-depto-chevron" aria-hidden="true">expand_more</span>
-        </div>
-
-        <nav class="centros-chips" aria-label="Filtrar por tipo de establecimiento">
-            <button type="button" class="centros-chip {% if not tipo or tipo == 'todos' %}is-active{% endif %}" data-tipo="todos" aria-pressed="{% if not tipo or tipo == 'todos' %}true{% else %}false{% endif %}">Todos</button>
-            <button type="button" class="centros-chip {% if tipo == 'casa_materna' %}is-active{% endif %}" data-tipo="casa_materna" aria-pressed="{% if tipo == 'casa_materna' %}true{% else %}false{% endif %}">Casas Maternas</button>
-            <button type="button" class="centros-chip {% if tipo == 'centro_salud' %}is-active{% endif %}" data-tipo="centro_salud" aria-pressed="{% if tipo == 'centro_salud' %}true{% else %}false{% endif %}">Centros de Salud</button>
-            <button type="button" class="centros-chip {% if tipo == 'puesto_salud' %}is-active{% endif %}" data-tipo="puesto_salud" aria-pressed="{% if tipo == 'puesto_salud' %}true{% else %}false{% endif %}">Puestos de Salud</button>
-            <button type="button" class="centros-chip {% if tipo == 'hospital' %}is-active{% endif %}" data-tipo="hospital" aria-pressed="{% if tipo == 'hospital' %}true{% else %}false{% endif %}">Hospitales</button>
-            <button type="button" class="centros-chip {% if tipo == 'clinica' %}is-active{% endif %}" data-tipo="clinica" aria-pressed="{% if tipo == 'clinica' %}true{% else %}false{% endif %}">Clínicas previsionales</button>
-        </nav>
-    </div>
-
-    {# ── Región en vivo para accesibilidad (lectores de pantalla) ── #}
-    <div id="centros-live-region" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
-
-    {# ── Listado de tarjetas de centros de atención ── #}
-    <section class="centros-list" id="centros-list" aria-label="Listado de centros de atención">
-        {% for centro in centros %}
-        {% set tipo_clean = 'Clínica Médica Previsional' if centro.tipo_establecimiento == 'clinica' else centro.tipo_establecimiento|replace('_', ' ') %}
-        {% set nombre_completo = centro.nombre if tipo_clean|lower in centro.nombre|lower else ((tipo_clean|capitalize) ~ ' ' ~ centro.nombre) %}
-        <article class="centro-card aurora-card"
-                 data-nombre="{{ nombre_completo|lower }}"
-                 data-municipio="{{ centro.municipio|lower }}"
-                 data-departamento="{{ centro.departamento|lower }}"
-                 data-tipo="{{ centro.tipo_establecimiento }}">
-            <span class="centro-card__category aurora-badge aurora-badge-lavanda">
-                {{ tipo_clean|upper }} · {% if centro.fecha_verificacion %}OFICIAL MINSA{% else %}POR CONFIRMAR{% endif %}
-            </span>
-
-            <h2 class="centro-card__title aurora-card-title">{{ nombre_completo }}</h2>
-
-            <p class="centro-card__location">
-                <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
-                <span>{{ centro.municipio }}, {{ centro.departamento }}</span>
-            </p>
-
-            <a class="centro-card__link aurora-card-link" href="{{ url_for('main.detalle_centro', centro_id=centro.id) }}">
-                <span>Ver información y servicios</span>
-                <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
-            </a>
-        </article>
-        {% else %}
-            {% set empty_title = 'Sin centros encontrados' %}
-            {% set empty_text = 'No hay establecimientos de salud disponibles en este momento.' %}
-            {% set empty_url = none %}
-            {% set empty_action = none %}
-            {% set empty_icon = 'location_off' %}
-            {% include 'partials/empty_state.html' %}
-        {% endfor %}
-
-        {# ── Estado vacío para búsqueda interactiva sin resultados ── #}
-        <div class="empty compact-empty orient-no-results" id="centros-no-results" hidden>
-            <span class="material-symbols-outlined orient-no-results__icon" aria-hidden="true">location_off</span>
-            <h3>Sin resultados en este criterio</h3>
-            <p>Prueba cambiando el nombre, municipio o ajustando los filtros.</p>
-            <button type="button" class="button button--secondary orient-reset-btn" id="centros-reset-btn">
-                <span class="material-symbols-outlined" aria-hidden="true">restart_alt</span>Restablecer filtros
-            </button>
-        </div>
-    </section>
+  <div class="explore-results-heading"><h2>{{ total }} centro{{ 's' if total!=1 else '' }}{% if departamento %} en {{ departamento }}{% endif %}</h2>{% if departamento or q or tipo or municipio %}<a href="{{ url_for('main.centros') }}">Ver todos</a>{% endif %}</div>
+  {% if total %}<p class="zone-help">{% if municipio %}{{ municipio }} · {% endif %}Mostrando {{ centros|length }} resultados{% if paginas>1 %} · Página {{ pagina }} de {{ paginas }}{% endif %}</p>{% endif %}
+  <p class="directory-note"><span class="material-symbols-outlined" aria-hidden="true">info</span><span><strong>Directorio de referencia.</strong> Confirma los datos con el centro antes de acudir.</span></p>
+  <section class="centros-list" id="centros-list" aria-label="Centros encontrados">
+    {% for centro in centros %}
+    {% set tipo_clean = 'Clínica Médica Previsional' if centro.tipo_establecimiento=='clinica' else centro.tipo_establecimiento|replace('_',' ') %}
+    {% set nombre_completo = centro.nombre if tipo_clean|lower in centro.nombre|lower else tipo_clean|capitalize ~ ' ' ~ centro.nombre %}
+    <article class="centro-card aurora-card directory-result" data-nombre="{{ nombre_completo|lower }}" data-municipio="{{ centro.municipio|lower }}" data-departamento="{{ centro.departamento|lower }}" data-tipo="{{ centro.tipo_establecimiento }}">
+      <div class="directory-result__head"><span class="directory-result__icon material-symbols-outlined" aria-hidden="true">{{ 'home' if centro.tipo_establecimiento=='casa_materna' else 'local_hospital' }}</span><span class="directory-result__type">{{ tipo_clean|capitalize }}</span></div>
+      <h3 class="centro-card__title">{{ nombre_completo }}</h3>
+      <p class="directory-result__location"><span class="material-symbols-outlined" aria-hidden="true">location_on</span>{{ centro.municipio }}, {{ centro.departamento }}</p>
+      <a class="button button--secondary button--wide" href="{{ url_for('main.detalle_centro', centro_id=centro.id) }}">Ver centro <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+    </article>
+    {% else %}<div class="explore-empty"><span class="material-symbols-outlined" aria-hidden="true">location_off</span><h3>No encontramos centros en esta búsqueda</h3><p>Prueba con otro municipio o quita algún filtro.</p><a href="{{ url_for('main.centros') }}" class="button button--secondary">Ver todos los centros</a></div>{% endfor %}
+  </section>
+  {% if paginas>1 %}<nav class="directory-pagination" aria-label="Páginas del directorio">{% if pagina>1 %}<a class="button button--secondary" href="{{ url_for('main.centros', departamento=departamento, municipio=municipio, q=q, tipo=tipo, pagina=pagina-1) }}">Anterior</a>{% endif %}<span>{{ pagina }} / {{ paginas }}</span>{% if pagina<paginas %}<a class="button button--primary" href="{{ url_for('main.centros', departamento=departamento, municipio=municipio, q=q, tipo=tipo, pagina=pagina+1) }}">Siguiente</a>{% endif %}</nav>{% endif %}
+  <a class="explore-source-link" href="{{ url_for('main.fuentes') }}">Consultar fuentes del directorio <span aria-hidden="true">↗</span></a>
 </main>
 {% endblock %}

@@ -97,6 +97,24 @@
       {% endif %}
     </section>
 
+    {% if siguientes %}
+    <section class="controls-section" aria-labelledby="siguientes-heading">
+      <h2 id="siguientes-heading">Otras citas programadas</h2>
+      <div class="agenda">
+      {% for control in siguientes %}
+        <article class="agenda-item card-surface">
+          <span class="agenda-item__icon"><span class="material-symbols-outlined" aria-hidden="true">event_available</span></span>
+          <div class="agenda-item__body">
+            <h3>Control {{ control.numero_control }}</h3>
+            <p><time datetime="{{ control.fecha_control.isoformat() }}">{{ control.fecha_control.strftime('%d/%m/%Y') }}</time>{% if control.hora_control %} · {{ control.hora_control.strftime('%H:%M') }}{% endif %}</p>
+            <a class="card-link aurora-card-link" href="{{ url_for('main.editar_control', control_id=control.id) }}">Ver detalles o editar ›</a>
+          </div>
+        </article>
+      {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
     <section class="controls-section history-section" aria-labelledby="anteriores-heading">
       <h2 id="anteriores-heading">Controles anteriores</h2>
       {% if anteriores %}

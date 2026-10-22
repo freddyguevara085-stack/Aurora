@@ -9,11 +9,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/app-icon-32.png') }}">
     <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/app-icon-192.png') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/app-icon-180.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=27">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=29">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=33">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}?v=36">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}?v=27">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=39">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=39">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=39">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}?v=39">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}?v=39">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/details.css') }}?v=5">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/gestation.css') }}?v=3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/explore.css') }}?v=1">
     <title>{% block title %}Aurora{% endblock %}</title>
 </head>
 <body>
@@ -37,14 +40,15 @@
         <a class="alert-fab" href="{{ url_for('main.alertas') }}" aria-label="Señales de alerta: cuándo buscar atención" title="Señales de alerta"><span class="material-symbols-outlined" aria-hidden="true">warning</span></a>
         {% endif %}
     {% endif %}
-    <dialog id="aurora-confirm" class="confirm-dialog" aria-labelledby="aurora-confirm-title">
+    <dialog id="aurora-confirm" class="confirm-dialog" aria-labelledby="aurora-confirm-title" aria-describedby="aurora-confirm-message">
+        <span class="material-symbols-outlined confirm-dialog__icon" data-confirm-icon aria-hidden="true">help_outline</span>
         <h2 id="aurora-confirm-title">Confirmar acción</h2>
-        <p data-confirm-message></p>
+        <p id="aurora-confirm-message" data-confirm-message></p>
         <div class="confirm-dialog__actions">
             <button type="button" class="button button--secondary" data-confirm-cancel>Cancelar</button>
             <button type="button" class="button button--danger" data-confirm-ok>Eliminar</button>
         </div>
     </dialog>
-    <script src="{{ url_for('static', filename='js/app.js') }}?v=23"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}?v=43"></script>
 </body>
 </html>

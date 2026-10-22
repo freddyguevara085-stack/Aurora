@@ -52,14 +52,14 @@
           {% for item in senales %}
             <tr>
               <td>
-                <span class="chip" style="font-weight: 700;">#{{ item.orden_visual }}</span>
+                <span class="chip chip--bold">#{{ item.orden_visual }}</span>
               </td>
               <td>
                 <strong>{{ item.titulo }}</strong>
                 <p class="admin-cell-desc">{{ item.descripcion[:90] }}...</p>
               </td>
               <td>
-                <p class="admin-cell-desc" style="color: #6f3253; font-weight: 500;">{{ item.accion_recomendada[:80] }}...</p>
+                <p class="admin-cell-desc admin-cell-desc--accent">{{ item.accion_recomendada[:80] }}...</p>
               </td>
               <td>
                 {% if item.activo %}
@@ -97,7 +97,7 @@
     </div>
   {% else %}
     <div class="empty">
-      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);" aria-hidden="true">warning</span>
+      <span class="material-symbols-outlined empty__icon empty__icon--muted" aria-hidden="true">warning</span>
       <h3>No se encontraron señales de alerta</h3>
       <p>No hay registros coincidentes con los filtros aplicados.</p>
     </div>

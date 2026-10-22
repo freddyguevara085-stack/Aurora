@@ -5,7 +5,8 @@ los catálogos usados por los formularios de embarazo, controles y red de apoyo.
 Sin HTML ni peticiones HTTP.
 """
 
-from datetime import date, timedelta
+from datetime import date, time, timedelta
+import re
 
 from extensions import db
 from models.gestacion import ContactoComunitario
@@ -31,7 +32,15 @@ ROLES_COMUNITARIOS = {
     'otro': 'Otro contacto',
 }
 
+TIPOS_CONTROL_VALIDOS = (
+    'Ultrasonido / Ecografía',
+    'Exámenes de laboratorio',
+    'Control prenatal regular',
+)
+
 PREGUNTA_MAX_CARACTERES = 500
+
+_RE_PREFIJO_CENTRO = re.compile(r"\[Centro:\s*([^\]]+)\]")
 
 
 def seguimiento_fecha_parto(
@@ -193,9 +202,62 @@ def construir_indicaciones(tipo_control, centro_personalizado, indicaciones_text
         partes.append(f"[{tipo_control}]")
     if centro_personalizado:
         partes.append(f"[Centro: {centro_personalizado}]")
-    if indicaciones_texto:
-        partes.append(indicaciones_texto)
+    if indicaciones_texto and indicaciones_texto.strip():
+        partes.append(indicaciones_texto.strip())
     return " ".join(partes).strip() or None
+
+
+def descomponer_indicaciones(indicaciones: str | None) -> tuple[str, str | None, str]:
+    """Extrae ``(tipo_control, centro_personalizado, texto_limpio)`` de ``indicaciones``."""
+    tipo_control = 'Control prenatal regular'
+    texto = (indicaciones or '').strip()
+    for opcion in TIPOS_CONTROL_VALIDOS:
+        prefijo = f"[{opcion}]"
+        if texto.startswith(prefijo):
+            tipo_control = opcion
+            texto = texto[len(prefijo):].strip()
+            break
+
+    centro_personalizado = None
+    if '[Centro:' in texto:
+        coincidencia = _RE_PREFIJO_CENTRO.search(texto)
+        if coincidencia:
+            centro_personalizado = coincidencia.group(1).strip() or None
+            texto = _RE_PREFIJO_CENTRO.sub('', texto).strip()
+
+    return tipo_control, centro_personalizado, texto
+
+
+def proximo_control_activo(controles_lista, hoy: date | None = None):
+    """Obtiene el próximo control programado o reprogramado a partir de ``hoy``."""
+    hoy = hoy or date.today()
+    proximos = [
+        control
+        for control in (controles_lista or [])
+        if control.fecha_control >= hoy and control.estado in {'programado', 'reprogramado'}
+    ]
+    return min(
+        proximos,
+        key=lambda control: (control.fecha_control, getattr(control, 'hora_control', None) or time.min),
+        default=None,
+    )
+
+
+def enmascarar_identificacion(cedula: str | None) -> str | None:
+    """Oculta los caracteres de la identificación excepto los últimos cuatro."""
+    if not cedula:
+        return None
+    limpia = cedula.strip()
+    if not limpia:
+        return None
+    return '*' * max(0, len(limpia) - 4) + limpia[-4:]
+
+
+def formatear_identificacion(cedula: str | None) -> str | None:
+    """Normaliza una identificación recortando espacios y limitando longitud."""
+    if not cedula:
+        return None
+    return cedula.strip()[:20] or None
 
 
 def resolver_centro_input(texto, centros):

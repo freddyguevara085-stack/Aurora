@@ -6,6 +6,7 @@
   {% set back_label = 'Volver a Mis controles' %}
   {% set page_title = 'Calendario' %}
   {% include 'partials/page_header.html' %}
+  {% include 'partials/flash.html' %}
 
   <div class="calendar-intro">
     <span class="material-symbols-outlined" aria-hidden="true">info</span>
@@ -15,7 +16,7 @@
   <a class="button button--primary button--wide" href="{{ url_for('main.nuevo_recordatorio') }}"><span class="material-symbols-outlined" aria-hidden="true">add</span>Nuevo recordatorio</a>
   {% endif %}
 
-  {% if not embarazo %}
+  {% if not embarazo and not recordatorios %}
     {% set empty_title = 'Tu calendario está vacío' %}
     {% set empty_text = 'Aquí aparecerán tus controles y recordatorios próximos.' %}
     {% set empty_url = none %}

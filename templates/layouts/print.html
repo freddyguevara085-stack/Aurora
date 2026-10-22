@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=37">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}?v=37">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/components.css') }}?v=37">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages.css') }}?v=37">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}?v=37">
+  <title>{% block title %}Aurora{% endblock %}</title>
+</head>
+<body class="print-page">
+  <main id="main" tabindex="-1" class="print-sheet{% block sheet_modifier %}{% endblock %}">
+    {% block print_content %}{% endblock %}
+  </main>
+  <div class="print-page__actions no-print">
+    <p class="print-page__warning" id="print-warning">{% block print_warning %}{% endblock %}</p>
+    <button class="button button--primary" type="button" data-print-action aria-describedby="print-warning">
+      <span class="material-symbols-outlined" aria-hidden="true">print</span>{% block print_button_label %}Imprimir{% endblock %}
+    </button>
+    <a class="text-link" href="{% block back_url %}{{ url_for('main.index') }}{% endblock %}">{% block back_label %}Volver a Inicio{% endblock %}</a>
+  </div>
+  <script src="{{ url_for('static', filename='js/app.js') }}?v=37"></script>
+</body>
+</html>

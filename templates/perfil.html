@@ -110,11 +110,11 @@
 
           <label class="checkbox-row">
             <input name="consentimiento_datos" type="checkbox" value="1" {% if (form_data and form_data.get('consentimiento_datos') == '1') or (not form_data and perfil and perfil.consentimiento_datos) %}checked{% endif %}>
-            Acepto guardar en esta demo los datos que decida registrar para organizar mi embarazo. Entiendo que Aurora no ofrece atención médica.
+            Doy mi consentimiento para guardar los datos que registre en Aurora con el fin de organizar mi atención prenatal. Entiendo que Aurora no ofrece atención médica.
           </label>
           <input type="hidden" name="consentimiento_datos" value="0">
 
-          <button class="button button--primary button--wide button--tactile" style="margin-top:16px">Guardar cambios</button>
+          <button class="button button--primary button--wide button--tactile profile-form-submit">Guardar cambios</button>
         </form>
       </div>
     </details>
@@ -158,7 +158,7 @@
               Confirmar nueva contraseña
               <input name="password_confirm" type="password" minlength="8" autocomplete="new-password" required>
             </label>
-            <button class="button button--primary button--wide button--tactile" style="margin-top:12px">Actualizar contraseña</button>
+            <button class="button button--primary button--wide button--tactile profile-form-submit">Actualizar contraseña</button>
           </form>
         </div>
       </details>

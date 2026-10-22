@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="logo%20para%20el%20readme.png" alt="Logo de Aurora" width="260">
+  <img src="static/images/aurora-logo.png" alt="Logo de Aurora" width="260">
   <h1>Aurora</h1>
   <p><strong>Un puente entre la vida diaria y la atención prenatal.</strong></p>
   <p>Una aplicación web para organizar controles, preparar preguntas y coordinar el traslado y la red de apoyo de una gestante.</p>
@@ -29,7 +29,7 @@
 - [Estructura](#estructura)
 - [Roles](#roles)
 - [PWA y disponibilidad sin conexión](#pwa-y-disponibilidad-sin-conexión)
-- [APK para Android](#apk-para-android)
+- [Contenido de salud y directorio](#contenido-de-salud-y-directorio)
 - [Seguridad](#seguridad)
 - [Limitaciones y próximos pasos](#limitaciones-y-próximos-pasos)
 
@@ -39,7 +39,7 @@
 - **Qué ofrece:** etapa orientativa del embarazo, agenda de controles, preguntas para la consulta, plan de traslado y apoyo, contactos personales y fichas imprimibles.
 - **Qué no ofrece:** diagnóstico, interpretación de síntomas, tratamientos, protocolos clínicos ni sustitución de la atención profesional.
 
-El seguimiento individual de puerperio, lactancia y recién nacido sigue fuera de los módulos de la aplicación. Para las cuatro cuentas ficticias, la guía de demostración muestra un panorama general desde la atención prenatal hasta el seguimiento postnatal, basado únicamente en materiales oficiales MINSA de 2020–2022 y marcado como pendiente de revisión clínica; no contiene pautas personalizadas.
+El seguimiento individual de puerperio, lactancia y recién nacido sigue fuera de los módulos de la aplicación.
 
 ## Qué incluye
 
@@ -74,7 +74,7 @@ Aurora está diseñada como un **medio sencillo de organización** entre la gest
 | MySQL | Base de datos relacional |
 | Jinja2 | Plantillas HTML |
 | Service Worker | Caché del shell y fallback offline |
-| Waitress | Servidor WSGI para producción en Windows |
+| Waitress | Servidor WSGI para la aplicación |
 | Pytest | Pruebas automatizadas |
 
 ## Requisitos
@@ -108,22 +108,19 @@ Si PowerShell bloquea la activación del entorno, puedes ejecutar directamente `
 
 Aurora usa MySQL y distribuye su esquema maestro y scripts de migración:
 
-- [Aurora_BD.sql](Aurora_BD.sql): crea la base de datos, tablas maestro, relaciones, roles, permisos e índices.
+- [Aurora_BD.sql](Aurora_BD.sql): crea la base de datos e incluye el esquema actual completo (todas las tablas, relaciones, roles, permisos e índices) para instalaciones nuevas.
 - [database/Aurora_MVP_seed.sql](database/Aurora_MVP_seed.sql): carga contenidos, señales y servicios iniciales.
-- [database/migrations/20260925_preguntas_consulta.sql](database/migrations/20260925_preguntas_consulta.sql): agrega el hilo de preguntas a bases existentes.
-- [database/migrations/20260926_plan_parto.sql](database/migrations/20260926_plan_parto.sql): tabla `planes_parto` para la logística de traslado y apoyo.
-- [database/migrations/20260926_red_comunitaria.sql](database/migrations/20260926_red_comunitaria.sql): tabla `contactos_comunitarios` para los contactos personales de apoyo.
-- [database/migrations/20261008_seguimiento_nacimiento.sql](database/migrations/20261008_seguimiento_nacimiento.sql): agrega la fecha real del nacimiento al seguimiento del embarazo.
+- `database/migrations/`: scripts incrementales exclusivos para actualizar bases de datos creadas con versiones anteriores del esquema:
+  - [database/migrations/20260925_preguntas_consulta.sql](database/migrations/20260925_preguntas_consulta.sql): agrega el hilo de preguntas a bases existentes.
+  - [database/migrations/20260926_plan_parto.sql](database/migrations/20260926_plan_parto.sql): tabla `planes_parto` para la logística de traslado y apoyo.
+  - [database/migrations/20260926_red_comunitaria.sql](database/migrations/20260926_red_comunitaria.sql): tabla `contactos_comunitarios` para los contactos personales de apoyo.
+  - [database/migrations/20261008_seguimiento_nacimiento.sql](database/migrations/20261008_seguimiento_nacimiento.sql): agrega la fecha real del nacimiento al seguimiento del embarazo.
 
-Desde CMD:
+Para una **instalación nueva** desde CMD (no requiere ejecutar `database/migrations/`):
 
 ```cmd
 mysql -u root -p < Aurora_BD.sql
 mysql -u root -p aurora < database\Aurora_MVP_seed.sql
-mysql -u root -p aurora < database\migrations\20260925_preguntas_consulta.sql
-mysql -u root -p aurora < database\migrations\20260926_plan_parto.sql
-mysql -u root -p aurora < database\migrations\20260926_red_comunitaria.sql
-mysql -u root -p aurora < database\migrations\20261008_seguimiento_nacimiento.sql
 ```
 
 Desde PowerShell:
@@ -131,11 +128,9 @@ Desde PowerShell:
 ```powershell
 Get-Content Aurora_BD.sql | mysql -u root -p
 Get-Content database\Aurora_MVP_seed.sql | mysql -u root -p aurora
-Get-Content database\migrations\20260925_preguntas_consulta.sql | mysql -u root -p aurora
-Get-Content database\migrations\20260926_plan_parto.sql | mysql -u root -p aurora
-Get-Content database\migrations\20260926_red_comunitaria.sql | mysql -u root -p aurora
-Get-Content database\migrations\20261008_seguimiento_nacimiento.sql | mysql -u root -p aurora
 ```
+
+Si estás actualizando una **base de datos existente** de una versión previa, aplica únicamente las migraciones de `database/migrations/` que aún no se hayan ejecutado.
 
 Para producción, utiliza un usuario MySQL dedicado con privilegios mínimos. No uses `root` ni una contraseña vacía.
 
@@ -201,9 +196,10 @@ El comando solicita los datos de forma interactiva y nunca recibe la contraseña
 
 ## Pruebas
 
-Ejecuta la suite completa de pruebas desde la raíz del proyecto:
+Instala las dependencias de desarrollo antes de ejecutar las pruebas:
 
 ```powershell
+python -m pip install -r requirements-dev.txt
 python -m pytest -q
 ```
 
@@ -227,7 +223,7 @@ La suite de Python y las pruebas de JavaScript nativo cubren:
 
 ## Despliegue en Azure Virtual Machine
 
-La demostración de Aurora se despliega en una máquina virtual Ubuntu de Azure.
+Aurora se despliega en una máquina virtual Ubuntu de Azure.
 La arquitectura es:
 
 ```text
@@ -235,10 +231,8 @@ Teléfono o navegador ── HTTPS :443 ──> Nginx ──> Aurora / Waitress 
 ```
 
 La base de datos permanece dentro de la VM; no se abre su puerto a Internet.
-La URL pública de demostración actual es
-[`https://158-158-0-166.sslip.io`](https://158-158-0-166.sslip.io). El dominio
-`sslip.io` resuelve hacia la IP pública de la VM; en un despliegue permanente se
-recomienda usar un dominio propio.
+Configura un dominio propio para el entorno y no publiques direcciones IP de la
+infraestructura en este repositorio.
 
 ### 1. Crear y preparar la VM
 
@@ -251,7 +245,7 @@ recomienda usar un dominio propio.
 3. Descarga la clave SSH y conéctate desde Windows:
 
    ```powershell
-   ssh -i "C:\ruta\a\hackton_key.pem" adminaurora@IP_PUBLICA
+   ssh -i "C:\ruta\a\aurora_key.pem" adminaurora@IP_PUBLICA
    ```
 
    Si OpenSSH indica que la clave tiene permisos demasiado abiertos, limita sus
@@ -293,18 +287,14 @@ FLUSH PRIVILEGES;
 EXIT;
 ```
 
-Inicializa una base nueva y aplica todas las migraciones:
+Inicializa una base nueva (`Aurora_BD.sql` ya incluye el esquema completo actual):
 
 ```bash
 sudo mysql < Aurora_BD.sql
 sudo mysql aurora < database/Aurora_MVP_seed.sql
-sudo mysql aurora < database/migrations/20260925_preguntas_consulta.sql
-sudo mysql aurora < database/migrations/20260926_plan_parto.sql
-sudo mysql aurora < database/migrations/20260926_red_comunitaria.sql
-sudo mysql aurora < database/migrations/20261008_seguimiento_nacimiento.sql
 ```
 
-En una base que ya existe, aplica solamente las migraciones aún no ejecutadas.
+En una base que ya existe de una versión anterior, aplica únicamente las migraciones de `database/migrations/` aún no ejecutadas.
 Por ejemplo, la columna de fecha real de nacimiento se puede comprobar con:
 
 ```bash
@@ -398,9 +388,9 @@ sudo systemctl status aurora
 sudo ufw status
 ```
 
-### 6. Crear cuentas administrativas de demostración
+### 6. Crear la cuenta administrativa inicial
 
-Desde `~/Aurora` ejecuta una vez por cada cuenta:
+Desde `~/Aurora` crea la cuenta administrativa inicial:
 
 ```bash
 source .venv/bin/activate
@@ -409,7 +399,7 @@ flask --app app create-user
 
 Elige el id `2` (`administrador`) cuando el comando pregunte el rol. La
 contraseña se solicita de forma oculta; no se escribe en el historial ni en el
-repositorio.
+repositorio. No se incluyen usuarios ni datos ficticios en la instalación.
 
 ### 7. Actualizar Azure después de cambios locales
 
@@ -435,49 +425,6 @@ Nginx no necesita reiniciarse cuando cambian solo Python, HTML, CSS o archivos
 estáticos. Usa `sudo nginx -t && sudo systemctl reload nginx` únicamente si
 cambiaste su configuración.
 
-### Alternativa: ejecución directa en Windows
-
-En Windows, `run.bat` selecciona el modo mediante `AURORA_ENV`:
-
-```cmd
-set AURORA_ENV=production
-set SESSION_COOKIE_SECURE=1
-run.bat
-```
-
-En producción, [wsgi.py](wsgi.py) inicia Waitress en `0.0.0.0` y usa la variable `PORT`:
-
-```powershell
-$env:AURORA_ENV="production"
-$env:PORT="5000"
-python wsgi.py
-```
-
-Coloca HTTPS delante de Waitress mediante un proxy o balanceador, configura copias de seguridad de MySQL y verifica la restauración antes de aceptar datos reales.
-
-### Alternativa: despliegue en Microsoft Azure App Service
-
-Aurora queda preparada para App Service sin cambiar su código. Pasos recomendados
-(verifícalos primero en local; este repositorio no crea recursos de Azure):
-
-1. **Runtime:** App Service con Python 3.10–3.12 (Linux o Windows).
-2. **Comando de inicio:** en Linux usa un servidor WSGI, por ejemplo
-   `gunicorn --bind=0.0.0.0:8000 wsgi:app`; en Windows usa `python wsgi.py`
-   (Waitress, ya incluido en `requirements.txt`).
-3. **Variables de entorno** (Configuración → Variables de aplicación):
-   `SECRET_KEY`, `AURORA_ENV=production`, `AURORA_DEBUG=0`,
-   `SESSION_COOKIE_SECURE=1`, `PORT=8000` y las credenciales `MYSQL_*` del
-   servidor de Azure Database for MySQL. No subas nunca el archivo `.env`.
-4. **Base de datos:** Azure Database for MySQL; aplica `Aurora_BD.sql` y las
-   migraciones `database/migrations/*.sql`. La app no crea ni inicializa el
-   esquema por sí sola.
-5. **HTTPS:** actívalo en App Service; `SESSION_COOKIE_SECURE=1` añade HSTS.
-6. **Diagnóstico:** App Service recoge `stdout`/`stderr`; los errores 500 se
-   registran con `app.logger.exception` sin exponer datos sensibles al usuario.
-
-> `gunicorn` no se ejecuta en Windows; para desarrollo y producción en Windows
-> se mantiene Waitress (`wsgi.py`).
-
 ## Estructura
 
 Aurora sigue una organización **MVC** adaptada a Flask:
@@ -485,7 +432,7 @@ Aurora sigue una organización **MVC** adaptada a Flask:
 - **Modelo (`models/`)** — entidades SQLAlchemy y reglas de integridad.
 - **Vista (`templates/` + `static/`)** — plantillas Jinja2, estilos, JavaScript y PWA.
 - **Controlador (`controllers/`)** — recibe la petición, valida y coordina; no concentra la lógica de negocio.
-- **Servicios (`services/`)** — reglas de negocio reutilizables (cálculos de gestación, consultas, auditoría).
+- **Servicios (`services/`)** — reglas de negocio reutilizables (cálculos de gestación, consultas, catálogo MINSA, semillas, auditoría).
 - **Decoradores (`controllers/decorators.py`)** — control de acceso por rol compartido.
 
 ```text
@@ -496,30 +443,49 @@ Aurora/
 ├── extensions.py                  # Base de datos, login y CSRF
 ├── commands.py                    # Comandos CLI de Flask
 ├── README.md                      # Guía de instalación, uso y despliegue
-├── ARQUITECTURA_MVC.md            # Explicación didáctica de la arquitectura
 ├── controllers/
 │   ├── blueprints.py              # Blueprint principal compartido
-│   ├── decorators.py              # admin_required y helpers de rol
+│   ├── decorators.py              # admin_required, usuario_gestante y helpers de rol
 │   ├── auth.py                    # Login, registro y recuperación
-│   ├── gestante.py                # Flujos de la gestante (embarazo, controles, apoyo, perfil)
 │   ├── publicas.py                # Inicio, guía, centros, alertas, información y PWA
+│   ├── gestante/                  # Flujos de la gestante por dominio
+│   │   ├── embarazo.py
+│   │   ├── controles.py
+│   │   ├── plan_parto.py
+│   │   ├── red_comunitaria.py
+│   │   ├── preguntas.py
+│   │   ├── calendario.py
+│   │   └── perfil.py
 │   └── admin/                     # Panel administrativo por recurso
+│       ├── _common.py
 │       ├── dashboard.py
 │       ├── contenidos.py
 │       ├── senales.py
 │       ├── centros.py
 │       └── servicios.py
 ├── models/                        # Modelos SQLAlchemy
-├── services/                      # Lógica de negocio (home, mvp, gestacion, auditoria)
+├── services/                      # Lógica de negocio (admin, auditoria, auth, catalogo_minsa, gestacion, home, mvp, seed)
 ├── templates/                     # Vistas Jinja2
-├── static/                        # CSS, JavaScript, fuentes, assets y PWA
-├── tests/                         # Pruebas pytest
-├── Aurora_BD.sql                  # Esquema principal MySQL
-├── database/                      # Seed y migraciones incrementales
-│   ├── Aurora_MVP_seed.sql         # Datos iniciales
-│   └── migrations/                 # Cambios para bases existentes
+├── static/                        # CSS, JavaScript, fuentes, íconos, imágenes y PWA
+├── tests/                         # Suite modular de pruebas (pytest y node --test)
+│   ├── conftest.py
+│   ├── test_admin.py
+│   ├── test_arquitectura.py
+│   ├── test_auth.py
+│   ├── test_gestante.py
+│   ├── test_publicas.py
+│   ├── test_services.py
+│   ├── test_smoke_rutas.py
+│   ├── test_print_sheet.cjs
+│   └── test_pwa_install.cjs
+├── Aurora_BD.sql                  # Esquema completo MySQL para instalaciones nuevas
+├── database/                      # Seeds y migraciones incrementales
+│   ├── Aurora_MVP_seed.sql        # Datos iniciales SQL
+│   ├── seeds/                     # Catálogos JSON de centros y fuentes MINSA
+│   └── migrations/                # Actualizaciones incrementales para bases anteriores
 ├── requirements.txt               # Dependencias
-└── run.bat                        # Arranque local o producción en Windows
+├── requirements-dev.txt           # Dependencias de pruebas y desarrollo
+└── run.bat                        # Arranque local en Windows
 ```
 
 La configuración se selecciona con `AURORA_ENV` (`development`, `testing` o
@@ -538,31 +504,7 @@ compartida vive en `services/`, evitando dependencias entre controladores.
 
 El navegador registra el Service Worker desde [static/js/app.js](static/js/app.js). Se almacenan algunos recursos estáticos y una página general de contingencia. La disponibilidad sin conexión es parcial: perfil, embarazo, controles, preguntas, traslado, contactos y recordatorios requieren conexión y no se guardan en caché. La página de contingencia no muestra datos de la cuenta. Aurora no envía notificaciones en segundo plano; los recordatorios se consultan dentro de la aplicación.
 
-## APK para Android
-
-El proyecto incluye una envoltura Android en [`android/`](android/). Esta versión
-mantiene Flask, las sesiones y MySQL en un servidor HTTPS y abre Aurora dentro
-de una aplicación móvil. Antes de compilar, cambia `server_url` en
-[`android/app/src/main/res/values/strings.xml`](android/app/src/main/res/values/strings.xml)
-por el dominio público de producción. Después abre `android/` en Android Studio
-y usa **Build > Build APK(s)**. El resultado se genera normalmente en
-`android/app/build/outputs/apk/debug/app-debug.apk`. No uses `localhost`, `127.0.0.1` ni HTTP: desde
-el teléfono esas direcciones no apuntan al servidor y el módulo bloquea tráfico
-sin cifrado.
-
-Para el entregable de descarga, la APK publicada se almacena como
-[`static/downloads/Aurora.apk`](static/downloads/Aurora.apk). La landing pública
-incluye el botón de descarga y Aurora la entrega desde:
-
-```text
-https://DOMINIO_PUBLICO/descargar/aurora.apk
-```
-
-Cada vez que cambies `server_url` o el proyecto Android, genera una APK nueva,
-reemplaza `static/downloads/Aurora.apk`, realiza `git commit` y aplica el
-proceso de actualización de Azure descrito arriba.
-
-El directorio de demostración replica el listado oficial de la Red de Salud del MINSA (consultado el 2026-10-06): 438 establecimientos entre hospitales (con su subtipo: primario, departamental, regional o de referencia nacional), casas maternas, centros de salud y Clínicas Médicas Previsionales, cubriendo los 15 departamentos y 2 regiones autónomas de toda Nicaragua (153 municipios), con SILAIS, departamento, municipio, localidad y zona urbano/rural tal como los publica la fuente. Teléfonos, horarios, coordenadas y servicios no aparecen en el listado y no se importan. Las CMP son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento.
+El directorio replica el listado oficial de la Red de Salud del MINSA (consultado el 2026-10-06): 438 establecimientos entre hospitales (con su subtipo: primario, departamental, regional o de referencia nacional), casas maternas, centros de salud y Clínicas Médicas Previsionales, cubriendo los 15 departamentos y 2 regiones autónomas de toda Nicaragua (153 municipios), con SILAIS, departamento, municipio, localidad y zona urbano/rural tal como los publica la fuente. Teléfonos, horarios, coordenadas y servicios no aparecen en el listado y no se importan. Las CMP son previsionales y aplican según convenios con el INSS: confirma elegibilidad y disponibilidad directamente con MINSA. La fecha de consulta no equivale a una verificación del establecimiento.
 
 Para poblar o actualizar el directorio en la base de datos de Azure, conéctate
 por SSH a la VM y ejecuta el comando desde la carpeta del proyecto. `seed-centros`
@@ -578,32 +520,14 @@ sudo systemctl restart aurora
 Comprueba el resultado en el directorio público de Aurora. No ejecutes el comando
 desde `~`: Git y Flask necesitan estar dentro de `~/Aurora`.
 
-## Demo y revisión de contenido clínico
+## Contenido de salud y directorio
 
-Para facilitar la revisión manual por parte de profesionales de salud en esta versión de prueba, la guía incluye 24 orientaciones detalladas que abarcan tanto el calendario prenatal como la resolución de dudas sobre las señales de alerta y emergencias obstétricas (sangrado vaginal, dolor de cabeza intenso con visión borrosa/zumbidos por preeclampsia, salida de líquido amniótico, disminución de movimientos fetales, fiebre e infecciones, contracciones prematuras, hinchazón súbita, dolor epigástrico y convulsiones), así como el rol del plan de parto y las Casas Maternas ante un traslado urgente.
-
-En modo de demostración (`AURORA_DEMO=1`), las cuentas de prueba y administradores pueden consultar los datos ficticios de la guía y el panel de revisión clínica en `/demo/revision-clinica`. En producción, `/guia` muestra las orientaciones que administración publicó y `/alertas` muestra las señales que administración activó.
-
-Los datos de demostración (cuatro perfiles ficticios, centros oficiales del MINSA
-y catálogo de alertas) se cargan con `seed-demo`. Esta operación requiere
-`AURORA_DEMO=1` y debe ejecutarse únicamente en una base de demostración separada;
-no la ejecutes en la base de producción de Azure porque crea o restablece cuentas
-y datos ficticios.
-
-1. Activar el modo demo (solo en la base/entorno de demo):
-   - PowerShell: `$env:AURORA_DEMO = "1"`
-   - Linux/macOS: `export AURORA_DEMO=1`
-2. En el entorno de demostración, cargar perfiles ficticios, agenda y centros:
-   `flask --app app seed-demo`. En la VM de Azure, primero entra a `~/Aurora`,
-   activa `.venv` y configura `AURORA_DEMO=1` en el entorno de demostración antes
-   de ejecutar el comando. Para actualizar únicamente los centros en Azure usa
-   `flask --app app seed-centros`, descrito arriba.
-3. Crear una cuenta revisora con rol `administrador`; la contraseña se pide de forma interactiva y no queda escrita en el código:
-   `flask --app app create-user` → elegir el id del rol `administrador`.
-4. Iniciar la aplicación: `python app.py`
-5. Ingresar en `http://localhost:5000/login` con la cuenta revisora o de prueba y abrir `/guia`, `/alertas` o `/demo/revision-clinica`.
-
-La vista muestra el aviso **PENDIENTE DE REVISIÓN CLÍNICA — NO USAR PARA ATENCIÓN** y cita el nombre de la fuente, la URL directa y la fecha de consulta de cada dato. Las fechas de consulta no son fechas de revisión clínica.
+La instalación no publica contenido clínico ni carga cuentas ficticias. La guía
+y las señales de alerta solo muestran registros que administración haya
+publicado o activado; cada registro debe contar con una fuente y una fecha de
+revisión. No publiques orientaciones hasta completar una revisión profesional
+responsable. El directorio MINSA tampoco confirma teléfonos, horarios ni
+servicios: valida esos datos directamente con cada establecimiento.
 
 ## Seguridad
 
@@ -634,3 +558,40 @@ Antes de publicar con datos reales, se recomienda completar:
 ## Licencia
 
 Este repositorio no incluye actualmente un archivo de licencia. Define una licencia antes de distribuirlo públicamente.
+
+## Presentación en Railway
+
+El archivo `railway.toml` prepara la base y arranca `python wsgi.py` con Waitress,
+utilizando el `PORT` asignado por Railway. `/health` comprueba también MySQL.
+
+En las variables del servicio web configura:
+
+- `AURORA_ENV=production`
+- `SECRET_KEY`: una clave aleatoria privada y estable.
+- `SESSION_COOKIE_SECURE=1` para el dominio HTTPS.
+- `MYSQL_URL=${{MySQL.MYSQL_URL}}`, ajustando `MySQL` al nombre del servicio de base de datos.
+
+También se admiten las variables individuales de Railway (`MYSQLHOST`,
+`MYSQLPORT`, `MYSQLDATABASE`, `MYSQLUSER`, `MYSQLPASSWORD`) o las variables locales
+con guiones bajos. No se necesita importar un SQL que fuerce el nombre `aurora`:
+`prepare-deploy` crea las tablas faltantes en la base seleccionada, agrega la
+columna de nacimiento si falta y carga el directorio si está vacío. Conserva
+las cuentas y registros existentes. No publica contenidos clínicos de ejemplo.
+
+### Cuenta ficticia de presentación
+
+```bash
+python -m flask --app app create-demo
+```
+
+El comando solicita una contraseña de al menos 12 caracteres sin mostrarla.
+Crea `maria.demo@example.com`, con perfil de María, embarazo de 24 semanas,
+tres controles anteriores, una próxima cita, preguntas, recordatorio y plan de
+traslado. Todos los datos personales son ficticios; se omiten cédulas y teléfonos
+para evitar que correspondan a alguien real. Repetirlo no duplica ni cambia una
+cuenta existente. Las fechas se calculan al crear la cuenta, en hora de Managua.
+
+Para crearlo automáticamente en una **base de demostración** de Railway, define
+`AURORA_DEMO_PASSWORD` en sus variables privadas antes de desplegar. Si la cuenta
+ya existe, no se modifica ni se cambia su contraseña. Retira esa variable después
+de la presentación. Las contraseñas y bases locales no se incluyen en Git.

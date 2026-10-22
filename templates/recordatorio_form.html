@@ -1,20 +1,26 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Nuevo recordatorio | Aurora{% endblock %}
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell section-shell">
+<main id="main" tabindex="-1" class="app-shell section-shell detail-form-page">
   {% set back_url = url_for('main.calendario') %}
   {% set back_label = 'Volver al calendario' %}
   {% set page_title = 'Nuevo recordatorio' %}
   {% include 'partials/page_header.html' %}
   {% include 'partials/flash.html' %}
-  <form class="card" method="post">
+  <section class="detail-intro" aria-labelledby="reminder-intro">
+    <span class="detail-intro__icon material-symbols-outlined" aria-hidden="true">notifications</span>
+    <div><h2 id="reminder-intro">Un pendiente menos en tu cabeza</h2><p>Deja anotado qué necesitas recordar y cuándo.</p></div>
+  </section>
+  <form class="card detail-form" method="post">
+    <p class="detail-form__hint">Los campos con <span aria-hidden="true">*</span><span class="sr-only">asterisco</span> son obligatorios.</p>
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label for="titulo">Título
-      <input id="titulo" name="titulo" type="text" maxlength="150" value="{{ request.form.get('titulo', '') if form_data else '' }}" required>
+    <label for="titulo">Título <span class="field-required" aria-hidden="true">*</span>
+      <input id="titulo" name="titulo" type="text" maxlength="150" placeholder="Ej. Llevar resultados a la consulta" value="{{ request.form.get('titulo', '') if form_data else '' }}" required>
     </label>
-    <label for="fecha_hora">Fecha y hora
-      <input id="fecha_hora" name="fecha_hora" type="datetime-local" value="{{ request.form.get('fecha_hora', '') if form_data else '' }}" required>
+    <label for="fecha_hora">Fecha y hora <span class="field-required" aria-hidden="true">*</span>
+      <input id="fecha_hora" name="fecha_hora" type="datetime-local" aria-describedby="reminder-time-help" value="{{ request.form.get('fecha_hora', '') if form_data else '' }}" required>
     </label>
+    <p class="detail-field-help" id="reminder-time-help">Elige una fecha futura. Lo verás en tu calendario al abrir Aurora; no se envían avisos en segundo plano.</p>
     <label for="tipo">Tipo
       <select id="tipo" name="tipo">
         {% for valor, etiqueta in [('personal', 'Personal'), ('control', 'Control'), ('informativo', 'Informativo')] %}
@@ -22,7 +28,7 @@
         {% endfor %}
       </select>
     </label>
-    <label for="control_prenatal_id">Control relacionado
+    <label for="control_prenatal_id">Control relacionado <span class="field-optional">Opcional</span>
       <select id="control_prenatal_id" name="control_prenatal_id">
         <option value="">Sin asociar</option>
         {% for control in controles %}
@@ -32,10 +38,13 @@
         {% endfor %}
       </select>
     </label>
-    <label for="descripcion">Descripción
-      <textarea id="descripcion" name="descripcion" maxlength="500">{{ request.form.get('descripcion', '') if form_data else '' }}</textarea>
+    <label for="descripcion">Descripción <span class="field-optional">Opcional</span>
+      <textarea id="descripcion" name="descripcion" maxlength="500" placeholder="Añade un detalle que te ayude a recordarlo.">{{ request.form.get('descripcion', '') if form_data else '' }}</textarea>
     </label>
-    <button class="button button--primary button--wide" type="submit">Guardar recordatorio</button>
+    <div class="detail-form__actions">
+      <button class="button button--primary button--wide" type="submit"><span class="material-symbols-outlined" aria-hidden="true">check</span>Guardar recordatorio</button>
+      <a class="button button--secondary button--wide" href="{{ url_for('main.calendario') }}">Cancelar</a>
+    </div>
   </form>
 </main>
 {% endblock %}

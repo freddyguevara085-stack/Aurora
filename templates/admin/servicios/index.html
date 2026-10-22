@@ -39,7 +39,7 @@
                 {% endif %}
               </td>
               <td>
-                <span class="chip" style="background: var(--soft); color: var(--primary);">
+                <span class="chip chip--soft">
                   {{ item.asignaciones_centros|length }} centro(s)
                 </span>
               </td>
@@ -78,7 +78,7 @@
     </div>
   {% else %}
     <div class="empty">
-      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);" aria-hidden="true">medical_services</span>
+      <span class="material-symbols-outlined empty__icon empty__icon--muted" aria-hidden="true">medical_services</span>
       <h3>No hay servicios registrados</h3>
       <p>Comienza agregando los servicios disponibles para asociarlos a los centros de salud.</p>
     </div>

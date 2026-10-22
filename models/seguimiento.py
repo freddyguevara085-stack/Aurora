@@ -1,7 +1,5 @@
 """Modelos de controles prenatales y recordatorios."""
 
-import re
-
 from sqlalchemy.dialects.mysql import ENUM
 from sqlalchemy.dialects.mysql import INTEGER as UINT
 from sqlalchemy.dialects.mysql import SMALLINT
@@ -111,22 +109,26 @@ class ControlPrenatal(db.Model):
         """Nombre del centro de atención oficial o puesto comunitario indicado."""
         if self.centro_atencion and getattr(self.centro_atencion, "nombre", None):
             return self.centro_atencion.nombre
-        if self.indicaciones and "[Centro:" in self.indicaciones:
-            m = re.search(r"\[Centro:\s*([^\]]+)\]", self.indicaciones)
-            if m:
-                return m.group(1).strip()
-        return "Centro por confirmar"
+        from services.gestacion import descomponer_indicaciones
+
+        _, centro_personalizado, _ = descomponer_indicaciones(self.indicaciones)
+        return centro_personalizado or "Centro por confirmar"
 
     @property
     def tipo_control(self) -> str:
         """Tipo o motivo del control prenatal (regular, ultrasonido, laboratorio)."""
-        if self.indicaciones:
-            if "[Ultrasonido" in self.indicaciones or "Ecografía" in self.indicaciones:
-                return "Ultrasonido"
-            if "[Exámenes de laboratorio]" in self.indicaciones or "laboratorio" in self.indicaciones.lower():
-                return "Laboratorio"
-            if "[Control prenatal regular]" in self.indicaciones:
-                return "Control regular"
+        from services.gestacion import descomponer_indicaciones
+
+        tipo, _, _ = descomponer_indicaciones(self.indicaciones)
+        if tipo == "Ultrasonido / Ecografía" or (
+            self.indicaciones
+            and ("[Ultrasonido" in self.indicaciones or "Ecografía" in self.indicaciones)
+        ):
+            return "Ultrasonido"
+        if tipo == "Exámenes de laboratorio" or (
+            self.indicaciones and "laboratorio" in self.indicaciones.lower()
+        ):
+            return "Laboratorio"
         return "Control regular"
 
     def __repr__(self) -> str:

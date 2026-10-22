@@ -2,7 +2,7 @@
 Modelo de control de acceso: Rol.
 
 Tabla representada : roles
-Fuente SQL         : Aurora_BD.sql líneas 11-74
+Fuente SQL         : Aurora_BD.sql líneas 11-26
 SQLAlchemy         : 2.0.x  (usa dialecto MySQL para INT UNSIGNED)
 """
 

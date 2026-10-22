@@ -1,0 +1,120 @@
+/* El widget utiliza las mismas superficies y tokens que las demás tarjetas. */
+.gestational-card,
+.pregnancy-page .pregnancy-visual.gestational-card {
+  padding: 18px;
+  border: var(--aurora-border-card);
+  border-radius: var(--aurora-radius-lg);
+  background: var(--aurora-card-bg);
+  box-shadow: var(--aurora-shadow-card);
+}
+.home-shell .pregnancy-overview.gestational-card {
+  padding: 18px;
+  border: 1px solid rgba(108,75,163,.08);
+  border-radius: 14px;
+  background: var(--white);
+  box-shadow: 0 2px 6px rgba(0,0,0,.03);
+}
+.gestational-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.gestational-widget__heading {
+  align-self: stretch;
+  text-align: left;
+}
+.gestational-widget__heading p {
+  margin: 0 0 4px;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.gestational-widget .gestational-ring-wrap,
+.home-shell .gestational-widget .gestational-ring-wrap {
+  width: 176px;
+  height: 176px;
+  margin: 0 auto 2px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+.gestational-widget .gestational-ring__track {
+  stroke: var(--aurora-lavender);
+  stroke-width: 6;
+}
+.gestational-widget .gestational-ring__progress {
+  stroke-width: 6;
+  filter: none;
+}
+.gestational-widget .gestational-ring__center {
+  gap: 2px;
+  width: 110px;
+  height: 110px;
+  background: transparent;
+  box-shadow: none;
+}
+.gestational-ring__eyebrow {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .09em;
+}
+.gestational-widget .gestational-ring__week,
+.home-shell .gestational-widget .gestational-ring__week {
+  color: var(--ink);
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -.04em;
+  font-variant-numeric: tabular-nums;
+}
+.gestational-trimester {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  max-width: 100%;
+  padding: 5px 11px;
+  border-radius: var(--radius-badge);
+  background: var(--aurora-lavender);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.gestational-trimester__dot {
+  display: none;
+}
+.gestational-comparison {
+  max-width: 100%;
+  margin: 18px 0 2px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.8;
+  text-align: center;
+}
+.gestational-comparison strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+.gestational-comparison > span {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 18px;
+  vertical-align: middle;
+}
+.gestational-widget__note {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+@media (max-width: 360px) {
+  .gestational-card,
+  .pregnancy-page .pregnancy-visual.gestational-card,
+  .home-shell .pregnancy-overview.gestational-card { padding: 16px; }
+}
+@media print {
+  .gestational-card { box-shadow: none; }
+}

@@ -2,105 +2,107 @@
 {% block title %}{{ centro.nombre }} | Aurora{% endblock %}
 
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell aurora-page-container">
-    {% set back_url = url_for('main.centros') %}
-    {% set back_label = 'Centros de salud' %}
-    {% set page_title = 'Detalles del Centro' %}
-    {% include 'partials/page_header.html' %}
+<main id="main" tabindex="-1" class="app-shell aurora-page-container explore-page directory-detail">
+  {% set back_url = url_for('main.centros') %}
+  {% set back_label = 'Centros de salud' %}
+  {% set page_title = 'Detalles del Centro' %}
+  {% include 'partials/page_header.html' %}
 
-    {% if centro.fecha_verificacion %}
-    <section class="verification-notice verification-notice--verified" role="status">
-        <span class="material-symbols-outlined" aria-hidden="true">verified</span>
-        <div>
-            <strong>Revisión registrada</strong>
-            <p>Fecha registrada: {{ centro.fecha_verificacion.strftime('%d/%m/%Y') }}. Confirma los datos antes de acudir.</p>
-        </div>
-    </section>
-    {% else %}
-    <section class="verification-notice" role="note">
-        <span class="material-symbols-outlined" aria-hidden="true">warning</span>
-        <div>
-            <strong>Información por confirmar</strong>
-            <p>Este centro aún no cuenta con verificación institucional registrada. Confirma teléfono, horario y servicios directamente con el establecimiento antes de acudir.</p>
-        </div>
-    </section>
-    {% endif %}
-
-    {% if centro.tipo_establecimiento == 'clinica' %}
-    <section class="verification-notice" role="note">
-        <span class="material-symbols-outlined" aria-hidden="true">info</span>
-        <div>
-            <strong>Clínica Médica Previsional (CMP MINSA)</strong>
-            <p>MINSA indica que estos servicios se brindan a asegurados, jubilados y beneficiarios según convenios con el INSS. <a href="https://www.minsa.gob.ni/index.php/centros-e-institutos/clinicas-medicas-previsionales-del-ministerio-de-salud-cmp-minsa" target="_blank" rel="noopener noreferrer">Consulta la fuente oficial</a> y confirma si aplica a tu caso.</p>
-        </div>
-    </section>
-    {% endif %}
-
-    <article class="card aurora-card" style="margin-bottom: 24px;">
-        <div style="margin-bottom: 16px;">
-            <span class="status-badge status-badge--success" style="text-transform: capitalize;">
-                {% if centro.tipo_establecimiento == 'clinica' %}Clínica Médica Previsional{% elif centro.subtipo %}{{ centro.subtipo }}{% else %}{{ centro.tipo_establecimiento|replace('_', ' ') }}{% endif %}
-            </span>
-        </div>
-
-        <h1 style="margin-top: 0; font-size: 22px; line-height: 1.3;">{{ centro.nombre }}</h1>
-        <div class="muted-row" style="margin-bottom: 20px;">
-            <span class="material-symbols-outlined" aria-hidden="true">map</span>
-            <span>{{ centro.municipio }}, {{ centro.departamento }}{% if centro.zona %} · zona {{ centro.zona }}{% endif %}</span>
-        </div>
-
-        {% if centro.direccion %}
-        <div class="muted-row" style="align-items: flex-start; margin-bottom: 12px;">
-            <span class="material-symbols-outlined" style="margin-top: 2px;" aria-hidden="true">location_on</span>
-            <span style="color: var(--ink);">{{ centro.direccion }}</span>
-        </div>
-        {% endif %}
-
-        {% if centro.horario %}
-        <div class="muted-row" style="align-items: flex-start; margin-bottom: 20px;">
-            <span class="material-symbols-outlined" style="margin-top: 2px;" aria-hidden="true">schedule</span>
-            <span style="color: var(--ink);">{{ centro.horario }}</span>
-        </div>
-        {% endif %}
-
-        {% if centro.telefono %}
-        <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 12px;">
-            {# Split phones if there are multiple (e.g. '8213-1122 / 2713-6305') #}
-            {% for tel in centro.telefono.split('/') %}
-                <a href="tel:{{ tel|trim|replace(' ', '')|replace('-', '') }}" class="button button--primary button--wide" style="text-decoration: none;">
-                    <span class="material-symbols-outlined" aria-hidden="true">call</span>
-                    Llamar al {{ tel|trim }}
-                </a>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {% if centro.latitud and centro.longitud %}
-        <div style="margin-top: {% if centro.telefono %}12px{% else %}24px{% endif %};">
-            <a href="https://www.google.com/maps/search/?api=1&query={{ centro.latitud }},{{ centro.longitud }}" target="_blank" class="button button--secondary button--wide" style="text-decoration: none;">
-                <span class="material-symbols-outlined" aria-hidden="true">directions</span>
-                Ver en el mapa
-            </a>
-        </div>
-        {% endif %}
-    </article>
-
-    <h2 class="eyebrow" style="margin-bottom: 12px;">SERVICIOS DISPONIBLES</h2>
-    <div class="card aurora-card" style="padding: 20px;">
-        {% if servicios %}
-            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                {% for servicio in servicios %}
-                    <span class="admin-badge" style="background: var(--soft); color: var(--ink); border: 1px solid var(--line); font-weight: 500; font-size: 13px; padding: 6px 12px;">
-                        {{ servicio.servicio.nombre }}{% if servicio.fecha_verificacion %} · revisión {{ servicio.fecha_verificacion.strftime('%d/%m/%Y') }}{% else %} · por confirmar{% endif %}
-                    </span>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="muted-row">
-                <span class="material-symbols-outlined" aria-hidden="true">info</span>
-                <span>No hay servicios registrados para este centro.</span>
-            </div>
-        {% endif %}
+  <article class="card aurora-card centro-detail-card">
+    <div class="centro-detail-card__badge-wrap">
+      <span class="status-badge status-badge--success centro-detail-card__badge">
+        {% if centro.tipo_establecimiento == 'clinica' %}Clínica Médica Previsional{% elif centro.subtipo %}{{ centro.subtipo }}{% else %}{{ centro.tipo_establecimiento|replace('_', ' ') }}{% endif %}
+      </span>
     </div>
+
+    <h2 class="centro-detail-card__title">{{ centro.nombre }}</h2>
+    <div class="muted-row centro-detail-card__location">
+      <span class="material-symbols-outlined" aria-hidden="true">map</span>
+      <span>{{ centro.municipio }}, {{ centro.departamento }}{% if centro.zona %} · zona {{ centro.zona }}{% endif %}</span>
+    </div>
+
+    {% if not centro.direccion %}<p class="directory-missing">Dirección por confirmar con el centro.</p>{% endif %}
+    {% if centro.direccion %}
+    <div class="muted-row centro-detail-card__meta">
+      <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+      <span>{{ centro.direccion }}</span>
+    </div>
+    {% endif %}
+
+    {% if not centro.horario %}<p class="directory-missing">Horario por confirmar con el centro.</p>{% endif %}
+    {% if centro.horario %}
+    <div class="muted-row centro-detail-card__meta centro-detail-card__meta--spaced">
+      <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+      <span>{{ centro.horario }}</span>
+    </div>
+    {% endif %}
+
+    {% if not centro.telefono %}<p class="directory-missing">Teléfono por confirmar con el centro.</p>{% endif %}
+    {% if centro.telefono %}
+    <div class="centro-detail-card__actions">
+      {% for tel in centro.telefono.split('/') %}
+        <a href="tel:{{ tel|trim|replace(' ', '')|replace('-', '') }}" class="button button--primary button--wide">
+          <span class="material-symbols-outlined" aria-hidden="true">call</span>
+          Llamar al {{ tel|trim }}
+        </a>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if centro.latitud and centro.longitud %}
+    <div class="centro-detail-card__map{% if centro.telefono %} centro-detail-card__map--compact{% endif %}">
+      <a href="https://www.google.com/maps/search/?api=1&query={{ centro.latitud }},{{ centro.longitud }}" target="_blank" rel="noopener noreferrer" class="button button--secondary button--wide">
+        <span class="material-symbols-outlined" aria-hidden="true">directions</span>
+        Ver en el mapa
+      </a>
+    </div>
+    {% endif %}
+  </article>
+
+  {% if centro.fecha_verificacion %}
+  <section class="verification-notice verification-notice--verified" role="status">
+    <span class="material-symbols-outlined" aria-hidden="true">verified</span>
+    <div>
+      <strong>Revisión registrada</strong>
+      <p>Fecha registrada: {{ centro.fecha_verificacion.strftime('%d/%m/%Y') }}. Confirma los datos antes de acudir.</p>
+    </div>
+  </section>
+  {% else %}
+  <section class="verification-notice" role="note">
+    <span class="material-symbols-outlined" aria-hidden="true">warning</span>
+    <div>
+      <strong>Información por confirmar</strong>
+      <p>Este centro aún no cuenta con verificación institucional registrada. Confirma teléfono, horario y servicios directamente con el establecimiento antes de acudir.</p>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if centro.tipo_establecimiento == 'clinica' %}
+  <section class="verification-notice" role="note">
+    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+    <div>
+      <strong>Clínica Médica Previsional (CMP MINSA)</strong>
+      <p>MINSA indica que estos servicios se brindan a asegurados, jubilados y beneficiarios según convenios con el INSS. <a href="https://www.minsa.gob.ni/index.php/centros-e-institutos/clinicas-medicas-previsionales-del-ministerio-de-salud-cmp-minsa" target="_blank" rel="noopener noreferrer">Consulta la fuente oficial</a> y confirma si aplica a tu caso.</p>
+    </div>
+  </section>
+  {% endif %}
+
+  <h2 class="eyebrow centro-services-heading">SERVICIOS REGISTRADOS</h2>
+  <div class="card aurora-card centro-services-card">
+    {% if servicios %}
+      <div class="centro-services-list">
+        {% for servicio in servicios %}
+          <span class="admin-badge centro-service-tag">
+            {{ servicio.servicio.nombre }}{% if servicio.fecha_verificacion %} · revisión {{ servicio.fecha_verificacion.strftime('%d/%m/%Y') }}{% else %} · por confirmar{% endif %}
+          </span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="muted-row">
+        <span class="material-symbols-outlined" aria-hidden="true">info</span>
+        <span>No hay servicios registrados para este centro.</span>
+      </div>
+    {% endif %}
+  </div>
 </main>
 {% endblock %}

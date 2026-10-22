@@ -193,42 +193,4 @@
     </div>
   </form>
 </main>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var fechaInput = document.getElementById('fecha_control');
-  var estadoInput = document.getElementById('estado');
-  var noteEl = document.getElementById('calc-gestacional-note');
-  var textEl = document.getElementById('calc-gestacional-text');
-  if (fechaInput && estadoInput) {
-    function actualizarLimiteFecha() {
-      if (estadoInput.value === 'programado' || estadoInput.value === 'reprogramado') {
-        var now = new Date();
-        fechaInput.min = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
-      } else {
-        fechaInput.removeAttribute('min');
-      }
-    }
-    actualizarLimiteFecha();
-    estadoInput.addEventListener('change', actualizarLimiteFecha);
-  }
-  if (fechaInput && noteEl && textEl) {
-    var inicioStr = noteEl.getAttribute('data-inicio');
-    if (inicioStr) {
-      var inicioDate = new Date(inicioStr + 'T00:00:00');
-      function actualizarSemana() {
-        if (!fechaInput.value) return;
-        var citaDate = new Date(fechaInput.value + 'T00:00:00');
-        var diffDays = Math.floor((citaDate - inicioDate) / (1000 * 60 * 60 * 24));
-        var semana = Math.min(42, Math.max(0, Math.floor(diffDays / 7)));
-        if (!isNaN(semana) && semana >= 0) {
-          textEl.innerHTML = 'Estarás cursando la <strong>semana ' + semana + '</strong> de gestación.';
-        }
-      }
-      fechaInput.addEventListener('change', actualizarSemana);
-      fechaInput.addEventListener('input', actualizarSemana);
-    }
-  }
-});
-</script>
 {% endblock %}

@@ -88,7 +88,7 @@
               <td>
                 {% set num_serv = item.asignaciones_servicios|length %}
                 {% if num_serv > 0 %}
-                  <span class="chip" style="background: var(--soft); color: var(--primary);">{{ num_serv }} servicio(s)</span>
+                  <span class="chip chip--soft">{{ num_serv }} servicio(s)</span>
                 {% else %}
                   <small class="muted-text">Ninguno</small>
                 {% endif %}
@@ -133,7 +133,7 @@
     </div>
   {% else %}
     <div class="empty">
-      <span class="material-symbols-outlined" style="font-size: 40px; color: var(--muted);" aria-hidden="true">local_hospital</span>
+      <span class="material-symbols-outlined empty__icon empty__icon--muted" aria-hidden="true">local_hospital</span>
       <h3>No se encontraron centros de salud</h3>
       <p>No hay establecimientos que coincidan con la búsqueda o aún no se han registrado.</p>
     </div>

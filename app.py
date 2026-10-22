@@ -25,6 +25,12 @@ def create_app(config_name: str | None = None) -> Flask:
     _registrar_extensiones(app)
     _registrar_blueprints(app)
     register_commands(app)
+
+    @app.get("/health")
+    def health():
+        db.session.execute(db.text("SELECT 1"))
+        return {"status": "ok"}
+
     _registrar_manejadores_de_error(app)
     _registrar_cabeceras_de_seguridad(app)
 

@@ -29,14 +29,3 @@ Thumbs.db
 
 # Registros
 *.log
-
-# Archivos pesados de presentación (se mantienen fuera del repositorio)
-presentacion/*.mp4
-presentacion/clips/
-presentacion/app-icon.png
-
-# Android build outputs and local configuration
-android/.gradle/
-android/build/
-android/app/build/
-android/local.properties

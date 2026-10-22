@@ -1,0 +1,42 @@
+{
+  "minsa_inicio": {
+    "nombre": "MINSA Nicaragua - Inicio (red de servicio pública)",
+    "url": "https://www.minsa.gob.ni/"
+  },
+  "minsa_hospitales": {
+    "nombre": "MINSA Nicaragua - Red de Salud: Hospitales",
+    "url": "https://www.minsa.gob.ni/index.php/red-de-salud/hospitales"
+  },
+  "minsa_casas_maternas": {
+    "nombre": "MINSA Nicaragua - Red de Salud: Casa Materna",
+    "url": "https://www.minsa.gob.ni/index.php/red-de-salud/casa-materna"
+  },
+  "minsa_centros_salud": {
+    "nombre": "MINSA Nicaragua - Red de Salud: Centro de Salud",
+    "url": "https://www.minsa.gob.ni/index.php/red-de-salud/centro-de-salud"
+  },
+  "minsa_clinicas_previsionales": {
+    "nombre": "MINSA Nicaragua - Red de Salud: Clínicas Médicas Previsionales",
+    "url": "https://www.minsa.gob.ni/index.php/red-de-salud/clinica-medica-previsional"
+  },
+  "minsa_cmp_info": {
+    "nombre": "MINSA Nicaragua - Clínicas Médicas Previsionales del MINSA",
+    "url": "https://www.minsa.gob.ni/index.php/centros-e-institutos/clinicas-medicas-previsionales-del-ministerio-de-salud-cmp-minsa"
+  },
+  "minsa_atencion_prenatal_2022": {
+    "nombre": "MINSA - Actividades Básicas durante la Atención Prenatal (2022); cita Normativa 011, tercera edición (2020)",
+    "url": "https://www.minsa.gob.ni/sites/default/files/publicaciones/II-Atencion%20Prenatal%202022-11.pdf"
+  },
+  "minsa_censo_gerencial_2022": {
+    "nombre": "MINSA - Elaboración y utilización del Censo Gerencial (2022)",
+    "url": "https://www.minsa.gob.ni/sites/default/files/publicaciones/I-%20Censo%20gerencial%202022-11.pdf"
+  },
+  "minsa_recien_nacido_2022": {
+    "nombre": "MINSA - Atención del Recién Nacido (2022); referencia Normativa 108 (2022)",
+    "url": "https://www.minsa.gob.ni/sites/default/files/publicaciones/V-Atencion%20del%20Reci%C3%A9n%20Nacido%202022-11.pdf"
+  },
+  "minsa_sip_plus_2022": {
+    "nombre": "MINSA - Normativa 078, Sistema de Información Perinatal Plus, segunda edición (2021; publicada en 2022)",
+    "url": "https://www.minsa.gob.ni/sites/default/files/publicaciones/Normativa%20078%20final%2019092022.pdf"
+  }
+}

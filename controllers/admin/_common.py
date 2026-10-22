@@ -1,24 +1,12 @@
 """Utilidades compartidas por los módulos del panel de administración."""
 
-from urllib.parse import urlsplit
-
 from flask import flash, redirect, request, url_for
 from flask_login import current_user
 from sqlalchemy.exc import SQLAlchemyError
 
 from extensions import db
+from services.admin import _url_fuente_valida  # noqa: F401  (reexportado)
 from services.auditoria import registrar_auditoria
-
-
-def _url_fuente_valida(url):
-    """True si la URL vacía o usa http/https con dominio."""
-    if not url:
-        return True
-    try:
-        partes = urlsplit(url)
-    except ValueError:
-        return False
-    return partes.scheme in {"http", "https"} and bool(partes.netloc)
 
 
 def _alternar(instancia, campo, entidad, etiqueta_exito, redirect_endpoint, **kwargs):

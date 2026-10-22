@@ -23,7 +23,6 @@ ENDPOINTS_ESPERADOS = {
     "main.centros",
     "main.detalle_centro",
     "main.alertas",
-    "main.revision_clinica",
     # Auth
     "auth.login",
     "auth.logout",

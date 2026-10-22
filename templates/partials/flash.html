@@ -1,1 +1,8 @@
-{% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<p class="flash flash--{{ category }}" role="alert">{{ message }}</p>{% endfor %}{% endwith %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% for category, message in messages %}
+    <p class="flash flash--{{ category }}" role="{{ 'alert' if category in ['error', 'danger'] else 'status' }}">
+      <span class="material-symbols-outlined flash__icon" aria-hidden="true">{{ 'error_outline' if category in ['error', 'danger'] else ('check_circle' if category == 'success' else 'info') }}</span>
+      <span class="flash__message">{{ message }}</span>
+    </p>
+  {% endfor %}
+{% endwith %}
