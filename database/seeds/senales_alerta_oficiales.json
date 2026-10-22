@@ -1,0 +1,83 @@
+[
+  {
+    "titulo": "Sangrado o salida de líquido vaginal",
+    "descripcion": "Durante el embarazo, notas sangre o salida de líquido por la vagina.",
+    "accion_recomendada": "Busca atención médica de inmediato.",
+    "orden_visual": 10,
+    "fuente_nombre": "MINSA · Cartilla Embarazo y partos saludables",
+    "fuente_url": "https://www.minsa.gob.ni/sites/default/files/publicaciones/Cartilla%20Embarazo%20y%20Partos%20Saludables.pdf",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Dificultad para respirar o dolor en el pecho",
+    "descripcion": "Te falta el aire o sientes dolor o presión en el pecho.",
+    "accion_recomendada": "Busca atención médica de inmediato.",
+    "orden_visual": 20,
+    "fuente_nombre": "CDC · Signos de advertencia de urgencia materna",
+    "fuente_url": "https://www.cdc.gov/hearher/es/maternal-warning-signs/index.html",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Dolor de cabeza intenso o cambios en la visión",
+    "descripcion": "Un dolor fuerte persiste o empeora; ves borroso, doble o destellos.",
+    "accion_recomendada": "Busca atención médica de inmediato.",
+    "orden_visual": 30,
+    "fuente_nombre": "CDC · Signos de advertencia de urgencia materna",
+    "fuente_url": "https://www.cdc.gov/hearher/es/maternal-warning-signs/index.html",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Dolor abdominal fuerte que no cede",
+    "descripcion": "El dolor de abdomen es intenso, repentino o empeora.",
+    "accion_recomendada": "Busca atención médica de inmediato.",
+    "orden_visual": 40,
+    "fuente_nombre": "CDC · Signos de advertencia de urgencia materna",
+    "fuente_url": "https://www.cdc.gov/hearher/es/maternal-warning-signs/index.html",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Fiebre de 38 °C o más",
+    "descripcion": "Tu temperatura alcanza los 38 °C o más.",
+    "accion_recomendada": "Busca atención médica de inmediato.",
+    "orden_visual": 50,
+    "fuente_nombre": "CDC · Signos de advertencia de urgencia materna",
+    "fuente_url": "https://www.cdc.gov/hearher/es/maternal-warning-signs/index.html",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Desmayo o pérdida de conocimiento",
+    "descripcion": "Te desmayas o pierdes el conocimiento.",
+    "accion_recomendada": "Busca atención médica de inmediato.",
+    "orden_visual": 60,
+    "fuente_nombre": "CDC · Signos de advertencia de urgencia materna",
+    "fuente_url": "https://www.cdc.gov/hearher/es/maternal-warning-signs/index.html",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Tu bebé deja de moverse",
+    "descripcion": "Notas que tu bebé deja de moverse como lo hacía antes.",
+    "accion_recomendada": "Busca atención médica de inmediato.",
+    "orden_visual": 70,
+    "fuente_nombre": "MINSA · Cartilla Embarazo y partos saludables",
+    "fuente_url": "https://www.minsa.gob.ni/sites/default/files/publicaciones/Cartilla%20Embarazo%20y%20Partos%20Saludables.pdf",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Hinchazón muy marcada en cara o manos",
+    "descripcion": "La cara o las manos se hinchan de forma extrema.",
+    "accion_recomendada": "Busca atención médica de inmediato.",
+    "orden_visual": 80,
+    "fuente_nombre": "CDC · Signos de advertencia de urgencia materna",
+    "fuente_url": "https://www.cdc.gov/hearher/es/maternal-warning-signs/index.html",
+    "fecha_revision": "2026-10-21"
+  },
+  {
+    "titulo": "Pensamientos de hacerte daño o dañar a tu bebé",
+    "descripcion": "Tienes pensamientos de lastimarte o de lastimar a tu bebé.",
+    "accion_recomendada": "Busca atención médica de inmediato.",
+    "orden_visual": 90,
+    "fuente_nombre": "CDC · Signos de advertencia de urgencia materna",
+    "fuente_url": "https://www.cdc.gov/hearher/es/maternal-warning-signs/index.html",
+    "fecha_revision": "2026-10-21"
+  }
+]

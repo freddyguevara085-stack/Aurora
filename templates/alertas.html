@@ -1,37 +1,33 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Señales de alerta | Aurora{% endblock %}
-
 {% block content %}
-<main id="main" tabindex="-1" class="app-shell">
-  {% set back_url = url_for('main.index') %}
-  {% set back_label = 'Inicio' %}
-  {% set page_title = 'Señales de alerta' %}
-  {% include 'partials/page_header.html' %}
-
-  <p class="notice">Prototipo educativo: confirma cualquier duda con personal de salud. Ante una urgencia, busca atención local de inmediato.</p>
-
-  {% for senal in senales %}
+<main id="main" tabindex="-1" class="app-shell aurora-page-container alerts-page">
+  {% set back_url=url_for('main.index') %}{% set back_label='Inicio' %}{% set page_title='Señales de alerta' %}{% include 'partials/page_header.html' %}
+  <section class="alerts-action" aria-labelledby="alerts-action-title">
+    <span class="material-symbols-outlined" aria-hidden="true">health_and_safety</span>
+    <div><h2 id="alerts-action-title">Si tienes una señal de alerta, busca atención ahora</h2>
+    <p>Acude a una unidad de salud de inmediato. No esperes tu próxima cita ni a terminar de leer esta página.</p></div>
+    <a class="button button--primary button--wide" href="{{ url_for('main.centros') }}">Buscar un centro de salud <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span></a>
+  </section>
+  <section aria-labelledby="alerts-list-title">
+    <div class="alerts-heading"><h2 id="alerts-list-title">Señales que debes conocer</h2><p>Durante el embarazo y después del parto. Información educativa; Aurora no evalúa tus síntomas.</p></div>
+    {% for senal in senales %}
     <article class="card alert-card">
-      <h2>{{ senal.titulo }}</h2>
-      <p>{{ senal.descripcion }}</p>
-      <p><b>Qué hacer:</b> {{ senal.accion_recomendada }}</p>
-      <small>
-        Fuente registrada:
-        {% if senal.fuente_url %}
-          <a href="{{ senal.fuente_url }}" rel="noopener noreferrer">{{ senal.fuente_nombre }}</a>
-        {% else %}
-          {{ senal.fuente_nombre }}
-        {% endif %}
-        {%- if senal.fecha_revision %} · revisión registrada {{ senal.fecha_revision.strftime('%d/%m/%Y') if senal.fecha_revision.strftime is defined else senal.fecha_revision }}{% endif %}
-      </small>
+      <div class="alert-card__heading"><span class="material-symbols-outlined" aria-hidden="true">warning</span><h3>{{ senal.titulo }}</h3></div>
+      <p class="alert-card__description">{{ senal.descripcion }}</p>
+      <p class="alert-card__action"><strong>Qué hacer</strong>{{ senal.accion_recomendada }}</p>
+      <details class="alert-card__source"><summary>Fuente: {{ senal.fuente_nombre }}</summary>
+        {% if senal.fuente_url %}<a href="{{ senal.fuente_url }}" target="_blank" rel="noopener noreferrer">Consultar documento oficial ↗</a>{% endif %}
+        {% if senal.fecha_revision %}<p>Consulta documental: {{ senal.fecha_revision.strftime('%d/%m/%Y') if senal.fecha_revision.strftime is defined else senal.fecha_revision }}.</p>{% endif %}
+      </details>
     </article>
-  {% else %}
-    {% set empty_title = 'Señales pendientes de revisión clínica' %}
-    {% set empty_text = 'Aurora no publica señales de alerta hasta que profesionales de salud validen el contenido. Ante una urgencia, acude de inmediato a tu establecimiento de salud.' %}
-    {% set empty_url = none %}
-    {% set empty_action = none %}
-    {% set empty_icon = 'fact_check' %}
-    {% include 'partials/empty_state.html' %}
-  {% endfor %}
+    {% else %}
+      {% set empty_title='Señales pendientes de revisión clínica' %}
+      {% set empty_text='Aurora no publica señales de alerta hasta que profesionales de salud validen el contenido. Ante una urgencia, acude de inmediato a tu establecimiento de salud.' %}
+      {% set empty_url=none %}{% set empty_action=none %}{% set empty_icon='fact_check' %}{% include 'partials/empty_state.html' %}
+    {% endfor %}
+  </section>
+  <aside class="alerts-context"><strong>Esta lista no incluye todas las situaciones posibles.</strong><p>Si sientes que algo no está bien, consulta al personal de salud, aunque no encuentres aquí lo que te ocurre. Indica si estás embarazada o has dado a luz recientemente.</p></aside>
+  <a class="alerts-support" href="{{ url_for('main.red_comunitaria') }}"><span class="material-symbols-outlined" aria-hidden="true">group</span><span><strong>Mi red de apoyo</strong><small>Consultar mis contactos para acompañamiento y traslado</small></span><span aria-hidden="true">›</span></a>
 </main>
 {% endblock %}

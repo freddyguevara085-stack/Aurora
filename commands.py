@@ -13,6 +13,19 @@ from services.seed import sincronizar_centros_minsa
 
 
 def register_commands(app) -> None:
+    @app.cli.command('consolidate-content')
+    def consolidate_content():
+        """Publica alertas documentadas y consolida lecturas sin borrar registros."""
+        from services.curacion import consolidar_contenido
+        try:
+            resultado = consolidar_contenido()
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+        for nombre, cantidad in resultado.items():
+            click.echo(f'{nombre}: {cantidad}')
+
     @app.cli.command("prepare-deploy")
     def prepare_deploy():
         """Inicializa tablas y catálogos faltantes sin borrar datos existentes."""
